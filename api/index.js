@@ -17,7 +17,7 @@ app.use(express.json());
 // Import only essential routes
 const redditRouter = require('../server/routes/reddit');
 const { router: videosRouter } = require('../server/routes/videos-vercel');
-const createTowerRouter = require('../server/routes/tower');
+const createTowerRouter = require('../server/routes/tower-vercel');
 const createDiscordAuthRouter = require('../server/routes/discord-auth');
 
 // Initialize Supabase for database routes
