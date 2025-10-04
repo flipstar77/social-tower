@@ -445,6 +445,11 @@ class ContentHub {
                 </div>
             </div>
         `).join('');
+
+        // Start carousel rotation after rendering
+        if (this.rotationSettings.isRotating) {
+            this.startRotation(container);
+        }
     }
 
     setupEventListeners() {
@@ -1185,19 +1190,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Initialize refactored feed managers
-    // DISABLED: ContentHub now handles YouTube and Reddit directly via Vercel API
-    // The refactored managers were overwriting the real data with cached mock data
-    /*
-    if (typeof YouTubeRSSManager !== 'undefined') {
-        window.youtubeManager = new YouTubeRSSManager();
-        window.youtubeManager.init();
-        console.log('✅ YouTube RSS Manager (refactored) initialized');
-    }
+    // YouTube is handled by ContentHub directly via Vercel API
+    // Reddit still uses the refactored manager since Reddit API blocks Vercel
 
     if (typeof RedditRSSManager !== 'undefined') {
         window.redditManager = new RedditRSSManager();
         window.redditManager.init();
         console.log('✅ Reddit RSS Manager (refactored) initialized');
     }
-    */
 });
