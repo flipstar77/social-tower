@@ -75,13 +75,8 @@ class SubmitCommand {
                 return await this.handleTestMode(interaction, parsedStats, tier, wave, damageStr, coinsStr, statsPaste);
             }
 
-            // Ensure user exists
-            await bot.ensureUserExists(interaction.user);
-
-            // Ensure server exists (for guild-based runs)
-            if (interaction.guild) {
-                await bot.ensureServerExists(interaction.guild);
-            }
+            // Note: User and server existence checks removed - not critical for saving runs
+            // The database will handle discord_user_id and discord_server_id fields directly
 
             // Save run data - include all parsed stats
             const runData = this.buildRunData(interaction, tier, wave, damageStr, coinsStr, duration, parsedStats);
