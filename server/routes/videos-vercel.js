@@ -36,13 +36,16 @@ const formatDuration = (isoDuration) => {
 async function fetchChannelRSS(channelId) {
     try {
         const rssUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
+        console.log(`📺 Fetching RSS for channel ${channelId}...`);
+
         const response = await axios.get(rssUrl, { timeout: 10000 });
+        console.log(`✅ Got RSS response for ${channelId}, status:`, response.status);
 
         const parser = new xml2js.Parser();
         const result = await parser.parseStringPromise(response.data);
 
         if (result.feed && result.feed.entry) {
-            return result.feed.entry.map(entry => ({
+            const videos = result.feed.entry.map(entry => ({
                 id: extractVideoId(entry.link[0].$.href),
                 title: entry.title[0],
                 url: entry.link[0].$.href,
@@ -52,10 +55,13 @@ async function fetchChannelRSS(channelId) {
                 channelTitle: entry.author[0].name[0],
                 duration: 'N/A' // RSS doesn't provide duration
             }));
+            console.log(`✅ Parsed ${videos.length} videos from ${channelId}`);
+            return videos;
         }
+        console.log(`⚠️ No entries in RSS feed for ${channelId}`);
         return [];
     } catch (error) {
-        console.error(`Error fetching RSS for channel ${channelId}:`, error.message);
+        console.error(`❌ Error fetching RSS for channel ${channelId}:`, error.message);
         return [];
     }
 }
