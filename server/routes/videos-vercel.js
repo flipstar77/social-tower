@@ -87,21 +87,22 @@ async function fetchAllVideos() {
 // GET /api/videos - Fetch all videos
 router.get('/', async (req, res) => {
     try {
-        // If cache is empty or older than 5 minutes, fetch new data
-        const cacheAge = lastUpdate ? Date.now() - new Date(lastUpdate).getTime() : Infinity;
-        if (videosCache.length === 0 || cacheAge > 5 * 60 * 1000) {
-            await fetchAllVideos();
-        }
+        console.log('📺 Videos API called, cache has:', videosCache.length, 'videos');
+
+        // Always fetch fresh data in serverless (no persistent cache)
+        const freshVideos = await fetchAllVideos();
+
+        console.log('📺 Fetched fresh videos:', freshVideos.length);
 
         res.json({
             success: true,
-            videos: videosCache,
+            videos: freshVideos,
             lastUpdate,
-            count: videosCache.length
+            count: freshVideos.length
         });
     } catch (error) {
         console.error('Error in /api/videos:', error);
-        res.status(500).json({ error: 'Failed to fetch videos' });
+        res.status(500).json({ error: 'Failed to fetch videos', message: error.message });
     }
 });
 
