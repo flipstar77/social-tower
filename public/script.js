@@ -436,6 +436,16 @@ class TowerStatsManager {
             const parsedData = GameDataParser.parseGameStats(data);
             console.log('Parsed data:', parsedData);
 
+            // Detect tournament runs based on tier having "+" suffix
+            if (parsedData.tier && typeof parsedData.tier === 'number') {
+                // Check if original tier string had "+" (already parsed to number)
+                const tierMatch = data.match(/Tier[:\s]+(\d+\+?)/i);
+                if (tierMatch && tierMatch[1].includes('+')) {
+                    parsedData.isTournament = true;
+                    console.log('🏆 Detected tournament run from tier:', tierMatch[1]);
+                }
+            }
+
             // Add selected cards to parsed data
             const selectedCards = this.getSelectedCards();
             if (selectedCards.length > 0) {
