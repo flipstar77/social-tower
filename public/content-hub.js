@@ -50,7 +50,8 @@ class ContentHub {
     // Load real YouTube data from server API
     async loadRealYouTubeData() {
         console.log('📺 Fetching YouTube data from API...');
-        const response = await fetch('http://localhost:6078/api/videos');
+        const apiBase = window.APP_CONFIG?.api?.baseUrl || '';
+        const response = await fetch(`${apiBase}/api/videos`);
 
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -81,7 +82,8 @@ class ContentHub {
     async loadRealRedditData() {
         console.log('📋 Fetching Reddit data from API...');
         try {
-            const response = await fetch('http://localhost:6078/api/reddit');
+            const apiBase = window.APP_CONFIG?.api?.baseUrl || '';
+            const response = await fetch(`${apiBase}/api/reddit`);
 
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -988,7 +990,8 @@ class ContentHub {
             this.showNotification('Refreshing YouTube content...');
 
             // Force refresh from server
-            const response = await fetch('http://localhost:6078/api/videos/refresh', {
+            const apiBase = window.APP_CONFIG?.api?.baseUrl || '';
+            const response = await fetch(`${apiBase}/api/videos/refresh`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -1079,7 +1082,8 @@ class ContentHub {
             wikiResults.innerHTML = '<div class="search-loading">Searching wiki...</div>';
 
             try {
-                const response = await fetch(`http://localhost:6078/api/wiki/search?q=${encodeURIComponent(query)}`);
+                const apiBase = window.APP_CONFIG?.api?.baseUrl || '';
+                const response = await fetch(`${apiBase}/api/wiki/search?q=${encodeURIComponent(query)}`);
                 const data = await response.json();
 
                 if (data.success && data.results && data.results.length > 0) {
@@ -1115,7 +1119,8 @@ class ContentHub {
             notionResults.innerHTML = '<div class="search-loading">Searching Notion...</div>';
 
             try {
-                const response = await fetch(`http://localhost:6078/api/notion/search?q=${encodeURIComponent(query)}`);
+                const apiBase = window.APP_CONFIG?.api?.baseUrl || '';
+                const response = await fetch(`${apiBase}/api/notion/search?q=${encodeURIComponent(query)}`);
                 const data = await response.json();
 
                 if (data.success && data.results && data.results.length > 0) {

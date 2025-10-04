@@ -2,9 +2,16 @@
 // Centralizes all hardcoded values for better maintainability
 
 // ========== API CONFIGURATION ==========
+const getApiBase = () => {
+    if (typeof window !== 'undefined' && window.APP_CONFIG?.api?.baseUrl !== undefined) {
+        return window.APP_CONFIG.api.baseUrl;
+    }
+    return window.location.hostname === 'localhost' ? 'http://localhost:6078' : '';
+};
+
 export const API_CONFIG = {
-    BASE_URL: 'http://localhost:6078/api/tower',
-    VIDEOS_URL: 'http://localhost:6078/api/videos',
+    BASE_URL: `${getApiBase()}/api/tower`,
+    VIDEOS_URL: `${getApiBase()}/api/videos`,
     TIMEOUT: 5000,
     RETRY_ATTEMPTS: 3
 };
