@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Tower Analytics Tiles</title>
+</head>
+<body>
+    <div id="analyticsStatsGrid">Loading...</div>
+
+    <script>
+        // Simple test to see if we can render basic tiles
+        console.log('Testing tile rendering...');
+
+        // Mock data
+        const mockStats = {
+            total_runs: 3,
+            max_tier: 11,
+            max_wave: 11289,
+            max_damage: 10.38
+        };
+
+        const mockTotals = {
+            total_coins: 217.87,
+            total_cells: 315.26
+        };
+
+        const mockRates = {
+            coins_per_hour: 14.87
+        };
+
+        // Simple formatting function
+        function formatNumber(num) {
+            if (num >= 1e12) return (num / 1e12).toFixed(2) + 'T';
+            if (num >= 1e9) return (num / 1e9).toFixed(2) + 'B';
+            if (num >= 1e6) return (num / 1e6).toFixed(2) + 'M';
+            if (num >= 1e3) return (num / 1e3).toFixed(2) + 'K';
+            return num.toString();
+        }
+
+        // Render basic stats
+        function renderBasicStats() {
+            const grid = document.getElementById('analyticsStatsGrid');
+            if (!grid) {
+                console.error('Grid not found!');
+                return;
+            }
+
+            const basicCards = [
+                { value: mockStats.total_runs || 0, label: 'Total Runs', icon: '🎮' },
+                { value: mockStats.max_tier || 0, label: 'Highest Tier', icon: '🏔️' },
+                { value: formatNumber(mockStats.max_wave || 0), label: 'Highest Wave', icon: '🌊' },
+                { value: formatNumber(mockStats.max_damage || 0), label: 'Max Damage', icon: '⚔️' }
+            ];
+
+            const cardsHtml = basicCards.map(card => `
+                <div class="analytics-stat-card" style="background: #2A2A3A; border: 1px solid #3A3A4A; border-radius: 8px; padding: 20px; text-align: center;">
+                    <div class="analytics-stat-icon" style="font-size: 24px; margin-bottom: 10px;">${card.icon}</div>
+                    <div class="analytics-stat-value" style="font-size: 24px; font-weight: bold; color: #E6E6FA; margin-bottom: 5px;">${card.value}</div>
+                    <div class="analytics-stat-label" style="font-size: 14px; color: #B0B0C8;">${card.label}</div>
+                </div>
+            `).join('');
+
+            grid.innerHTML = `<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">${cardsHtml}</div>`;
+            console.log('Basic stats rendered successfully');
+        }
+
+        // Test immediately
+        setTimeout(renderBasicStats, 100);
+
+        // Log some debug info
+        setTimeout(() => {
+            console.log('All elements with "grid":', document.querySelectorAll('[id*="grid"], [class*="grid"]'));
+            console.log('Analytics grid element:', document.getElementById('analyticsStatsGrid'));
+        }, 500);
+    </script>
+</body>
+</html>

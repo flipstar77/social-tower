@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tower Game Statistics Dashboard</title>
+    <link rel="icon" type="image/jpeg" href="assets/thetowerlogo.jpg">
+    <link rel="stylesheet" href="styles.css?v=8">
+    <link rel="stylesheet" href="content-hub.css?v=7">
+    <link rel="stylesheet" href="youtube-styles.css?v=7">
+    <link rel="stylesheet" href="tower-analytics.css?v=1">
+    <link rel="stylesheet" href="tournaments.css?v=1">
+    <link rel="stylesheet" href="css/unique-modules.css?v=1">
+    <link rel="stylesheet" href="css/glassmorphism-theme.css?v=1">
+    <link rel="stylesheet" href="css/wiki-search.css?v=1">
+    <link rel="stylesheet" href="css/achievements.css?v=1">
+    <link rel="stylesheet" href="css/data-sharing.css?v=1">
+    <link rel="stylesheet" href="css/discord-auth.css?v=1">
+    <link rel="stylesheet" href="css/landing-page.css?v=1">
+    <!-- FORCE GLASSMORPHISM OVERRIDE - Must be loaded last to override all existing styles -->
+    <link rel="stylesheet" href="css/force-glassmorphism.css?v=11">
+    <!-- DARK DASHBOARD THEME - Figma Design Implementation -->
+    <link rel="stylesheet" href="css/dark-dashboard-theme.css?v=1">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Helvetica+Neue:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+</head>
+<body style="background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #2a2a2a 100%); font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;">
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <img src="assets/thetowerlogo.jpg" alt="The Tower" class="logo-image">
+                <span class="logo-text">Tower Stats</span>
+            </div>
+
+            <nav class="sidebar-menu">
+                <div class="menu-item active" data-section="dashboard">
+                    <div class="menu-icon dashboard-icon">📊</div>
+                    <span>Dashboard</span>
+                </div>
+                <div class="menu-item" data-section="contentHub">
+                    <div class="menu-icon content-icon">🎮</div>
+                    <span>Content Hub</span>
+                </div>
+            </nav>
+
+            <div class="active-state-mark"></div>
+            <div class="collapse-icon"></div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Landing Page (shown when not authenticated) -->
+            <div id="landing-page" class="landing-page" style="display: block;">
+                <div class="landing-hero">
+                    <div class="hero-content">
+                        <!-- Left Side: Artwork Section -->
+                        <div class="hero-features">
+                            <div class="hero-logo">
+                                <img src="assets/thetowerlogo.jpg" alt="The Tower" class="hero-logo-image">
+                            </div>
+                            <h1 class="hero-title">Welcome aboard my friend, just a couple of clicks and we start</h1>
+                        </div>
+
+                        <!-- Right Side: Login Form -->
+                        <div class="hero-cta">
+                            <div class="login-prompt">
+                                <h2>Welcome</h2>
+                                <p>Login with Discord to access your personalized dashboard</p>
+                                <button class="discord-login-btn" onclick="window.discordAuth?.login()">
+                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                                        <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515a.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0a12.64 12.64 0 0 0-.617-1.25a.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057a19.9 19.9 0 0 0 5.993 3.03a.078.078 0 0 0 .084-.028a14.09 14.09 0 0 0 1.226-1.994a.076.076 0 0 0-.041-.106a13.107 13.107 0 0 1-1.872-.892a.077.077 0 0 1-.008-.128a10.2 10.2 0 0 0 .372-.292a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.174.373.292a.077.077 0 0 1-.006.127a12.299 12.299 0 0 1-1.873.892a.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028a19.839 19.839 0 0 0 6.002-3.03a.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.956-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.955-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.946 2.418-2.157 2.418z"/>
+                                    </svg>
+                                    Login with Discord
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Authenticated Content (hidden by default) -->
+            <div id="authenticated-content" class="authenticated-content" style="display: none;">
+                <!-- Header -->
+                <header class="header">
+                    <div class="title">
+                        <div class="title-content">
+                            <h1>Tower Statistics</h1>
+                            <p>Track your game progress and performance</p>
+                        </div>
+                        <div class="bot-logos">
+                            <img src="assets/flamebot.png" alt="Flame Bot" class="bot-icon" title="Flame Bot">
+                            <img src="assets/gbot.png" alt="Golden Bot" class="bot-icon" title="Golden Bot">
+                        </div>
+                    </div>
+                    <div class="header-actions">
+                        <button class="icon-button search">
+                            <div class="search-icon"></div>
+                        </button>
+                        <button class="icon-button menu">
+                            <div class="menu-grid"></div>
+                        </button>
+                        <div class="notification-badge">
+                            <div class="bell-icon"></div>
+                            <span class="badge-count">15</span>
+                        </div>
+                        <div class="user-profile">
+                            <div class="user-avatar"></div>
+                            <span class="user-name">Tower Player</span>
+                            <button class="logout-btn" onclick="window.discordAuth?.logout()" style="background: linear-gradient(135deg, #ff4757, #ff3742); color: white; border: none; padding: 8px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; margin-left: 10px; transition: all 0.3s ease;">🚪 Logout</button>
+                            <div class="dropdown-arrow"></div>
+                        </div>
+                    </div>
+                </header>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <!-- Statistics Cards -->
+                <div class="stats-section">
+                    <h2 class="section-title">Game Statistics</h2>
+                    <div class="stats-grid">
+                        <!-- Coins/Hour Card -->
+                        <div class="stat-card coins-card">
+                            <div class="card-glow"></div>
+                            <div class="stat-icon coins-icon">💰</div>
+                            <div class="stat-info">
+                                <span class="stat-label">COINS/HOUR</span>
+                                <span class="stat-value" id="coins-hour-value">0</span>
+                                <span class="stat-change" id="coins-hour-change">No data</span>
+                            </div>
+                            <div class="line-graph coins-graph"></div>
+                        </div>
+
+                        <!-- Cells/Hour Card -->
+                        <div class="stat-card wave-card">
+                            <div class="stat-icon wave-icon">🔬</div>
+                            <div class="stat-info">
+                                <span class="stat-label">CELLS/HOUR</span>
+                                <span class="stat-value" id="cells-hour-value">0</span>
+                                <span class="stat-change" id="cells-hour-change">No data</span>
+                            </div>
+                            <div class="line-graph wave-graph"></div>
+                        </div>
+
+                        <!-- Reroll Shards/Hour Card -->
+                        <div class="stat-card tier-card">
+                            <div class="stat-icon tier-icon">🔄</div>
+                            <div class="stat-info">
+                                <span class="stat-label">SHARDS/HOUR</span>
+                                <span class="stat-value" id="shards-hour-value">0</span>
+                                <span class="stat-change" id="shards-hour-change">No data</span>
+                            </div>
+                            <div class="line-graph tier-graph"></div>
+                        </div>
+
+                        <!-- Add Session Button -->
+                        <div class="stat-card add-card">
+                            <span class="add-text">+ Add Session</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Chart -->
+                <div class="chart-section">
+                    <div class="chart-container">
+                        <div class="chart-background"></div>
+                        <canvas id="mainChart"></canvas>
+                        <div class="chart-overlay" style="display: none;">
+                            <div class="selected-value">
+                                <div class="value-pin"></div>
+                                <div class="value-display" id="chart-value-display">$0</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chart Legends -->
+                    <div class="chart-legends">
+                        <div class="legend-item">
+                            <div class="legend-dot tier-dot"></div>
+                            <span>TIER</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot wave-dot"></div>
+                            <span>WAVE</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot coins-dot"></div>
+                            <span>COINS</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comprehensive Stats Grid -->
+                <div class="comprehensive-stats-section">
+                    <h2 class="section-title">Run Statistics</h2>
+                    <div class="comprehensive-stats-grid" id="comprehensive-stats-grid">
+                        <!-- Stats will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Bottom Section -->
+                <div class="bottom-section">
+                    <!-- Trend Cards -->
+                    <div class="trend-section">
+                        <h2 class="section-title">Performance Trends</h2>
+                        <div class="trend-grid" id="trend-grid">
+                            <!-- Trend cards will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Session History -->
+                    <div class="history-section">
+                        <div class="section-header">
+                            <h2 class="section-title">Recent Sessions</h2>
+                            <div class="run-filter-controls">
+                                <select id="runFilter" class="run-filter-select">
+                                    <option value="current">Current Run</option>
+                                    <option value="last5">Last 5 Runs</option>
+                                    <option value="week">Last Week</option>
+                                    <option value="all" selected>All Runs</option>
+                                    <option value="tournaments">🏆 Tournaments Only</option>
+                                    <option value="regular">Regular Runs Only</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="history-list">
+                            <!-- History items will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Input Modal -->
+        <div id="dataModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Import Farm Run Statistics</h2>
+
+                <!-- Preset Selection Section -->
+                <div class="modal-preset-section">
+                    <h3>Quick Setup Presets</h3>
+                    <div class="preset-controls">
+                        <select id="presetSelector" class="preset-selector">
+                            <option value="">-- Select a preset --</option>
+                        </select>
+                        <button type="button" id="saveCurrentPreset" class="preset-btn">💾 Save Current</button>
+                    </div>
+                    <p id="presetDescription" class="preset-description"></p>
+                </div>
+
+                <textarea id="gameDataInput" placeholder="Paste your Tower farm run statistics here (from the game's stats screen)...
+
+Example format:
+Game Time    2d 6h 29m 19s
+Real Time    11h 8m 23s
+Tier    11
+Wave    8541
+..."></textarea>
+
+                <!-- Card Selection Section -->
+                <div class="modal-card-selection">
+                    <h3>Select Cards Used in This Run (Optional)</h3>
+                    <p>Click on the cards you used during this run to track card performance:</p>
+                    <div id="modalCardGrid" class="modal-card-grid">
+                        <!-- Cards will be populated by JavaScript -->
+                    </div>
+                    <div class="modal-card-controls">
+                        <button type="button" id="clearCardSelection" class="card-control-btn">Clear All</button>
+                        <button type="button" id="selectAllCards" class="card-control-btn">Select All</button>
+                        <span id="selectedCardCount" class="selected-count">0 cards selected</span>
+                    </div>
+                </div>
+
+                <button id="importBtn" class="import-btn">Import Data</button>
+            </div>
+        </div>
+
+        <!-- Content Hub Section (Hidden by default) -->
+        <div id="contentHub" class="content-hub-section" style="display: none;">
+            <!-- Search Section -->
+            <div class="content-hub-search-section">
+                <button class="logout-btn" onclick="window.discordAuth?.logout()" style="position: absolute; right: 20px; top: 20px; z-index: 100; background: linear-gradient(135deg, #ff4757, #ff3742); color: white; border: none; padding: 8px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.3s ease;">🚪 Logout</button>
+                <div class="search-header">
+                    <h2 class="search-title">🔍 Knowledge Search</h2>
+                    <p class="search-subtitle">Search through Tower wiki and community guides</p>
+                </div>
+
+                <div class="search-tabs">
+                    <button class="search-tab active" data-search-type="wiki">
+                        <span class="tab-icon">📚</span>
+                        Wiki Search
+                    </button>
+                    <button class="search-tab" data-search-type="notion">
+                        <span class="tab-icon">📝</span>
+                        Notion Guides
+                    </button>
+                </div>
+
+                <div class="search-content">
+                    <!-- Wiki Search -->
+                    <div id="wiki-search-panel" class="search-panel active">
+                        <div class="wiki-search-container">
+                            <!-- Will be populated by wiki search component -->
+                        </div>
+                    </div>
+
+                    <!-- Notion Search -->
+                    <div id="notion-search-panel" class="search-panel">
+                        <div class="notion-search-container">
+                            <div class="notion-search-input-group">
+                                <input type="text" id="notionSearchInput" class="notion-search-input" placeholder="Search Notion guides (e.g., strategies, builds...)">
+                                <button id="notionSearchButton" class="notion-search-button">🔍</button>
+                            </div>
+                            <div class="notion-search-results" id="notionSearchResults" style="display: none;">
+                                <!-- Results will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-hub-container">
+                <!-- Filter Bar -->
+                <div class="filter-section">
+                    <div class="filter-header">
+                        <h2 class="filter-title">Tower YouTube Content</h2>
+                        <div class="filter-controls">
+                            <div class="filter-group">
+                                <label>Channels:</label>
+                                <div id="channelFilterChips" class="filter-chips-container">
+                                    <!-- Channel filter chips will be populated here -->
+                                </div>
+                            </div>
+                            <div class="filter-group">
+                                <label for="sortFilter">Sort by:</label>
+                                <select id="sortFilter" class="filter-select">
+                                    <option value="newest">Newest First</option>
+                                    <option value="oldest">Oldest First</option>
+                                    <option value="channel">By Channel</option>
+                                </select>
+                            </div>
+                            <button id="refreshVideos" class="refresh-btn">🔄 Refresh</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- YouTube Videos Section -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2 class="content-title">Latest Videos</h2>
+                        <div class="chevron-right"></div>
+                    </div>
+                    <div class="content-grid youtube-grid auto-rotate">
+                        <!-- YouTube videos will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Reddit Posts Section -->
+                <div class="content-section reddit-section">
+                    <div class="section-header">
+                        <h2 class="content-title">Tower Game Reddit</h2>
+                        <div class="reddit-filter-controls">
+                            <div class="filter-group reddit-flair-group">
+                                <label>Flair:</label>
+                                <div id="redditFlairChips" class="filter-chips-container">
+                                    <!-- Reddit flair filter chips will be populated here -->
+                                </div>
+                            </div>
+                            <button id="refreshReddit" class="refresh-btn">🔄 Refresh</button>
+                        </div>
+                        <div class="chevron-right"></div>
+                    </div>
+                    <div class="content-grid reddit-grid auto-rotate">
+                        <!-- Reddit posts will be populated here -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Tournaments Section (Hidden by default) -->
+        <div id="tournaments" class="tournaments-section" style="display: none;">
+            <div class="tournaments-header">
+                <h1 class="tournaments-title">🏆 Tournaments</h1>
+                <div class="tournaments-controls">
+                    <button class="tournaments-btn upload-btn" onclick="window.tournaments?.showImportDialog()">
+                        📊 Import Tournament Data
+                    </button>
+                    <button class="tournaments-btn refresh-btn" onclick="window.tournaments?.loadDashboard()">
+                        🔄 Refresh
+                    </button>
+                    <button class="tournaments-btn add-btn" onclick="window.tournaments?.showAddDialog()">
+                        ➕ Add Tournament
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tournament Statistics Grid -->
+            <div class="tournaments-stats-grid" id="tournamentsStatsGrid">
+                <!-- Tournament stats cards will be populated here -->
+            </div>
+
+            <!-- Tournament List -->
+            <div class="tournaments-list-container">
+                <h2 class="section-title">🏆 Recent Tournaments</h2>
+                <div class="tournaments-table-container">
+                    <table class="tournaments-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Tournament</th>
+                                <th>Rank</th>
+                                <th>Score</th>
+                                <th>Tier</th>
+                                <th>Wave</th>
+                                <th>Rewards</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tournamentsTableBody">
+                            <!-- Tournament entries will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Add Tournament Modal -->
+            <div id="addTournamentModal" class="tournament-modal" style="display: none;">
+                <div class="tournament-modal-content">
+                    <span class="tournament-modal-close" onclick="window.tournaments?.hideAddDialog()">&times;</span>
+                    <h2>Add Tournament Entry</h2>
+                    <form id="addTournamentForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="tournamentDate">Date:</label>
+                                <input type="date" id="tournamentDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="tournamentName">Tournament Name:</label>
+                                <input type="text" id="tournamentName" placeholder="e.g., Weekly Challenge" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="tournamentRank">Rank:</label>
+                                <input type="number" id="tournamentRank" min="1" placeholder="e.g., 15" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="tournamentScore">Score:</label>
+                                <input type="number" id="tournamentScore" placeholder="e.g., 1250000" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="tournamentTier">Tier Reached:</label>
+                                <input type="number" id="tournamentTier" min="1" placeholder="e.g., 11" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="tournamentWave">Wave Reached:</label>
+                                <input type="number" id="tournamentWave" min="1" placeholder="e.g., 9743" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="tournamentRewards">Rewards:</label>
+                                <input type="text" id="tournamentRewards" placeholder="e.g., 500 gems, Legendary module">
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" onclick="window.tournaments?.hideAddDialog()">Cancel</button>
+                            <button type="submit">Add Tournament</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Import Tournament Data Modal -->
+            <div id="importTournamentModal" class="tournament-modal" style="display: none;">
+                <div class="tournament-modal-content">
+                    <span class="tournament-modal-close" onclick="window.tournaments?.hideImportDialog()">&times;</span>
+                    <h2>Import Tournament Statistics</h2>
+                    <textarea id="tournamentDataInput" placeholder="Paste your tournament statistics here...
+
+Example format:
+Date,Name,Rank,Score,Tier,Wave,Rewards
+2024-01-15,Weekly Championship,3,125000,12,850,500 gems
+2024-01-08,Daily Tournament,8,98000,11,720,200 gems
+...
+
+Or paste raw tournament data from game stats."></textarea>
+                    <div class="form-actions">
+                        <button type="button" onclick="window.tournaments?.hideImportDialog()">Cancel</button>
+                        <button type="button" onclick="window.tournaments?.importTournamentData()">Import Data</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tower Analytics Section (Hidden by default) -->
+        <div id="towerAnalytics" class="tower-analytics-section" style="display: none;">
+            <div class="analytics-header">
+                <h1 class="analytics-title">🏗️ Tower Analytics</h1>
+                <button class="logout-btn" onclick="window.discordAuth?.logout()" style="position: absolute; right: 20px; top: 20px; background: linear-gradient(135deg, #ff4757, #ff3742); color: white; border: none; padding: 8px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.3s ease;">🚪 Logout</button>
+                <div class="analytics-controls">
+                    <div class="analytics-presets-group">
+                        <label class="analytics-label">Stats Preset:</label>
+                        <select class="analytics-preset-select" id="analyticsPresetSelect" onchange="window.towerAnalytics?.applyPreset(this.value)">
+                            <option value="essential">Essential</option>
+                            <option value="progress">Progress</option>
+                            <option value="combat">Combat</option>
+                            <option value="efficiency">Efficiency</option>
+                            <option value="detailed">Detailed</option>
+                            <option value="all">All Stats</option>
+                        </select>
+                    </div>
+                    <button class="analytics-btn upload-btn" onclick="ModalManager.showDataModal()">
+                        📊 Import Farm Data
+                    </button>
+                    <button class="analytics-btn refresh-btn" onclick="window.towerAnalytics?.loadDashboard()">
+                        🔄 Refresh
+                    </button>
+                    <button class="analytics-btn restore-btn" onclick="window.towerAnalytics?.restoreHiddenCards()" id="restoreCardsBtn" style="display: none;">
+                        👁️ Restore Hidden
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filters Section -->
+            <div class="analytics-filters">
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label class="filter-label">View Mode</label>
+                        <select id="analyticsViewMode" class="filter-select" onchange="window.towerAnalytics?.changeViewMode(this.value)">
+                            <option value="latest">Latest Run Only</option>
+                            <option value="all">All Runs Combined</option>
+                        </select>
+                    </div>
+                    <div class="filter-group" id="timeRangeGroup" style="display: none;">
+                        <label class="filter-label">Time Range</label>
+                        <select id="analyticsTimeFilter" class="filter-select" onchange="window.towerAnalytics?.applyFilters()">
+                            <option value="all">All Time</option>
+                            <option value="7">Last 7 Days</option>
+                            <option value="30">Last 30 Days</option>
+                            <option value="90">Last 90 Days</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Wiki Search Section -->
+            <div id="wikiSearchSection"></div>
+
+            <!-- Achievements Section in Tower Analytics -->
+            <div id="achievementsSection"></div>
+
+            <!-- Stats Overview -->
+            <div class="analytics-stats-grid" id="analyticsStatsGrid">
+                <div class="analytics-loading">Loading statistics...</div>
+            </div>
+
+            <!-- Charts -->
+            <div class="analytics-charts-container">
+                <div class="analytics-chart-card">
+                    <h3 class="analytics-chart-title">Progress Over Time</h3>
+                    <div class="analytics-chart-container">
+                        <canvas id="analyticsProgressChart"></canvas>
+                    </div>
+                </div>
+                <div class="analytics-chart-card">
+                    <h3 class="analytics-chart-title">Tier Distribution</h3>
+                    <div class="analytics-chart-container">
+                        <canvas id="analyticsTierChart"></canvas>
+                    </div>
+                </div>
+                <div class="analytics-chart-card analytics-wide-chart">
+                    <div class="analytics-chart-header">
+                        <h3 class="analytics-chart-title">Damage Sources Breakdown</h3>
+                        <div class="analytics-chart-controls">
+                            <select class="analytics-chart-type" onchange="window.towerAnalytics?.changeDamageChartType(this.value)">
+                                <option value="bar">Bar Chart</option>
+                                <option value="doughnut">Doughnut</option>
+                                <option value="polarArea">Polar Area</option>
+                                <option value="radar">Radar</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="analytics-chart-container">
+                        <canvas id="analyticsDamageChart"></canvas>
+                    </div>
+                </div>
+                <div class="analytics-chart-card analytics-wide-chart">
+                    <div class="analytics-chart-header">
+                        <h3 class="analytics-chart-title">Enemy Types Defeated</h3>
+                        <div class="analytics-chart-controls">
+                            <select class="analytics-chart-type" onchange="window.towerAnalytics?.changeEnemyChartType(this.value)">
+                                <option value="bar">Bar Chart</option>
+                                <option value="doughnut">Doughnut</option>
+                                <option value="polarArea">Polar Area</option>
+                                <option value="radar">Radar</option>
+                            </select>
+                            <button class="analytics-btn" onclick="window.towerAnalytics?.viewLatestRun()">Latest Run</button>
+                        </div>
+                    </div>
+                    <div class="analytics-chart-container">
+                        <canvas id="analyticsEnemyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coin Income Chart Section -->
+            <div id="coinIncomeChartContainer" class="coin-income-section">
+                <!-- Coin income chart will be rendered here -->
+            </div>
+
+            <!-- Cards Section -->
+            <div class="analytics-cards-container glass-container" style="background: #232323; border: 1px solid rgba(255, 255, 255, 0.2); backdrop-filter: blur(5px); border-radius: 24px; box-shadow: 0px 2px 20px rgba(0, 0, 0, 0.15);">
+                <div class="analytics-cards-header">
+                    <h3 class="glass-title">🃏 Cards Setup</h3>
+                    <div class="cards-controls">
+                        <div class="preset-controls">
+                            <label>Presets:</label>
+                            <select id="cardPresetSelect" class="glass-select">
+                                <option value="">Choose Preset...</option>
+                                <option value="farm">🌾 Farm Setup</option>
+                                <option value="tournament">🏆 Tournament Setup</option>
+                                <option value="push">📈 Push Setup</option>
+                                <option value="defense">🛡️ Defense Setup</option>
+                            </select>
+                            <button id="savePresetBtn" class="preset-btn glass-button">💾 Save Preset</button>
+                            <button id="clearAllCardsBtn" class="preset-btn glass-button">🗑️ Clear All</button>
+                        </div>
+                        <div class="card-status">
+                            <span id="activeCardCount">0 cards active</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="analytics-cards-grid" id="analyticsCardsGrid">
+                    <!-- Cards will be dynamically generated here -->
+                </div>
+            </div>
+
+            <!-- Unique Modules Section -->
+            <div class="analytics-modules-container glass-container" style="background: #232323; border: 1px solid rgba(255, 255, 255, 0.2); backdrop-filter: blur(5px); border-radius: 24px; box-shadow: 0px 2px 20px rgba(0, 0, 0, 0.15);">
+                <div class="analytics-modules-header">
+                    <h3 class="glass-title">🔮 Unique Modules Setup</h3>
+                    <div class="modules-controls">
+                        <div class="preset-controls">
+                            <label>Presets:</label>
+                            <select id="modulePresetSelect" class="glass-select">
+                                <option value="">Choose Preset...</option>
+                                <option value="balanced">⚖️ Balanced Build</option>
+                                <option value="offensive">⚔️ Offensive Build</option>
+                                <option value="defensive">🛡️ Defensive Build</option>
+                                <option value="economy">💰 Economy Build</option>
+                            </select>
+                            <button id="saveModulePresetBtn" class="preset-btn glass-button">💾 Save Preset</button>
+                            <button id="clearAllModulesBtn" class="preset-btn glass-button">🗑️ Clear All</button>
+                        </div>
+                        <div class="module-status">
+                            <span id="activeModuleCountAnalytics">0 modules active</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="analytics-modules-grid" id="analyticsModulesGrid">
+                    <!-- Modules will be dynamically generated here -->
+                </div>
+            </div>
+
+            <!-- Recent Runs Table -->
+            <div class="analytics-table-container">
+                <h3 class="analytics-chart-title">Recent Runs</h3>
+                <div style="overflow-x: auto;">
+                    <table class="analytics-runs-table" id="analyticsRunsTable" style="width: 100%; margin: 0 auto; min-width: 800px;">
+                        <thead>
+                            <tr>
+                                <th style="width: 12%; min-width: 90px;">Date</th>
+                                <th style="width: 6%; min-width: 45px;">T</th>
+                                <th style="width: 10%; min-width: 70px;">Wave</th>
+                                <th style="width: 12%; min-width: 85px;">Death</th>
+                                <th style="width: 11%; min-width: 85px;">Time</th>
+                                <th style="width: 13%; min-width: 100px;">Coins</th>
+                                <th style="width: 10%; min-width: 75px;">$/h</th>
+                                <th style="width: 10%; min-width: 75px;">C/h</th>
+                                <th style="width: 16%; min-width: 100px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="analyticsRunsTableBody">
+                            <tr><td colspan="9" class="analytics-loading">Loading runs...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Unique Modules Section (Hidden by default) -->
+        <div id="uniqueModules" class="unique-modules-section" style="display: none;">
+            <div class="unique-modules-container">
+                <!-- Header -->
+                <div class="modules-header">
+                    <div class="modules-title">Unique Modules</div>
+                    <div class="modules-count" id="activeModuleCount">0 modules active</div>
+                </div>
+
+                <!-- Controls -->
+                <div class="modules-controls">
+                    <div class="modules-controls-group">
+                        <span class="modules-controls-label">Filter:</span>
+                        <div class="module-category-filters">
+                            <button class="module-category-filter active" data-category="all">All</button>
+                            <button class="module-category-filter" data-category="cannons">Cannons</button>
+                            <button class="module-category-filter" data-category="armor">Armor</button>
+                            <button class="module-category-filter" data-category="generators">Generators</button>
+                            <button class="module-category-filter" data-category="cores">Cores</button>
+                        </div>
+                    </div>
+
+                    <div class="modules-action-buttons">
+                        <button class="modules-btn modules-btn-primary" id="saveModulesConfigBtn">
+                            💾 Save Config
+                        </button>
+                        <button class="modules-btn modules-btn-secondary" id="loadModulesConfigBtn">
+                            📁 Load Config
+                        </button>
+                        <button class="modules-btn modules-btn-danger" id="clearAllModulesBtn">
+                            🗑️ Clear All
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Modules Grid -->
+                <div class="unique-modules-grid" id="uniqueModulesGrid">
+                    <!-- Module categories and tiles will be dynamically generated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Achievements Section (Hidden by default) -->
+        <div id="achievements" class="achievements-section" style="display: none;">
+            <div class="achievements-header-main">
+                <h1 class="achievements-title-main">🏆 Tower Achievements</h1>
+                <div class="achievements-summary-main" id="achievementsSummaryMain">
+                    <!-- Dynamic summary will be inserted here -->
+                </div>
+            </div>
+
+            <div id="achievementsMainContainer">
+                <!-- Achievements content will be dynamically inserted here -->
+            </div>
+        </div>
+
+            </div> <!-- End authenticated-content -->
+        </div> <!-- End main-content -->
+
+    </div> <!-- End container -->
+
+    <!-- Utility Modules (load first) -->
+    <script src="js/config/field-mappings.js?v=1"></script>
+    <script src="js/config/preset-manager.js?v=1"></script>
+    <script src="js/utils/storage.js?v=1"></script>
+    <script src="js/utils/formatting.js?v=1"></script>
+    <script src="js/utils/data-parser.js?v=1"></script>
+    <script src="js/utils/notifications.js?v=1"></script>
+    <script src="js/utils/modal.js?v=1"></script>
+    <script src="js/utils/modules-demo.js?v=1"></script>
+
+    <!-- Core Modules -->
+    <script src="js/modules/event-bus.js?v=1"></script>
+    <script src="js/modules/session-manager.js?v=1"></script>
+    <script src="js/modules/chart-manager.js?v=1"></script>
+    <script src="js/modules/navigation-manager.js?v=1"></script>
+    <script src="js/modules/cards-manager.js?v=1"></script>
+    <script src="js/modules/unique-modules-manager.js?v=1"></script>
+    <script src="js/modules/coin-income-chart.js?v=5"></script>
+    <script src="js/modules-direct-inject.js?v=1"></script>
+
+    <!-- Configuration Files (load first) -->
+    <script src="/config/app-config.js?v=1"></script>
+    <script src="/config/channels-config.js?v=1"></script>
+    <script src="/config/reddit-config.js?v=1"></script>
+
+    <!-- Core Services -->
+    <script src="js/services/api-client.js?v=1"></script>
+    <script src="js/services/cache-service.js?v=1"></script>
+
+    <!-- Shared Utilities -->
+    <script src="js/utils/text-utils.js?v=1"></script>
+
+    <!-- UI Components -->
+    <script src="js/components/filter-chips.js?v=1"></script>
+
+    <!-- Core Feed Architecture -->
+    <script src="js/core/base-feed-manager.js?v=1"></script>
+
+    <!-- Refactored Feed Managers -->
+    <script src="js/youtube-rss-refactored.js?v=1"></script>
+    <script src="js/reddit-rss-refactored.js?v=1"></script>
+
+    <!-- Dashboard Modular System (currently disabled - modules exist but not active) -->
+    <!-- <script src="js/dashboard/DataNormalizationUtils.js?v=1"></script>
+    <script src="js/dashboard/DashboardDataService.js?v=1"></script>
+    <script src="js/dashboard/StatsDisplayManager.js?v=1"></script>
+    <script src="js/dashboard/SessionHistoryManager.js?v=1"></script>
+    <script src="js/dashboard/ChartManager.js?v=1"></script>
+    <script src="js/dashboard/DashboardController.js?v=1"></script> -->
+
+    <!-- Main Application Scripts -->
+    <script src="script.js?v=8"></script>
+    <script src="content-hub.js?v=13"></script>
+    <!-- New Modular Tower Analytics System -->
+    <script type="module" src="js/tower/TowerDataService.js?v=4"></script>
+    <script type="module" src="js/tower/TowerStatsCalculator.js?v=4"></script>
+    <script type="module" src="js/tower/TowerTableRenderer.js?v=14"></script>
+    <script type="module" src="js/tower/TowerAnalyticsManager.js?v=4"></script>
+    <script type="module" src="js/tower/TowerMigrationCoordinator.js?v=4"></script>
+
+    <!-- Legacy Monolithic System (will be gradually replaced) -->
+    <script src="tower-analytics.js?v=9"></script>
+    <script src="tournaments.js?v=1"></script>
+
+    <script>
+        // Initialize application modules
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Initialize Tower Analytics Migration System
+            try {
+                const { default: TowerMigrationCoordinator } = await import('./js/tower/TowerMigrationCoordinator.js');
+                window.towerMigration = new TowerMigrationCoordinator();
+                await window.towerMigration.initialize();
+                console.log('🚀 Tower Analytics migration system ready');
+            } catch (error) {
+                console.error('❌ Failed to initialize migration system:', error);
+            }
+
+            // Initialize cards manager for Tower Analytics integration
+            if (window.cardsManager) {
+                window.cardsManager.init();
+            }
+
+            // Initialize unique modules manager
+            if (window.uniqueModulesManager) {
+                window.uniqueModulesManager.init();
+            }
+
+            // Initialize cards and modules when Tower Analytics is shown
+            if (window.towerAnalytics) {
+                const originalShowSection = window.towerAnalytics.showSection;
+                window.towerAnalytics.showSection = function() {
+                    originalShowSection.call(this);
+                    if (window.cardsManager) {
+                        window.cardsManager.showSection();
+                    }
+                    if (window.uniqueModulesManager) {
+                        window.uniqueModulesManager.showAnalyticsSection();
+                    }
+                    if (window.coinIncomeChart) {
+                        window.coinIncomeChart.init('coinIncomeChartContainer');
+                        window.coinIncomeChart.updateChart();
+                    }
+                };
+            }
+        });
+    </script>
+
+    <!-- Wiki Search Component -->
+    <script src="js/wiki-search.js?v=1"></script>
+
+    <!-- Achievements System -->
+    <script src="js/achievements.js?v=1"></script>
+    <script src="js/data-sharing.js?v=1"></script>
+
+    <!-- Modular Analytics System -->
+    <script src="js/analytics-run-manager.js?v=2"></script>
+    <script src="js/analytics-filter-manager.js?v=2"></script>
+    <script src="js/analytics-table-renderer.js?v=2"></script>
+    <script src="js/analytics-stats-calculator.js?v=2"></script>
+    <script src="js/analytics-coordinator.js?v=2"></script>
+
+    <!-- Discord Authentication -->
+    <script type="module" src="discord-auth.js?v=3"></script>
+</body>
+</html>

@@ -1,0 +1,252 @@
+/* Landing Page Styles */
+
+.landing-page {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    background: #FFFFFF;
+    overflow: hidden;
+    display: flex;
+}
+
+.landing-page::before {
+    content: '';
+    position: absolute;
+    width: 558px;
+    height: 536px;
+    right: -144px;
+    top: -144px;
+    background: linear-gradient(135deg, rgba(88, 101, 242, 0.1) 0%, rgba(88, 101, 242, 0.05) 100%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.landing-hero {
+    width: 100%;
+    display: flex;
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    box-shadow: 0px 48px 48px -6px #17328E, 0px 0px 1px #17328E;
+    border-radius: 24px;
+    margin: 2rem;
+    overflow: hidden;
+    border: 1px solid #E6E9FA;
+}
+
+.hero-content {
+    display: flex;
+    width: 100%;
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+}
+
+/* Left side - Artwork section */
+.hero-features {
+    flex: 0 0 60%;
+    background: url('../assets/thumbnail.jpg') center/cover no-repeat, rgba(57, 73, 171, 0.5);
+    background-blend-mode: overlay;
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    position: relative;
+}
+
+.hero-logo {
+    margin-bottom: 3rem;
+    text-align: center;
+}
+
+.hero-logo-image {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.hero-title {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #FFFFFF;
+    text-align: center;
+    line-height: 200%;
+    max-width: 314px;
+    margin: 0 auto;
+}
+
+.hero-subtitle {
+    display: none;
+}
+
+.feature-item {
+    display: none;
+}
+
+/* Right side - Login form */
+.hero-cta {
+    flex: 0 0 40%;
+    background: #FFFFFF;
+    backdrop-filter: blur(12px);
+    border-radius: 0 24px 24px 0;
+    padding: 64px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 32px;
+    margin: 0;
+    border: none;
+    box-shadow: none;
+}
+
+.login-prompt {
+    width: 100%;
+    max-width: 358px;
+}
+
+.login-prompt h2 {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 24px;
+    font-weight: 600;
+    color: #343434;
+    margin-bottom: 2rem;
+    text-align: left;
+}
+
+.login-prompt p {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    color: #828282;
+    margin-bottom: 2rem;
+    text-align: center;
+    line-height: 1.5;
+}
+
+/* Discord Login Button */
+.discord-login-btn {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 11px 96px;
+    gap: 8px;
+    background: #3949AB;
+    border: none;
+    border-radius: 40px;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    color: #FFFFFF;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: none;
+    margin: 0;
+}
+
+.discord-login-btn:hover {
+    background: #2d3a8c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(57, 73, 171, 0.3);
+}
+
+.discord-login-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Hide authenticated content by default */
+.authenticated-content {
+    display: none;
+}
+
+/* Show authenticated content when user is logged in */
+body.authenticated .authenticated-content {
+    display: block;
+}
+
+body.authenticated .landing-page {
+    display: none;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 1024px) {
+    .landing-hero {
+        margin: 1rem;
+    }
+
+    .hero-content {
+        flex-direction: column;
+    }
+
+    .hero-features {
+        flex: 1 1 auto;
+        padding: 3rem 2rem;
+        border-radius: 24px 24px 0 0;
+    }
+
+    .hero-cta {
+        flex: 1 1 auto;
+        border-radius: 0 0 24px 24px;
+        padding: 3rem 2rem;
+    }
+
+    .hero-title {
+        font-size: 1.2rem;
+    }
+
+    .hero-logo-image {
+        width: 120px;
+        height: 120px;
+    }
+}
+
+@media (max-width: 768px) {
+    .landing-hero {
+        margin: 0.5rem;
+    }
+
+    .hero-features {
+        padding: 2rem 1.5rem;
+    }
+
+    .hero-cta {
+        padding: 2rem 1.5rem;
+    }
+
+    .login-prompt {
+        max-width: 100%;
+    }
+
+    .discord-login-btn {
+        padding: 11px 48px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-title {
+        font-size: 1rem;
+        max-width: 250px;
+    }
+
+    .hero-logo-image {
+        width: 100px;
+        height: 100px;
+    }
+
+    .login-prompt h2 {
+        font-size: 20px;
+    }
+
+    .hero-cta {
+        padding: 1.5rem 1rem;
+    }
+}

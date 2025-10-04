@@ -1,0 +1,407 @@
+/**
+ * Dark Dashboard Theme - Based on Figma Design
+ * Preserves all existing functionality while applying new visual design
+ */
+
+/* ============================================
+   GLOBAL THEME VARIABLES
+   ============================================ */
+:root {
+    /* Background Gradients */
+    --bg-gradient-main: linear-gradient(159.02deg, #0F123B 14.25%, #090D2E 56.45%, #020515 86.14%);
+    --bg-gradient-card: linear-gradient(126.97deg, rgba(6, 11, 40, 0.74) 28.26%, rgba(10, 14, 35, 0.71) 91.2%);
+
+    /* Colors */
+    --color-primary: #4318FF;
+    --color-primary-blue: #0075FF;
+    --color-success: #01B574;
+    --color-error: #E31A1A;
+    --color-warning: #F6AD55;
+    --color-info: #4299E1;
+
+    /* Text Colors */
+    --text-primary: #FFFFFF;
+    --text-secondary: #A0AEC0;
+    --text-muted: #CBD5E0;
+
+    /* Border & Dividers */
+    --border-color: #56577A;
+    --divider-color: #2D2E5F;
+
+    /* Glass Effect */
+    --glass-blur: 60px;
+    --glass-border: rgba(255, 255, 255, 0.1);
+
+    /* Shadows */
+    --shadow-card: 0px 3.5px 5.5px rgba(0, 0, 0, 0.02);
+
+    /* Font */
+    --font-main: 'Plus Jakarta Display', 'Inter', 'Open Sans', sans-serif;
+}
+
+/* ============================================
+   GLOBAL OVERRIDES
+   ============================================ */
+body {
+    background: #060B26 !important;
+    color: var(--text-primary) !important;
+    font-family: var(--font-main) !important;
+}
+
+/* Apply gradient background with blur effect */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--bg-gradient-main);
+    z-index: -2;
+}
+
+/* Blurred background image effect */
+body::after {
+    content: '';
+    position: fixed;
+    width: 2526px;
+    height: 1980px;
+    left: -331px;
+    top: 0;
+    background: url('../assets/thumbnail.jpg') center/cover no-repeat;
+    filter: blur(136px);
+    opacity: 0.3;
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* ============================================
+   CONTAINER & LAYOUT
+   ============================================ */
+.container {
+    background: transparent !important;
+}
+
+.main-content {
+    background: transparent !important;
+}
+
+/* ============================================
+   CARDS & SECTIONS - GLASSMORPHIC STYLE
+   ============================================ */
+.stats-section,
+.chart-section,
+.comprehensive-stats-section,
+.trend-section,
+.history-section,
+.content-hub-section,
+.tower-analytics-section,
+.tournaments-section,
+.unique-modules-section,
+.achievements-section,
+.stat-card,
+.card {
+    background: var(--bg-gradient-card) !important;
+    backdrop-filter: blur(var(--glass-blur)) !important;
+    border-radius: 20px !important;
+    border: 1px solid var(--glass-border) !important;
+    filter: drop-shadow(var(--shadow-card)) !important;
+}
+
+/* ============================================
+   HEADER
+   ============================================ */
+.header {
+    background: var(--bg-gradient-card) !important;
+    backdrop-filter: blur(var(--glass-blur)) !important;
+    border-radius: 20px !important;
+    padding: 24px !important;
+    margin-bottom: 24px !important;
+}
+
+.header h1 {
+    font-family: var(--font-main) !important;
+    font-weight: 700 !important;
+    font-size: 24px !important;
+    color: var(--text-primary) !important;
+}
+
+.header p {
+    font-family: var(--font-main) !important;
+    font-weight: 400 !important;
+    font-size: 14px !important;
+    color: var(--text-secondary) !important;
+}
+
+/* ============================================
+   SIDEBAR
+   ============================================ */
+.sidebar {
+    background: var(--bg-gradient-card) !important;
+    backdrop-filter: blur(var(--glass-blur)) !important;
+    border-right: 1px solid var(--glass-border) !important;
+}
+
+.sidebar-menu .menu-item {
+    color: var(--text-secondary) !important;
+    transition: all 0.3s ease !important;
+}
+
+.sidebar-menu .menu-item:hover {
+    background: rgba(67, 24, 255, 0.1) !important;
+    color: var(--text-primary) !important;
+}
+
+.sidebar-menu .menu-item.active {
+    background: var(--color-primary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* ============================================
+   STAT CARDS
+   ============================================ */
+.stat-card {
+    padding: 20px !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 8px 24px rgba(67, 24, 255, 0.2) !important;
+}
+
+.stat-card .label {
+    font-family: var(--font-main) !important;
+    font-weight: 400 !important;
+    font-size: 10px !important;
+    text-transform: uppercase !important;
+    color: var(--text-secondary) !important;
+    letter-spacing: 0.5px !important;
+}
+
+.stat-card .value {
+    font-family: var(--font-main) !important;
+    font-weight: 700 !important;
+    font-size: 24px !important;
+    color: var(--text-primary) !important;
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+button,
+.btn,
+.discord-login-btn {
+    font-family: var(--font-main) !important;
+    font-weight: 400 !important;
+    transition: all 0.3s ease !important;
+}
+
+.btn-primary,
+.discord-login-btn {
+    background: var(--color-primary) !important;
+    color: var(--text-primary) !important;
+    border: none !important;
+    border-radius: 40px !important;
+    padding: 11px 32px !important;
+}
+
+.btn-primary:hover,
+.discord-login-btn:hover {
+    background: #3614cc !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(67, 24, 255, 0.4) !important;
+}
+
+/* ============================================
+   PROGRESS BARS
+   ============================================ */
+.progress-bar {
+    background: var(--divider-color) !important;
+    border-radius: 10px !important;
+    height: 6px !important;
+    overflow: hidden !important;
+}
+
+.progress-bar-fill {
+    background: var(--color-primary-blue) !important;
+    border-radius: 10px !important;
+    transition: width 0.5s ease !important;
+}
+
+/* ============================================
+   TABLES
+   ============================================ */
+table {
+    border-collapse: separate !important;
+    border-spacing: 0 8px !important;
+}
+
+table thead th {
+    font-family: var(--font-main) !important;
+    font-weight: 400 !important;
+    font-size: 10px !important;
+    text-transform: uppercase !important;
+    color: var(--text-secondary) !important;
+    padding: 12px !important;
+    border: none !important;
+}
+
+table tbody tr {
+    background: rgba(255, 255, 255, 0.02) !important;
+    transition: all 0.3s ease !important;
+}
+
+table tbody tr:hover {
+    background: rgba(67, 24, 255, 0.1) !important;
+}
+
+table tbody td {
+    font-family: var(--font-main) !important;
+    font-weight: 400 !important;
+    font-size: 14px !important;
+    color: var(--text-primary) !important;
+    padding: 16px 12px !important;
+    border: none !important;
+}
+
+/* ============================================
+   DIVIDERS & LINES
+   ============================================ */
+hr,
+.divider {
+    border: none !important;
+    border-top: 1px solid var(--border-color) !important;
+    margin: 16px 0 !important;
+}
+
+/* ============================================
+   CHARTS
+   ============================================ */
+.chart-container {
+    background: transparent !important;
+    padding: 20px !important;
+}
+
+/* ============================================
+   ICONS & BADGES
+   ============================================ */
+.badge {
+    background: var(--color-primary) !important;
+    color: var(--text-primary) !important;
+    border-radius: 12px !important;
+    padding: 4px 12px !important;
+    font-family: var(--font-main) !important;
+    font-weight: 700 !important;
+    font-size: 12px !important;
+}
+
+.badge.success {
+    background: var(--color-success) !important;
+}
+
+.badge.error {
+    background: var(--color-error) !important;
+}
+
+.badge.warning {
+    background: var(--color-warning) !important;
+}
+
+/* ============================================
+   CONTENT HUB SPECIFIC
+   ============================================ */
+.tile-component {
+    background: var(--bg-gradient-card) !important;
+    backdrop-filter: blur(var(--glass-blur)) !important;
+    border-radius: 16px !important;
+    border: 1px solid var(--glass-border) !important;
+    transition: all 0.3s ease !important;
+}
+
+.tile-component:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 8px 24px rgba(67, 24, 255, 0.2) !important;
+}
+
+/* ============================================
+   ANALYTICS CARDS
+   ============================================ */
+.analytics-stats-grid .tile-wrapper {
+    background: transparent !important;
+}
+
+.analytics-stats-grid .stat-tile {
+    background: var(--bg-gradient-card) !important;
+    backdrop-filter: blur(var(--glass-blur)) !important;
+    border-radius: 16px !important;
+    border: 1px solid var(--glass-border) !important;
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+.footer {
+    background: transparent !important;
+    border-top: 1px solid var(--border-color) !important;
+    padding: 20px 0 !important;
+    margin-top: 40px !important;
+}
+
+.footer a {
+    font-family: var(--font-main) !important;
+    font-weight: 400 !important;
+    font-size: 14px !important;
+    color: var(--text-primary) !important;
+    text-decoration: none !important;
+    transition: color 0.3s ease !important;
+}
+
+.footer a:hover {
+    color: var(--color-primary-blue) !important;
+}
+
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+::-webkit-scrollbar {
+    width: 8px !important;
+    height: 8px !important;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-radius: 10px !important;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--color-primary) !important;
+    border-radius: 10px !important;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primary-blue) !important;
+}
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================ */
+@media (max-width: 1024px) {
+    body::after {
+        width: 100%;
+        height: 100%;
+        left: 0;
+        filter: blur(100px);
+    }
+}
+
+@media (max-width: 768px) {
+    .stat-card,
+    .card {
+        border-radius: 16px !important;
+    }
+
+    body::after {
+        filter: blur(80px);
+    }
+}

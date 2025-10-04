@@ -1,0 +1,31 @@
+{
+  "name": "tower-statistics-dashboard",
+  "version": "2.0.0",
+  "description": "Tower Statistics Dashboard with Discord Authentication - Refactored & Modular",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "start:new": "node init-refactored.js start",
+    "stop": "node init-refactored.js stop",
+    "status": "node init-refactored.js status",
+    "logs": "node init-refactored.js logs",
+    "build": "echo 'No build step required'",
+    "dev": "node server/server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "@supabase/supabase-js": "^2.38.0",
+    "discord.js": "^14.14.1",
+    "node-fetch": "^2.6.7",
+    "cheerio": "^1.0.0-rc.12",
+    "puppeteer": "^21.5.0"
+  },
+  "engines": {
+    "node": ">=18.x"
+  },
+  "keywords": ["tower", "dashboard", "discord", "vercel"],
+  "author": "Your Name",
+  "license": "MIT"
+}
