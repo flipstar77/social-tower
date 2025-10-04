@@ -19,7 +19,7 @@ function createTowerRouter(supabaseManager) {
             const { data, error } = await supabaseManager.supabase
                 .from('tower_runs')
                 .select('*')
-                .order('created_at', { ascending: false })
+                .order('timestamp', { ascending: false })
                 .limit(limit);
 
             if (error) throw error;
@@ -94,7 +94,7 @@ function createTowerRouter(supabaseManager) {
             const { data, error } = await supabaseManager.supabase
                 .from('tower_runs')
                 .select('*')
-                .order('created_at', { ascending: false })
+                .order('timestamp', { ascending: false })
                 .limit(100);
 
             if (error) throw error;

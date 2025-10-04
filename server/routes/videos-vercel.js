@@ -94,6 +94,7 @@ router.get('/', async (req, res) => {
         }
 
         res.json({
+            success: true,
             videos: videosCache,
             lastUpdate,
             count: videosCache.length
