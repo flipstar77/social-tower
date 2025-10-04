@@ -1185,6 +1185,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Initialize refactored feed managers
+    // DISABLED: ContentHub now handles YouTube and Reddit directly via Vercel API
+    // The refactored managers were overwriting the real data with cached mock data
+    /*
     if (typeof YouTubeRSSManager !== 'undefined') {
         window.youtubeManager = new YouTubeRSSManager();
         window.youtubeManager.init();
@@ -1196,4 +1199,5 @@ document.addEventListener('DOMContentLoaded', function() {
         window.redditManager.init();
         console.log('✅ Reddit RSS Manager (refactored) initialized');
     }
+    */
 });
