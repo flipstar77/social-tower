@@ -1,0 +1,121 @@
+const express = require('express');
+const axios = require('axios');
+const xml2js = require('xml2js');
+const router = express.Router();
+
+// Import centralized channel configuration
+const { YOUTUBE_CHANNELS } = require('../../config/channels-config');
+
+// Cache for storing fetched videos
+let videosCache = [];
+let lastUpdate = null;
+
+// Utility functions
+const extractVideoId = (url) => {
+    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/);
+    return match ? match[1] : null;
+};
+
+const formatDuration = (isoDuration) => {
+    if (!isoDuration) return 'N/A';
+
+    const match = isoDuration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+    if (!match) return 'N/A';
+
+    const hours = parseInt(match[1]) || 0;
+    const minutes = parseInt(match[2]) || 0;
+    const seconds = parseInt(match[3]) || 0;
+
+    if (hours > 0) {
+        return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+};
+
+// Fetch RSS feed for a channel
+async function fetchChannelRSS(channelId) {
+    try {
+        const rssUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
+        const response = await axios.get(rssUrl, { timeout: 10000 });
+
+        const parser = new xml2js.Parser();
+        const result = await parser.parseStringPromise(response.data);
+
+        if (result.feed && result.feed.entry) {
+            return result.feed.entry.map(entry => ({
+                id: extractVideoId(entry.link[0].$.href),
+                title: entry.title[0],
+                url: entry.link[0].$.href,
+                thumbnail: `https://i.ytimg.com/vi/${extractVideoId(entry.link[0].$.href)}/mqdefault.jpg`,
+                publishedAt: entry.published[0],
+                channelId: channelId,
+                channelTitle: entry.author[0].name[0],
+                duration: 'N/A' // RSS doesn't provide duration
+            }));
+        }
+        return [];
+    } catch (error) {
+        console.error(`Error fetching RSS for channel ${channelId}:`, error.message);
+        return [];
+    }
+}
+
+// Fetch all videos from all channels
+async function fetchAllVideos() {
+    try {
+        const allVideos = [];
+
+        for (const channel of YOUTUBE_CHANNELS) {
+            const videos = await fetchChannelRSS(channel.id);
+            allVideos.push(...videos);
+        }
+
+        // Sort by publish date (newest first)
+        allVideos.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
+
+        videosCache = allVideos;
+        lastUpdate = new Date().toISOString();
+
+        console.log(`✅ Fetched ${allVideos.length} videos from ${YOUTUBE_CHANNELS.length} channels`);
+        return allVideos;
+    } catch (error) {
+        console.error('Error fetching videos:', error);
+        return videosCache; // Return cached data on error
+    }
+}
+
+// GET /api/videos - Fetch all videos
+router.get('/', async (req, res) => {
+    try {
+        // If cache is empty or older than 5 minutes, fetch new data
+        const cacheAge = lastUpdate ? Date.now() - new Date(lastUpdate).getTime() : Infinity;
+        if (videosCache.length === 0 || cacheAge > 5 * 60 * 1000) {
+            await fetchAllVideos();
+        }
+
+        res.json({
+            videos: videosCache,
+            lastUpdate,
+            count: videosCache.length
+        });
+    } catch (error) {
+        console.error('Error in /api/videos:', error);
+        res.status(500).json({ error: 'Failed to fetch videos' });
+    }
+});
+
+// GET /api/videos/cache-status
+router.get('/cache-status', (req, res) => {
+    res.json({
+        cached: videosCache.length,
+        lastUpdate,
+        channels: YOUTUBE_CHANNELS.length
+    });
+});
+
+module.exports = {
+    router,
+    fetchAllVideos,
+    getCacheStatus: () => ({ cached: videosCache.length, lastUpdate }),
+    YOUTUBE_CHANNELS
+};

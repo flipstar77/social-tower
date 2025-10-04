@@ -16,9 +16,8 @@ app.use(express.json());
 
 // Import only essential routes
 const redditRouter = require('../server/routes/reddit');
-const { router: videosRouter } = require('../server/routes/videos');
+const { router: videosRouter } = require('../server/routes/videos-vercel');
 const createTowerRouter = require('../server/routes/tower');
-const createWikiRouter = require('../server/routes/wiki');
 const createDiscordAuthRouter = require('../server/routes/discord-auth');
 
 // Initialize Supabase for database routes
@@ -29,7 +28,6 @@ const supabase = new SupabaseManager();
 app.use('/api/reddit', redditRouter);
 app.use('/api/videos', videosRouter);
 app.use('/api/tower', createTowerRouter(supabase));
-app.use('/api/wiki', createWikiRouter());
 app.use('/auth/discord', createDiscordAuthRouter(supabase));
 
 // Health check
