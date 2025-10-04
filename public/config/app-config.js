@@ -6,7 +6,7 @@
 const APP_CONFIG = {
     // API Configuration
     api: {
-        baseUrl: (typeof process !== 'undefined' && process.env?.API_URL) || 'http://localhost:6078',
+        baseUrl: window.location.hostname === 'localhost' ? 'http://localhost:6078' : '',
         timeout: 10000,
         retryAttempts: 3,
         retryDelay: 1000
