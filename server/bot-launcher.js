@@ -9,7 +9,7 @@ async function launchBot() {
     const requiredEnvVars = [
         'DISCORD_BOT_TOKEN',
         'SUPABASE_URL',
-        'SUPABASE_ANON_KEY'
+        'SUPABASE_SERVICE_KEY'
     ];
 
     const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
