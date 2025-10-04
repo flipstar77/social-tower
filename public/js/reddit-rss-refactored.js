@@ -35,8 +35,9 @@ class RedditRSSManager extends BaseFeedManager {
             console.log('🔄 Loading Reddit posts...');
 
             // Try multiple data sources in order
+            const baseUrl = window.location.hostname === 'localhost' ? 'http://localhost:6078' : '';
             const urls = [
-                `http://localhost:6078/api/reddit?subreddit=${this.subreddit}&limit=${this.maxItems}`,
+                `${baseUrl}/api/reddit?subreddit=${this.subreddit}&limit=${this.maxItems}`,
                 `https://www.reddit.com/r/${this.subreddit}.json?limit=${this.maxItems}`
             ];
 
