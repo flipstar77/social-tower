@@ -22,13 +22,31 @@ const createDiscordAuthRouter = require('../server/routes/discord-auth');
 
 // Initialize Supabase for database routes
 const SupabaseManager = require('../server/supabase-config');
-const supabase = new SupabaseManager();
+let supabase;
+try {
+    supabase = new SupabaseManager();
+} catch (error) {
+    console.error('Failed to initialize Supabase:', error);
+    supabase = null;
+}
 
 // Mount routes
 app.use('/api/reddit', redditRouter);
 app.use('/api/videos', videosRouter);
-app.use('/api/tower', createTowerRouter(supabase));
-app.use('/auth/discord', createDiscordAuthRouter(supabase));
+
+// Only mount database routes if Supabase is available
+if (supabase && supabase.supabase) {
+    app.use('/api/tower', createTowerRouter(supabase));
+    app.use('/auth/discord', createDiscordAuthRouter(supabase));
+} else {
+    console.warn('⚠️ Supabase not configured - database routes disabled');
+    app.use('/api/tower', (req, res) => {
+        res.status(503).json({ error: 'Database not configured' });
+    });
+    app.use('/auth/discord', (req, res) => {
+        res.status(503).json({ error: 'Authentication not configured' });
+    });
+}
 
 // Health check
 app.get('/api/health', (req, res) => {
