@@ -45,7 +45,12 @@
       "Bash(TASKKILL:*)",
       "Bash(cat:*)",
       "Bash(git init:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git remote add:*)",
+      "Bash(git branch:*)",
+      "Bash(git push:*)",
+      "Bash(echo:*)"
     ],
     "deny": [],
     "ask": []

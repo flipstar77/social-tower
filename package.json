@@ -4,12 +4,10 @@
   "description": "Tower Statistics Dashboard with Discord Authentication - Refactored & Modular",
   "main": "server/server.js",
   "scripts": {
-    "start": "node server/server.js",
-    "start:new": "node init-refactored.js start",
-    "stop": "node init-refactored.js stop",
-    "status": "node init-refactored.js status",
-    "logs": "node init-refactored.js logs",
-    "build": "echo 'No build step required'",
+    "start": "cd server && node bot-launcher.js",
+    "start:server": "node server/server.js",
+    "start:bot": "cd server && node bot-launcher.js",
+    "build": "cd server && npm install",
     "dev": "node server/server.js"
   },
   "dependencies": {
@@ -20,12 +18,13 @@
     "discord.js": "^14.14.1",
     "node-fetch": "^2.6.7",
     "cheerio": "^1.0.0-rc.12",
-    "puppeteer": "^21.5.0"
+    "axios": "^1.6.0",
+    "xml2js": "^0.6.2"
   },
   "engines": {
     "node": ">=18.x"
   },
-  "keywords": ["tower", "dashboard", "discord", "vercel"],
+  "keywords": ["tower", "dashboard", "discord", "railway"],
   "author": "Your Name",
   "license": "MIT"
 }
