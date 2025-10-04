@@ -78,8 +78,20 @@ class TowerStatsManager {
 
                     // Convert API runs to session format
                     const apiSessions = data.runs.map(run => {
-                        const isTournament = run.is_tournament || run.raw_data?.isTournament || false;
-                        console.log(`📊 Processing run: Tier ${run.tier}, Wave ${run.wave}, isTournament:`, isTournament, 'raw_data:', run.raw_data);
+                        // Parse raw_data if it's a string
+                        let parsedRawData = run.raw_data;
+                        if (typeof run.raw_data === 'string') {
+                            try {
+                                parsedRawData = JSON.parse(run.raw_data);
+                            } catch (e) {
+                                console.warn('Failed to parse raw_data:', e);
+                            }
+                        }
+
+                        // Check if tournament: tier with "+" suffix or explicit flags
+                        const tierHasPlus = typeof run.tier === 'string' && run.tier.includes('+');
+                        const isTournament = tierHasPlus || run.is_tournament || parsedRawData?.isTournament || false;
+                        console.log(`📊 Processing run: Tier ${run.tier}, Wave ${run.wave}, tierHasPlus: ${tierHasPlus}, isTournament:`, isTournament, 'raw_data:', parsedRawData);
 
                         // Helper function to extract clean time from corrupted field
                         const extractTime = (timeStr) => {
@@ -100,8 +112,8 @@ class TowerStatsManager {
                             return str;
                         };
 
-                        // Extract and clean raw_data
-                        const cleanRawData = run.raw_data || {};
+                        // Extract and clean raw_data (use already parsed version)
+                        const cleanRawData = parsedRawData || {};
 
                         // Clean time fields
                         if (cleanRawData.gameTime) cleanRawData.gameTime = extractTime(cleanRawData.gameTime);
