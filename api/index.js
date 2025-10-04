@@ -18,7 +18,6 @@ app.use(express.json());
 const redditRouter = require('../server/routes/reddit');
 const { router: videosRouter } = require('../server/routes/videos-vercel');
 const createTowerRouter = require('../server/routes/tower-vercel');
-const createDiscordAuthRouter = require('../server/routes/discord-auth');
 
 // Initialize Supabase for database routes
 const SupabaseManager = require('../server/supabase-config');
@@ -37,16 +36,15 @@ app.use('/api/videos', videosRouter);
 // Only mount database routes if Supabase is available
 if (supabase && supabase.supabase) {
     app.use('/api/tower', createTowerRouter(supabase));
-    app.use('/auth/discord', createDiscordAuthRouter(supabase));
 } else {
     console.warn('⚠️ Supabase not configured - database routes disabled');
     app.use('/api/tower', (req, res) => {
         res.status(503).json({ error: 'Database not configured' });
     });
-    app.use('/auth/discord', (req, res) => {
-        res.status(503).json({ error: 'Authentication not configured' });
-    });
 }
+
+// Note: Discord auth is handled client-side via Supabase Auth
+// No need for server-side Discord OAuth routes in Vercel
 
 // Health check
 app.get('/api/health', (req, res) => {
