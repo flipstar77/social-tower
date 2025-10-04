@@ -47,7 +47,7 @@ console.log('   Will load Discord endpoints:', !!(supabase && supabase.supabase)
 
 // Middleware
 app.use(cors({
-    origin: process.env.DASHBOARD_URL || 'http://localhost:6078',
+    origin: process.env.DASHBOARD_URL || 'https://trackyourstats.vercel.app',
     credentials: true
 }));
 app.use(cookieParser());
