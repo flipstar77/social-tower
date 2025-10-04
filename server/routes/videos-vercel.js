@@ -72,7 +72,7 @@ async function fetchAllVideos() {
         const allVideos = [];
 
         for (const channel of YOUTUBE_CHANNELS) {
-            const videos = await fetchChannelRSS(channel.id);
+            const videos = await fetchChannelRSS(channel.channelId);
             allVideos.push(...videos);
         }
 
