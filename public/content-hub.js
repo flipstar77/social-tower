@@ -521,8 +521,12 @@ class ContentHub {
         const tile = e.target.closest('.tile-component');
         const tileId = tile?.dataset.tileId;
 
+        console.log('🖱️ Thumbnail clicked, tileId:', tileId);
+
         if (tileId) {
             this.playContent(tileId);
+        } else {
+            console.error('❌ No tileId found on thumbnail click');
         }
 
         e.stopPropagation();
@@ -556,7 +560,7 @@ class ContentHub {
     }
 
     playContent(contentId) {
-        console.log(`Playing content: ${contentId}`);
+        console.log(`▶️ Playing content: ${contentId}`);
 
         // Find the content item by ID - include Reddit posts
         const allContent = [
@@ -565,19 +569,23 @@ class ContentHub {
             ...this.contentData.strategies,
             ...this.contentData.reddit
         ];
+        console.log(`📊 Searching in ${allContent.length} items for ID ${contentId}`);
         const content = allContent.find(item => item.id == contentId);
+        console.log(`🔍 Found content:`, content);
 
         if (content && content.youtubeId) {
             // Open YouTube video in new tab
             const youtubeUrl = content.url || `https://www.youtube.com/watch?v=${content.youtubeId}`;
+            console.log(`🎬 Opening YouTube URL: ${youtubeUrl}`);
             window.open(youtubeUrl, '_blank');
             this.showNotification(`Opening "${content.title}" on YouTube...`);
         } else if (content && content.url) {
             // Open Reddit post or other content with URL
+            console.log(`📋 Opening URL: ${content.url}`);
             window.open(content.url, '_blank');
             this.showNotification(`Opening "${content.title}"...`);
         } else {
-            console.error('Content not found or no URL:', contentId, content);
+            console.error('❌ Content not found or no URL:', contentId, content);
             this.showNotification('Unable to open content');
         }
     }
