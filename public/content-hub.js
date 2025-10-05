@@ -12,6 +12,8 @@ class ContentHub {
             currentSpeed: 'normal'
         };
         this.rotationIntervals = new Map();
+        this.channelFilters = null; // Will be initialized after DOM loads
+        this.activeChannels = new Set(); // Track active channel filters
         this.init();
     }
 
@@ -24,6 +26,8 @@ class ContentHub {
         this.setupEventListeners();
         console.log('🔍 Initializing search functionality...');
         this.initSearchFunctionality();
+        console.log('🎛️ Initializing channel filters...');
+        this.initChannelFilters();
         console.log('✅ Content Hub initialization complete');
     }
 
@@ -1045,6 +1049,63 @@ class ContentHub {
             console.error('Error refreshing content:', error);
             this.showNotification('Error refreshing content');
         }
+    }
+
+    // Initialize channel filters
+    initChannelFilters() {
+        if (typeof FilterChips === 'undefined') {
+            console.warn('FilterChips not loaded, skipping channel filter initialization');
+            return;
+        }
+
+        // Get unique channels from all videos
+        const allVideos = [
+            ...this.contentData.trending,
+            ...this.contentData.recent,
+            ...this.contentData.strategies
+        ];
+
+        const channelsMap = new Map();
+        allVideos.forEach(video => {
+            if (video.channel && !channelsMap.has(video.channel)) {
+                channelsMap.set(video.channel, {
+                    label: video.channel,
+                    value: video.channel,
+                    color: video.channelColor || '#4CAF50'
+                });
+            }
+        });
+
+        const channels = Array.from(channelsMap.values());
+
+        // Initialize FilterChips
+        this.channelFilters = new FilterChips('channelFilterChips', {
+            multiSelect: true,
+            onChange: (activeChannels) => {
+                this.activeChannels = new Set(activeChannels);
+                this.applyChannelFilter();
+            }
+        });
+
+        this.channelFilters.render(channels);
+        this.activeChannels = new Set(channels.map(c => c.value)); // All active by default
+    }
+
+    // Apply channel filter
+    applyChannelFilter() {
+        const allVideos = [
+            ...this.contentData.trending,
+            ...this.contentData.recent,
+            ...this.contentData.strategies
+        ];
+
+        // Filter videos by active channels
+        const filteredVideos = allVideos.filter(video =>
+            this.activeChannels.has(video.channel)
+        );
+
+        // Re-render only YouTube sections with filtered data
+        this.renderSection('youtube', filteredVideos);
     }
 
     // Initialize search functionality
