@@ -185,11 +185,15 @@ class DiscordAuth {
     setupUI() {
         const landingPage = document.getElementById('landing-page');
         const authenticatedContent = document.getElementById('authenticated-content');
+        const sidebar = document.querySelector('.sidebar');
+        const header = document.querySelector('.header');
 
         if (this.isAuthenticated) {
             // Show authenticated content, hide landing page
             if (landingPage) landingPage.style.display = 'none';
             if (authenticatedContent) authenticatedContent.style.display = 'block';
+            if (sidebar) sidebar.style.display = 'flex';
+            if (header) header.style.display = 'flex';
 
             // Update user info in the UI
             this.updateUserInfo();
@@ -200,9 +204,11 @@ class DiscordAuth {
             // Ensure navigation is working
             this.initializeNavigation();
         } else {
-            // Show landing page, hide authenticated content
+            // Show landing page ONLY, hide everything else
             if (landingPage) landingPage.style.display = 'block';
             if (authenticatedContent) authenticatedContent.style.display = 'none';
+            if (sidebar) sidebar.style.display = 'none';
+            if (header) header.style.display = 'none';
 
             // Show login button in landing page
             this.showLoginButton();
