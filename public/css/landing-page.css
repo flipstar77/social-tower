@@ -1,10 +1,28 @@
 /* Landing Page Styles */
 
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.8; }
+}
+
+@keyframes gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
 .landing-page {
     position: relative;
     width: 100%;
     min-height: 100vh;
-    background: #FFFFFF;
+    background: linear-gradient(-45deg, #0a0a0a, #1a1a2e, #16213e, #0f3460);
+    background-size: 400% 400%;
+    animation: gradient-shift 15s ease infinite;
     overflow: hidden;
     display: flex;
 }
@@ -16,10 +34,25 @@
     height: 536px;
     right: -144px;
     top: -144px;
-    background: linear-gradient(135deg, rgba(88, 101, 242, 0.1) 0%, rgba(88, 101, 242, 0.05) 100%);
+    background: linear-gradient(135deg, rgba(247, 37, 133, 0.2) 0%, rgba(114, 9, 183, 0.15) 100%);
     border-radius: 50%;
     pointer-events: none;
     z-index: 0;
+    animation: pulse 4s ease-in-out infinite;
+}
+
+.landing-page::after {
+    content: '';
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    left: -100px;
+    bottom: -100px;
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.15) 0%, rgba(59, 130, 246, 0.1) 100%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    animation: pulse 6s ease-in-out infinite;
 }
 
 .landing-hero {
@@ -28,11 +61,19 @@
     position: relative;
     z-index: 1;
     min-height: 100vh;
-    box-shadow: 0px 48px 48px -6px #17328E, 0px 0px 1px #17328E;
+    box-shadow: 0px 48px 48px -6px rgba(23, 50, 142, 0.3), 0px 0px 40px rgba(247, 37, 133, 0.1);
     border-radius: 24px;
     margin: 2rem;
     overflow: hidden;
-    border: 1px solid #E6E9FA;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.03);
+    animation: float 6s ease-in-out infinite;
+    transition: transform 0.3s ease;
+}
+
+.landing-hero:hover {
+    transform: scale(1.01);
 }
 
 .hero-content {
@@ -46,7 +87,8 @@
 /* Left side - Artwork section */
 .hero-features {
     flex: 0 0 60%;
-    background: url('../assets/thumbnail.jpg') center/cover no-repeat, rgba(57, 73, 171, 0.5);
+    background: url('../assets/thumbnail.jpg') center/cover no-repeat,
+                linear-gradient(135deg, rgba(247, 37, 133, 0.3), rgba(114, 9, 183, 0.3));
     background-blend-mode: overlay;
     backdrop-filter: blur(10px);
     display: flex;
@@ -55,30 +97,67 @@
     justify-content: center;
     padding: 4rem 2rem;
     position: relative;
+    overflow: hidden;
+}
+
+.hero-features::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg,
+        transparent 0%,
+        rgba(247, 37, 133, 0.1) 50%,
+        transparent 100%);
+    animation: gradient-shift 10s ease infinite;
+    background-size: 200% 200%;
 }
 
 .hero-logo {
     margin-bottom: 3rem;
     text-align: center;
+    position: relative;
+    z-index: 1;
+    animation: float 4s ease-in-out infinite;
 }
 
 .hero-logo-image {
     width: 150px;
     height: 150px;
     border-radius: 50%;
-    border: 3px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 20px 60px rgba(247, 37, 133, 0.4),
+                0 0 40px rgba(114, 9, 183, 0.3);
+    transition: all 0.4s ease;
+}
+
+.hero-logo-image:hover {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 30px 80px rgba(247, 37, 133, 0.6),
+                0 0 60px rgba(114, 9, 183, 0.5);
 }
 
 .hero-title {
     font-family: 'Open Sans', sans-serif;
-    font-size: 1.5rem;
-    font-weight: 600;
+    font-size: 1.8rem;
+    font-weight: 700;
     color: #FFFFFF;
     text-align: center;
-    line-height: 200%;
-    max-width: 314px;
+    line-height: 150%;
+    max-width: 400px;
     margin: 0 auto;
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5),
+                 0 0 20px rgba(247, 37, 133, 0.3);
+    animation: fadeIn 1s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .hero-subtitle {
@@ -92,8 +171,8 @@
 /* Right side - Login form */
 .hero-cta {
     flex: 0 0 40%;
-    background: #FFFFFF;
-    backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
     border-radius: 0 24px 24px 0;
     padding: 64px;
     display: flex;
@@ -103,31 +182,50 @@
     gap: 32px;
     margin: 0;
     border: none;
-    box-shadow: none;
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-cta::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(247, 37, 133, 0.05) 0%, transparent 70%);
+    animation: pulse 8s ease-in-out infinite;
 }
 
 .login-prompt {
     width: 100%;
     max-width: 358px;
+    position: relative;
+    z-index: 1;
+    animation: fadeIn 1.2s ease-in;
 }
 
 .login-prompt h2 {
     font-family: 'Open Sans', sans-serif;
-    font-size: 24px;
-    font-weight: 600;
-    color: #343434;
-    margin-bottom: 2rem;
+    font-size: 28px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #343434 0%, #5a5a5a 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
     text-align: left;
 }
 
 .login-prompt p {
     font-family: 'Open Sans', sans-serif;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 400;
-    color: #828282;
-    margin-bottom: 2rem;
+    color: #666;
+    margin-bottom: 2.5rem;
     text-align: center;
-    line-height: 1.5;
+    line-height: 1.6;
 }
 
 /* Discord Login Button */
@@ -137,30 +235,61 @@
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    padding: 11px 96px;
-    gap: 8px;
-    background: #3949AB;
+    padding: 16px 96px;
+    gap: 10px;
+    background: linear-gradient(135deg, #5865F2 0%, #4752C4 100%);
     border: none;
-    border-radius: 40px;
+    border-radius: 50px;
     font-family: 'Open Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 400;
+    font-size: 15px;
+    font-weight: 600;
     color: #FFFFFF;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: none;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 10px 30px rgba(88, 101, 242, 0.3);
     margin: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.discord-login-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.discord-login-btn:hover::before {
+    width: 300px;
+    height: 300px;
 }
 
 .discord-login-btn:hover {
-    background: #2d3a8c;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(57, 73, 171, 0.3);
+    background: linear-gradient(135deg, #4752C4 0%, #3949AB 100%);
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 15px 40px rgba(88, 101, 242, 0.5);
+}
+
+.discord-login-btn:active {
+    transform: translateY(-2px) scale(0.98);
 }
 
 .discord-login-btn svg {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
+    position: relative;
+    z-index: 1;
+    transition: transform 0.3s ease;
+}
+
+.discord-login-btn:hover svg {
+    transform: rotate(10deg) scale(1.1);
 }
 
 /* Hide authenticated content by default */
