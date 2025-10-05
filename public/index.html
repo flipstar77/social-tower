@@ -944,6 +944,32 @@ Or paste raw tournament data from game stats."></textarea>
                 window.uniqueModulesManager.init();
             }
 
+            // Wait for discord-auth to be ready before initializing charts
+            // This ensures authenticated fetch is available
+            const waitForAuth = () => {
+                return new Promise((resolve) => {
+                    if (window.discordAuth) {
+                        resolve();
+                    } else {
+                        const checkAuth = setInterval(() => {
+                            if (window.discordAuth) {
+                                clearInterval(checkAuth);
+                                resolve();
+                            }
+                        }, 100);
+                        // Timeout after 5 seconds
+                        setTimeout(() => {
+                            clearInterval(checkAuth);
+                            console.warn('⚠️ Discord auth not loaded, proceeding anyway');
+                            resolve();
+                        }, 5000);
+                    }
+                });
+            };
+
+            await waitForAuth();
+            console.log('✅ Discord auth ready, initializing charts...');
+
             // Initialize Performance Charts Dashboard
             try {
                 if (typeof echarts !== 'undefined' && window.PerformanceCharts) {
