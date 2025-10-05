@@ -3,7 +3,7 @@
  * Central orchestrator that manages all analytics modules and data flow
  */
 class AnalyticsCoordinator {
-    constructor(apiBase = 'http://localhost:6078/api/tower') {
+    constructor(apiBase = '/api/tower') {
         this.apiBase = apiBase;
 
         // Initialize modules

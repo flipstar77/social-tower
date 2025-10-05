@@ -43,7 +43,7 @@ class TowerAnalytics {
             };
         }
 
-        this.apiBase = 'http://localhost:6078/api/tower';
+        this.apiBase = '/api/tower';
         this.runs = [];
         this.filteredRuns = [];
         this.charts = {};
