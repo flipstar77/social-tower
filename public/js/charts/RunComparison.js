@@ -610,10 +610,21 @@ class RunComparison {
      */
     parseNumber(str) {
         if (!str) return 0;
-        const match = str.match(/([\d,.]+)([KMBTqQsSNOo])?/);
+
+        // Handle European decimal notation (comma as decimal separator)
+        // If it looks like "28,66K" (1-3 digits, comma, 1-2 digits, suffix) convert comma to dot for decimal
+        let cleanStr = str;
+        if (/^\d{1,3},\d{1,2}[KMBTqQsSNOo]?$/i.test(str)) {
+            cleanStr = str.replace(',', '.');
+        } else {
+            // Otherwise remove commas (thousands separators like 1,234,567)
+            cleanStr = str.replace(/,/g, '');
+        }
+
+        const match = cleanStr.match(/([\d.]+)([KMBTqQsSNOo])?/);
         if (!match) return 0;
 
-        const num = parseFloat(match[1].replace(/,/g, ''));
+        const num = parseFloat(match[1]);
         const suffix = match[2];
 
         const multipliers = {
