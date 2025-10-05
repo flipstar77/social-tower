@@ -25,15 +25,22 @@ async function authenticateUser(req, res, next) {
         // Get token from Authorization header
         const authHeader = req.headers.authorization;
 
+        console.log('🔐 Auth Check:', {
+            path: req.path,
+            hasAuth: !!authHeader,
+            authPreview: authHeader ? authHeader.substring(0, 30) + '...' : 'none',
+            supabaseReady: !!supabase
+        });
+
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            // No auth token - allow anonymous access but set user to null
+            console.log('⚠️ No auth token, proceeding as anonymous');
             req.user = null;
             req.discordUserId = null;
             return next();
         }
 
         if (!supabase) {
-            console.warn('⚠️ Supabase not configured, cannot verify token');
+            console.error('❌ Supabase not initialized! Check SUPABASE_SERVICE_KEY env var');
             req.user = null;
             req.discordUserId = null;
             return next();
@@ -45,7 +52,7 @@ async function authenticateUser(req, res, next) {
         const { data: { user }, error } = await supabase.auth.getUser(token);
 
         if (error) {
-            console.error('❌ Auth error:', error.message);
+            console.error('❌ Auth verification failed:', error.message);
             req.user = null;
             req.discordUserId = null;
             return next();
@@ -55,7 +62,9 @@ async function authenticateUser(req, res, next) {
             req.user = user;
             // Extract Discord user ID from user metadata
             req.discordUserId = user.user_metadata?.provider_id || user.id;
-            console.log(`✅ Authenticated user: ${user.user_metadata?.full_name || user.id} (Discord ID: ${req.discordUserId})`);
+            console.log(`✅ User authenticated: ${user.user_metadata?.full_name || 'Unknown'}`);
+            console.log(`   Discord ID: ${req.discordUserId}`);
+            console.log(`   Metadata:`, JSON.stringify(user.user_metadata, null, 2));
         } else {
             req.user = null;
             req.discordUserId = null;
@@ -63,7 +72,7 @@ async function authenticateUser(req, res, next) {
 
         next();
     } catch (error) {
-        console.error('❌ Authentication middleware error:', error);
+        console.error('❌ Auth middleware exception:', error.message);
         req.user = null;
         req.discordUserId = null;
         next();

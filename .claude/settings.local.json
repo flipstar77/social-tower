@@ -57,7 +57,9 @@
       "Read(//c/Users/Администратор/**)",
       "Bash(npx @playwright/mcp@latest:*)",
       "Bash(claude mcp:*)",
-      "Bash(start http://localhost:6079/test-charts.html)"
+      "Bash(start http://localhost:6079/test-charts.html)",
+      "Bash(vercel env add:*)",
+      "Bash(git reset:*)"
     ],
     "deny": [],
     "ask": []
