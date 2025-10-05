@@ -506,7 +506,7 @@ class ContentHub {
 
         document.addEventListener('mouseout', (e) => {
             if (e.target.closest('.content-grid.auto-rotate')) {
-                this.resumeRotation(e.target.closest('.content-grid'));
+                this.resumeRotation(e.target.closest('.content-grid'), e);
             }
         });
     }
@@ -971,7 +971,7 @@ class ContentHub {
         }
     }
 
-    resumeRotation(grid) {
+    resumeRotation(grid, event) {
         if (!grid || !this.rotationSettings.isRotating) return;
 
         // Only resume if we're actually leaving this grid
