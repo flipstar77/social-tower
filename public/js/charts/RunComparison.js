@@ -576,6 +576,14 @@ class RunComparison {
             const hours = this.parseTime(run.real_time || run.run_duration || '1h');
             const hourlyCoins = coins / Math.max(hours, 1);
 
+            console.log(`💰 Hourly Coins Debug - T${tier}:`, {
+                coinsStr: run.coins_earned,
+                coinsParsed: coins,
+                timeStr: run.real_time || run.run_duration,
+                hoursParsed: hours,
+                hourlyCoins: hourlyCoins
+            });
+
             if (!tierData[tier]) {
                 tierData[tier] = { total: 0, count: 0 };
             }
