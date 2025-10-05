@@ -610,18 +610,21 @@ class RunComparison {
      */
     parseNumber(str) {
         if (!str) return 0;
-        const match = str.match(/([\d,.]+)([KMBTQ])?/);
+        const match = str.match(/([\d,.]+)([KMBTqQsSNOo])?/);
         if (!match) return 0;
 
         const num = parseFloat(match[1].replace(/,/g, ''));
         const suffix = match[2];
 
         const multipliers = {
-            'K': 1e3,
-            'M': 1e6,
-            'B': 1e9,
-            'T': 1e12,
-            'Q': 1e15
+            'K': 1e3, 'k': 1e3,
+            'M': 1e6, 'm': 1e6,
+            'B': 1e9, 'b': 1e9,
+            'T': 1e12, 't': 1e12,
+            'q': 1e15, 'Q': 1e18,
+            's': 1e21, 'S': 1e24,
+            'O': 1e27, 'o': 1e27,
+            'N': 1e30, 'n': 1e30
         };
 
         return num * (multipliers[suffix] || 1);
