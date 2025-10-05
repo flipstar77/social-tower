@@ -33,7 +33,18 @@ class RunComparison {
                 const data = await response.json();
                 this.allRuns = data.runs || [];
             }
+
+            // Sort by date (newest first)
+            this.allRuns.sort((a, b) => {
+                const dateA = new Date(a.submitted_at || a.timestamp || a.created_at);
+                const dateB = new Date(b.submitted_at || b.timestamp || b.created_at);
+                return dateB - dateA; // Descending (newest first)
+            });
+
             console.log(`✅ Loaded ${this.allRuns.length} runs for comparison`);
+            if (this.allRuns.length > 0) {
+                console.log(`📅 Latest run: T${this.allRuns[0]?.tier} W${this.allRuns[0]?.wave} (${new Date(this.allRuns[0]?.submitted_at).toLocaleString()})`);
+            }
         } catch (error) {
             console.error('❌ Failed to load runs:', error);
         }
@@ -51,9 +62,11 @@ class RunComparison {
 
         container.innerHTML = `
             <div class="comparison-controls">
+                <h2 class="section-title" style="color: #FFF; font-size: 24px; margin-bottom: 20px; font-weight: 600;">🔍 Compare Runs</h2>
                 <div class="run-selector-grid">
-                    ${this.allRuns.slice(0, 10).map((run, i) => `
-                        <div class="run-selector-card" data-run-index="${i}">
+                    ${this.allRuns.slice(0, 15).map((run, i) => `
+                        <div class="run-selector-card ${i === 0 ? 'newest-run' : ''}" data-run-index="${i}">
+                            ${i === 0 ? '<div class="new-badge">NEW!</div>' : ''}
                             <input type="checkbox" id="run-${run.id}" class="run-checkbox" data-run-id="${run.id}">
                             <label for="run-${run.id}" class="run-label">
                                 <div class="run-tier">T${run.tier}</div>

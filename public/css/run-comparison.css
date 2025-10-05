@@ -27,6 +27,31 @@
     position: relative;
 }
 
+.run-selector-card.newest-run {
+    background: linear-gradient(135deg, #1a1f2e 0%, #151A20 100%);
+    border: 2px solid #F72585;
+    box-shadow: 0 0 20px rgba(247, 37, 133, 0.3);
+}
+
+.new-badge {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    background: linear-gradient(135deg, #F72585, #7209B7);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    animation: pulse 2s infinite;
+    z-index: 10;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
 .run-selector-card:hover {
     background: #1E2125;
     transform: translateY(-2px);
