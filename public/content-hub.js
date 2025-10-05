@@ -417,7 +417,8 @@ class ContentHub {
             return;
         }
 
-        container.innerHTML = data.map(item => `
+        // Create tiles HTML
+        const tilesHTML = data.map(item => `
             <div class="tile-component" data-tile-id="${item.id}" style="background: ${item.gradient}">
                 <div class="tile-thumbnail" style="cursor: pointer;">
                     <img src="${item.thumbnail}" alt="${item.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/320x180?text=No+Image'" style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px;">
@@ -427,7 +428,7 @@ class ContentHub {
                 </div>
                 <div class="tile-header">
                     <div class="match-score">${item.matchPercentage}% Match</div>
-                    <div class="tile-channel" style="font-size: 11px; color: ${item.channelColor}">${item.channel}</div>
+                    <div class="tile-channel" style="font-size: 11px; color: ${item.channelColor}">${item.channel || 'Unknown'}</div>
                 </div>
                 <div class="tile-body">
                     <h3 class="tile-title" style="font-size: 13px; margin: 8px 0; line-height: 1.3;">${item.title}</h3>
@@ -449,6 +450,9 @@ class ContentHub {
                 </div>
             </div>
         `).join('');
+
+        // Wrap in tiles-container for rotation
+        container.innerHTML = `<div class="tiles-container">${tilesHTML}</div>`;
 
         // Start carousel rotation after rendering
         if (this.rotationSettings.isRotating) {
@@ -1097,6 +1101,7 @@ class ContentHub {
 
         const channelsMap = new Map();
         allVideos.forEach(video => {
+            console.log('🔍 Video channel:', video.channel, 'channelColor:', video.channelColor);
             if (video.channel && !channelsMap.has(video.channel)) {
                 channelsMap.set(video.channel, {
                     label: video.channel,
@@ -1107,11 +1112,18 @@ class ContentHub {
         });
 
         const channels = Array.from(channelsMap.values());
+        console.log('📺 Found channels:', channels);
+
+        if (channels.length === 0) {
+            console.warn('⚠️ No channels found in video data');
+            return;
+        }
 
         // Initialize FilterChips
         this.channelFilters = new FilterChips('channelFilterChips', {
             multiSelect: true,
             onChange: (activeChannels) => {
+                console.log('🎛️ Channel filter changed:', activeChannels);
                 this.activeChannels = new Set(activeChannels);
                 this.applyChannelFilter();
             }
@@ -1119,6 +1131,7 @@ class ContentHub {
 
         this.channelFilters.render(channels);
         this.activeChannels = new Set(channels.map(c => c.value)); // All active by default
+        console.log('✅ Channel filters initialized with', channels.length, 'channels');
     }
 
     // Apply channel filter
