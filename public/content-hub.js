@@ -8,7 +8,7 @@ class ContentHub {
         };
         this.rotationSettings = {
             isRotating: true,
-            speed: 120, // seconds - synchronized speed
+            speed: 30, // seconds - fast enough to see movement
             currentSpeed: 'normal'
         };
         this.rotationIntervals = new Map();
@@ -63,9 +63,12 @@ class ContentHub {
 
         const data = await response.json();
 
-        if (data.success && data.videos) {
+        // API returns: { success: true, data: { videos: [...], lastUpdate, totalVideos, totalChannels } }
+        const videos = data.data?.videos || data.videos || [];
+
+        if (data.success && videos.length > 0) {
             // Convert YouTube videos to content format
-            const youtubeVideos = data.videos.slice(0, 20); // Limit to 20 videos
+            const youtubeVideos = videos.slice(0, 20); // Limit to 20 videos
             console.log('📺 Sample video from API:', youtubeVideos[0]);
 
             // Split into categories
