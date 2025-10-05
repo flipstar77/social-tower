@@ -932,8 +932,8 @@ Or paste raw tournament data from game stats."></textarea>
     <!-- Main Application Scripts -->
     <script src="script.js?v=8"></script>
     <script src="content-hub.js?v=21"></script>
-    <!-- Charts Manager -->
-    <script src="js/charts/ChartManager.js?v=2"></script>
+    <!-- Performance Charts -->
+    <script src="js/charts/PerformanceCharts.js?v=3"></script>
     <!-- New Modular Tower Analytics System -->
     <script type="module" src="js/tower/TowerDataService.js?v=4"></script>
     <script type="module" src="js/tower/TowerStatsCalculator.js?v=4"></script>
@@ -968,17 +968,17 @@ Or paste raw tournament data from game stats."></textarea>
                 window.uniqueModulesManager.init();
             }
 
-            // Initialize Charts Dashboard
+            // Initialize Performance Charts Dashboard
             try {
-                if (typeof echarts !== 'undefined' && window.ChartManager) {
-                    window.chartManager = new ChartManager();
-                    await window.chartManager.init();
-                    console.log('📊 Charts Dashboard initialized');
+                if (typeof echarts !== 'undefined' && window.PerformanceCharts) {
+                    window.performanceCharts = new PerformanceCharts();
+                    await window.performanceCharts.init();
+                    console.log('📊 Performance Charts initialized');
                 } else {
-                    console.warn('⚠️ ECharts or ChartManager not loaded');
+                    console.warn('⚠️ ECharts or PerformanceCharts not loaded');
                 }
             } catch (error) {
-                console.error('❌ Failed to initialize charts:', error);
+                console.error('❌ Failed to initialize performance charts:', error);
             }
 
             // Initialize cards and modules when Tower Analytics is shown
