@@ -1,4 +1,5 @@
 const express = require('express');
+const { createClient } = require('@supabase/supabase-js');
 
 /**
  * Simplified Tower router for Vercel serverless
@@ -7,7 +8,47 @@ const express = require('express');
 function createTowerRouter(supabaseManager) {
     const router = express.Router();
 
-    // GET /api/tower/runs - Get all runs
+    // Auth middleware - extract user from Supabase JWT
+    router.use(async (req, res, next) => {
+        const authHeader = req.headers.authorization;
+
+        console.log('🔐 Vercel Auth Check:', {
+            path: req.path,
+            hasAuth: !!authHeader,
+            method: req.method
+        });
+
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            console.log('⚠️ No auth token');
+            req.user = null;
+            req.discordUserId = null;
+            return next();
+        }
+
+        try {
+            const token = authHeader.substring(7);
+            const { data: { user }, error } = await supabaseManager.supabase.auth.getUser(token);
+
+            if (error || !user) {
+                console.log('❌ Auth failed:', error?.message);
+                req.user = null;
+                req.discordUserId = null;
+            } else {
+                req.user = user;
+                req.discordUserId = user.user_metadata?.provider_id || user.id;
+                console.log(`✅ Authenticated: ${user.user_metadata?.full_name || user.id}`);
+                console.log(`   Discord ID: ${req.discordUserId}`);
+            }
+        } catch (error) {
+            console.error('❌ Auth error:', error.message);
+            req.user = null;
+            req.discordUserId = null;
+        }
+
+        next();
+    });
+
+    // GET /api/tower/runs - Get runs filtered by authenticated user
     router.get('/runs', async (req, res) => {
         try {
             const limit = parseInt(req.query.limit) || 100;
@@ -16,13 +57,32 @@ function createTowerRouter(supabaseManager) {
                 return res.status(503).json({ error: 'Database not configured' });
             }
 
-            const { data, error } = await supabaseManager.supabase
+            // Build query with user filter
+            let query = supabaseManager.supabase
                 .from('tower_runs')
                 .select('*')
                 .order('submitted_at', { ascending: false })
                 .limit(limit);
 
+            // CRITICAL: Filter by authenticated user's Discord ID
+            if (req.discordUserId) {
+                query = query.eq('discord_user_id', req.discordUserId);
+                console.log(`📊 Fetching runs for user: ${req.discordUserId}`);
+            } else {
+                console.log('⚠️ No user ID - returning empty results for security');
+                return res.json({
+                    success: true,
+                    runs: [],
+                    count: 0,
+                    message: 'Please log in to see your runs'
+                });
+            }
+
+            const { data, error } = await query;
+
             if (error) throw error;
+
+            console.log(`✅ Returned ${data?.length || 0} runs for user ${req.discordUserId}`);
 
             res.json({
                 success: true,
@@ -119,7 +179,7 @@ function createTowerRouter(supabaseManager) {
         }
     });
 
-    // POST /api/tower/runs - Create new run (for Discord bot)
+    // POST /api/tower/runs - Create new run (for Discord bot or web upload)
     router.post('/runs', async (req, res) => {
         try {
             if (!supabaseManager || !supabaseManager.supabase) {
@@ -128,12 +188,21 @@ function createTowerRouter(supabaseManager) {
 
             const runData = req.body;
 
+            // Add authenticated user's Discord ID if available
+            if (req.discordUserId && !runData.discord_user_id) {
+                runData.discord_user_id = req.discordUserId;
+                runData.source = 'web';
+                console.log(`📝 Adding user ID to run: ${req.discordUserId}`);
+            }
+
             const { data, error } = await supabaseManager.supabase
                 .from('tower_runs')
                 .insert([runData])
                 .select();
 
             if (error) throw error;
+
+            console.log(`✅ Created run for user: ${runData.discord_user_id || 'unknown'}`);
 
             res.json({
                 success: true,
