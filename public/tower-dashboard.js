@@ -981,7 +981,7 @@ async function uploadFile(input) {
     formData.append('statsFile', file);
 
     try {
-        const response = await fetch('http://localhost:6078/api/tower/upload-stats', {
+        const response = await fetch('/api/tower/runs/upload-stats', {
             method: 'POST',
             body: formData
         });

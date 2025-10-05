@@ -106,20 +106,43 @@ class RunComparison {
      */
     async refresh() {
         const previousSelection = this.selectedRuns.map(r => r.id);
+
+        // Dispose old charts before recreating UI
+        this.charts.forEach(chart => {
+            try {
+                chart.dispose();
+            } catch (e) {
+                console.warn('Failed to dispose chart:', e);
+            }
+        });
+        this.charts.clear();
+
         await this.loadRuns();
         this.createComparisonUI();
+        this.initializeCharts(); // Reinitialize charts after UI recreation
 
         // Restore previous selection if runs still exist
+        const restoredSelection = [];
         previousSelection.forEach(id => {
             const checkbox = document.getElementById(`run-${id}`);
             if (checkbox) {
                 checkbox.checked = true;
                 const run = this.allRuns.find(r => r.id === id);
-                if (run) this.selectedRuns.push(run);
+                if (run) {
+                    this.selectedRuns.push(run);
+                    restoredSelection.push(run);
+                }
             }
         });
 
         this.updateVisualizeButton();
+
+        // Re-visualize if there were selections before
+        if (restoredSelection.length > 0) {
+            console.log(`🔄 Re-visualizing ${restoredSelection.length} restored selections`);
+            this.visualizeSelectedRuns();
+        }
+
         console.log('✅ Run comparison refreshed');
     }
 
