@@ -21,9 +21,13 @@
     <link rel="stylesheet" href="css/force-glassmorphism.css?v=11">
     <!-- DARK DASHBOARD THEME - Figma Design Implementation -->
     <link rel="stylesheet" href="css/dark-dashboard-theme.css?v=1">
+    <!-- Charts Styles -->
+    <link rel="stylesheet" href="charts.css?v=1">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Helvetica+Neue:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Charting Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 </head>
@@ -276,6 +280,124 @@ Wave    8541
                 </div>
 
                 <button id="importBtn" class="import-btn">Import Data</button>
+            </div>
+        </div>
+
+        <!-- Charts Dashboard Section -->
+        <div class="charts-dashboard-section" style="margin: 40px 0; padding: 20px;">
+            <h2 class="section-title" style="color: #FFF; font-size: 28px; margin-bottom: 30px; font-weight: 700;">📊 Performance Analytics</h2>
+
+            <div class="charts-container">
+                <!-- Vertical Bar Chart Card -->
+                <div class="chart-card">
+                    <div class="card-header">
+                        <div class="header-content">
+                            <h4 class="card-title">Weekly Progress</h4>
+                            <p class="card-subtitle">Statistics of the month</p>
+                        </div>
+                        <button class="card-menu-btn">
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                        </button>
+                    </div>
+
+                    <div class="card-legend">
+                        <div class="legend-item">
+                            <span class="legend-color" style="background: #F72585;"></span>
+                            <span class="legend-label">Floors Cleared</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background: #7209B7;"></span>
+                            <span class="legend-label">Sessions</span>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <div id="chart-vertical-bars" class="chart-graphic"></div>
+                    </div>
+                </div>
+
+                <!-- Horizontal Progress Bars Card -->
+                <div class="chart-card">
+                    <div class="card-header">
+                        <div class="header-content">
+                            <h4 class="card-number">854</h4>
+                            <div class="stat-indicator positive">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <path d="M7 14L12 9L17 14" stroke="#00FAFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span>25% upward</span>
+                            </div>
+                        </div>
+                        <button class="card-menu-btn">
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                        </button>
+                    </div>
+
+                    <div class="card-body">
+                        <div id="chart-horizontal-bars" class="chart-graphic horizontal"></div>
+                    </div>
+
+                    <div class="card-footer">
+                        <h5 class="footer-title">Tower Floor Progress</h5>
+                        <p class="footer-description">Track your advancement through different tower floors and difficulty levels</p>
+                    </div>
+                </div>
+
+                <!-- Line Chart Card -->
+                <div class="chart-card">
+                    <div class="card-header">
+                        <div class="header-content">
+                            <h4 class="card-number">12.5K</h4>
+                            <div class="stat-indicator positive">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <path d="M7 14L12 9L17 14" stroke="#00FAFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <button class="card-menu-btn" aria-label="More options">
+                            <svg width="22" height="12" viewBox="0 0 22 12" fill="#FFF">
+                                <rect width="22" height="2" rx="1"/>
+                                <rect y="5" width="22" height="2" rx="1"/>
+                                <rect y="10" width="22" height="2" rx="1"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="card-body">
+                        <div id="chart-line" class="chart-graphic"></div>
+                    </div>
+
+                    <div class="card-footer">
+                        <h5 class="footer-title">Coins Performance Trend</h5>
+                        <p class="footer-description">Monitor your coin generation efficiency over time</p>
+                    </div>
+                </div>
+
+                <!-- Area Chart Card (Temperature Theme) -->
+                <div class="chart-card">
+                    <div class="card-header">
+                        <div class="header-content">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" class="icon">
+                                <path d="M10 3V13M10 13C8.34315 13 7 14.3431 7 16C7 17.6569 8.34315 19 10 19C11.6569 19 13 17.6569 13 16C13 14.3431 11.6569 13 10 13Z" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            <h5 class="card-title">Activity Heatmap</h5>
+                        </div>
+                        <button class="card-menu-btn">
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                        </button>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="value-display">4.2 hrs</div>
+                        <div id="chart-area" class="chart-graphic area"></div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -810,6 +932,8 @@ Or paste raw tournament data from game stats."></textarea>
     <!-- Main Application Scripts -->
     <script src="script.js?v=8"></script>
     <script src="content-hub.js?v=21"></script>
+    <!-- Charts Manager -->
+    <script src="js/charts/ChartManager.js?v=1"></script>
     <!-- New Modular Tower Analytics System -->
     <script type="module" src="js/tower/TowerDataService.js?v=4"></script>
     <script type="module" src="js/tower/TowerStatsCalculator.js?v=4"></script>
@@ -842,6 +966,19 @@ Or paste raw tournament data from game stats."></textarea>
             // Initialize unique modules manager
             if (window.uniqueModulesManager) {
                 window.uniqueModulesManager.init();
+            }
+
+            // Initialize Charts Dashboard
+            try {
+                if (typeof echarts !== 'undefined' && window.ChartManager) {
+                    window.chartManager = new ChartManager();
+                    await window.chartManager.init();
+                    console.log('📊 Charts Dashboard initialized');
+                } else {
+                    console.warn('⚠️ ECharts or ChartManager not loaded');
+                }
+            } catch (error) {
+                console.error('❌ Failed to initialize charts:', error);
             }
 
             // Initialize cards and modules when Tower Analytics is shown

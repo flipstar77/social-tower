@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Charts - Social Tower</title>
+    <link rel="stylesheet" href="charts.css">
+</head>
+<body>
+    <div class="charts-container">
+        <!-- Vertical Bar Chart Card -->
+        <div class="chart-card">
+            <div class="card-header">
+                <div class="header-content">
+                    <h4 class="card-title">Vertical bar</h4>
+                    <p class="card-subtitle">Statistics of the month</p>
+                </div>
+                <button class="card-menu-btn">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </button>
+            </div>
+
+            <div class="card-legend">
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #F72585;"></span>
+                    <span class="legend-label">Data one</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #7209B7;"></span>
+                    <span class="legend-label">Data two</span>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div id="chart-vertical-bars" class="chart-graphic"></div>
+            </div>
+        </div>
+
+        <!-- Horizontal Progress Bars Card -->
+        <div class="chart-card">
+            <div class="card-header">
+                <div class="header-content">
+                    <h4 class="card-number">854</h4>
+                    <div class="stat-indicator positive">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M7 14L12 9L17 14" stroke="#00FAFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>25 upward</span>
+                    </div>
+                </div>
+                <button class="card-menu-btn">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </button>
+            </div>
+
+            <div class="card-body">
+                <div id="chart-horizontal-bars" class="chart-graphic horizontal"></div>
+            </div>
+
+            <div class="card-footer">
+                <h5 class="footer-title">Vertical bar</h5>
+                <p class="footer-description">Minim dolor in amet nulla laboris enim dolore consequatt...</p>
+            </div>
+        </div>
+
+        <!-- Line Chart Card -->
+        <div class="chart-card">
+            <div class="card-header">
+                <div class="header-content">
+                    <h4 class="card-number">854</h4>
+                    <div class="stat-indicator positive">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M7 14L12 9L17 14" stroke="#00FAFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                </div>
+                <button class="card-menu-btn" aria-label="More options">
+                    <svg width="22" height="12" viewBox="0 0 22 12" fill="#FFF">
+                        <rect width="22" height="2" rx="1"/>
+                        <rect y="5" width="22" height="2" rx="1"/>
+                        <rect y="10" width="22" height="2" rx="1"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="card-body">
+                <div id="chart-line" class="chart-graphic"></div>
+            </div>
+
+            <div class="card-footer">
+                <h5 class="footer-title">Atmosphere Temperature by Altitude</h5>
+                <p class="footer-description">Minim dolor in amet nulla laboris enim dolore consequatt...</p>
+            </div>
+        </div>
+
+        <!-- Area Chart Card (Temperature Theme) -->
+        <div class="chart-card">
+            <div class="card-header">
+                <div class="header-content">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" class="icon">
+                        <path d="M10 3V13M10 13C8.34315 13 7 14.3431 7 16C7 17.6569 8.34315 19 10 19C11.6569 19 13 17.6569 13 16C13 14.3431 11.6569 13 10 13Z" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <h5 class="card-title">Temperature theme</h5>
+                </div>
+                <button class="card-menu-btn">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </button>
+            </div>
+
+            <div class="card-body">
+                <div class="value-display">4.875</div>
+                <div id="chart-area" class="chart-graphic area"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Apache ECharts Library -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+
+    <!-- Chart Manager -->
+    <script src="js/charts/ChartManager.js"></script>
+
+    <!-- Initialize Charts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const chartManager = new ChartManager();
+            await chartManager.init();
+
+            // Store globally for access
+            window.chartManager = chartManager;
+        });
+    </script>
+</body>
+</html>
