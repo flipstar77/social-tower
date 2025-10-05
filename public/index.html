@@ -956,31 +956,38 @@ Or paste raw tournament data from game stats."></textarea>
             };
 
             await waitForAuth();
-            console.log('✅ Discord auth ready, initializing charts...');
+            console.log('✅ Discord auth ready');
 
-            // Initialize Performance Charts Dashboard
-            try {
-                if (typeof echarts !== 'undefined' && window.PerformanceCharts) {
-                    window.performanceCharts = new PerformanceCharts();
-                    await window.performanceCharts.init();
-                    console.log('📊 Performance Charts initialized');
+            // Only initialize charts if user is authenticated
+            if (window.discordAuth && window.discordAuth.isAuthenticated) {
+                console.log('🔑 User authenticated, initializing charts...');
 
-                    // Load real tower data into charts
-                    if (window.ChartDataAdapter) {
-                        window.chartDataAdapter = new ChartDataAdapter();
-                        await window.chartDataAdapter.updateAllCharts(window.performanceCharts);
+                // Initialize Performance Charts Dashboard
+                try {
+                    if (typeof echarts !== 'undefined' && window.PerformanceCharts) {
+                        window.performanceCharts = new PerformanceCharts();
+                        await window.performanceCharts.init();
+                        console.log('📊 Performance Charts initialized');
+
+                        // Load real tower data into charts
+                        if (window.ChartDataAdapter) {
+                            window.chartDataAdapter = new ChartDataAdapter();
+                            await window.chartDataAdapter.updateAllCharts(window.performanceCharts);
+                        }
+
+                        // Initialize Run Comparison
+                        if (window.RunComparison) {
+                            window.runComparison = new RunComparison();
+                            await window.runComparison.init();
+                        }
+                    } else {
+                        console.warn('⚠️ ECharts or PerformanceCharts not loaded');
                     }
-
-                    // Initialize Run Comparison
-                    if (window.RunComparison) {
-                        window.runComparison = new RunComparison();
-                        await window.runComparison.init();
-                    }
-                } else {
-                    console.warn('⚠️ ECharts or PerformanceCharts not loaded');
+                } catch (error) {
+                    console.error('❌ Failed to initialize performance charts:', error);
                 }
-            } catch (error) {
-                console.error('❌ Failed to initialize performance charts:', error);
+            } else {
+                console.log('🔒 Not authenticated, skipping chart initialization');
             }
 
             // Initialize cards and modules when Tower Analytics is shown
