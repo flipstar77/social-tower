@@ -415,7 +415,7 @@ class ContentHub {
 
         container.innerHTML = data.map(item => `
             <div class="tile-component" data-tile-id="${item.id}" style="background: ${item.gradient}">
-                <div class="tile-thumbnail" style="cursor: pointer;" onclick="window.contentHubInstance?.playContent('${item.id}')">
+                <div class="tile-thumbnail" style="cursor: pointer;">
                     <img src="${item.thumbnail}" alt="${item.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/320x180?text=No+Image'" style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px;">
                     <div class="tile-overlay">
                         <div class="control-btn play-btn">▶</div>
@@ -441,7 +441,7 @@ class ContentHub {
                         <span>👀 ${item.views.toLocaleString('en-US')}</span>
                         <span>👍 ${item.likes.toLocaleString('en-US')}</span>
                     </div>
-                    <div class="control-btn add-btn" onclick="window.contentHubInstance?.addToList(${item.id})">+</div>
+                    <div class="control-btn add-btn">+</div>
                 </div>
             </div>
         `).join('');
@@ -457,8 +457,9 @@ class ContentHub {
         document.addEventListener('click', (e) => {
             if (e.target.closest('.control-btn')) {
                 this.handleControlClick(e);
-            }
-            if (e.target.closest('.tile-component')) {
+            } else if (e.target.closest('.tile-thumbnail')) {
+                this.handleThumbnailClick(e);
+            } else if (e.target.closest('.tile-component')) {
                 this.handleTileClick(e);
             }
             if (e.target.closest('.chevron-right')) {
@@ -516,6 +517,17 @@ class ContentHub {
         e.stopPropagation();
     }
 
+    handleThumbnailClick(e) {
+        const tile = e.target.closest('.tile-component');
+        const tileId = tile?.dataset.tileId;
+
+        if (tileId) {
+            this.playContent(tileId);
+        }
+
+        e.stopPropagation();
+    }
+
     handleTileClick(e) {
         const tile = e.target.closest('.tile-component');
         const tileId = tile?.dataset.tileId;
@@ -525,7 +537,7 @@ class ContentHub {
             return;
         }
 
-        if (tileId && !e.target.closest('.control-btn')) {
+        if (tileId && !e.target.closest('.control-btn') && !e.target.closest('.tile-thumbnail')) {
             this.showContentDetails(tileId);
         }
     }
