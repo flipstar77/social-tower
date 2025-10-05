@@ -76,7 +76,7 @@ body {
 .logo {
     display: flex;
     align-items: center;
-    padding: 20px 54px;
+    padding: 20px 20px;
     margin-top: 43px;
 }
 
@@ -106,13 +106,13 @@ body {
 
 .sidebar-menu {
     margin-top: 154px;
-    padding: 0 8px;
+    padding: 0 20px;
 }
 
 .menu-item {
     display: flex;
     align-items: center;
-    padding: 18px 12px;
+    padding: 18px 8px;
     margin-bottom: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
