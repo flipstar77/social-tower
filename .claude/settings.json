@@ -1,0 +1,21 @@
+{
+  "description": "Social Tower Dashboard - Claude Code Project Settings",
+  "mcpServers": {
+    "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"],
+      "env": {},
+      "description": "Browser automation for visual testing and screenshots"
+    }
+  },
+  "permissions": {
+    "allowedTools": [],
+    "ignorePatterns": [
+      "**/node_modules/**",
+      "**/.git/**",
+      "**/dist/**",
+      "**/build/**"
+    ]
+  }
+}
