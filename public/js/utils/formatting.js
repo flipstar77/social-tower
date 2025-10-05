@@ -47,15 +47,21 @@ class FormattingUtils {
         }
 
         const multipliers = {
-            'K': 1e3, 'M': 1e6, 'B': 1e9, 'T': 1e12, 'q': 1e15, 'Q': 1e18,
-            's': 1e21, 'S': 1e24, 'O': 1e27, 'N': 1e30
+            'K': 1e3, 'k': 1e3,
+            'M': 1e6, 'm': 1e6,
+            'B': 1e9, 'b': 1e9,
+            'T': 1e12, 't': 1e12,
+            'q': 1e15, 'Q': 1e18,
+            's': 1e21, 'S': 1e24,
+            'O': 1e27, 'o': 1e27,
+            'N': 1e30, 'n': 1e30
         };
 
-        // Match number with optional suffix
-        const match = str.match(/^([\d.]+)([KMBTQSNOqs]?)$/i);
+        // Match number with optional suffix (case-sensitive for q vs Q)
+        const match = str.match(/^([\d.]+)([KMBTqQsSNOkmbtno]?)$/);
         if (match) {
             const num = parseFloat(match[1]);
-            const suffix = match[2].toUpperCase();
+            const suffix = match[2]; // Keep original case for q vs Q distinction
             return num * (multipliers[suffix] || 1);
         }
 

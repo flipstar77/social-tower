@@ -112,7 +112,7 @@ body {
 .menu-item {
     display: flex;
     align-items: center;
-    padding: 18px 8px;
+    padding: 12px 0;
     margin-bottom: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -136,7 +136,7 @@ body {
 .menu-icon {
     width: 32px;
     height: 32px;
-    margin-right: 20px;
+    margin-right: 8px;
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -211,10 +211,16 @@ body {
 
 /* Main Content */
 .main-content {
-    margin-left: 273px;
+    margin-left: 0;
     flex: 1;
     padding: 34px 50px;
     background: #0D0B1F;
+    transition: margin-left 0.3s ease;
+}
+
+/* Only add margin when sidebar is visible (user is authenticated) */
+body.authenticated .main-content {
+    margin-left: 273px;
 }
 
 /* Header */

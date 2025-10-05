@@ -726,14 +726,29 @@ class TowerStatsManager {
         const session = this.currentSession || {};
 
         // Calculate hourly rates
-        const hours = this.parseTimeToHours(session.realTime || session.real_time || '0h 0m 0s');
+        const timeStr = session.realTime || session.real_time || '0h 0m 0s';
+        const hours = this.parseTimeToHours(timeStr);
         const coins = FormattingUtils.parseNumericValue(session.coinsEarned || session.coins_earned || session.coins || '0');
         const cells = FormattingUtils.parseNumericValue(session.cellsEarned || session.cells_earned || '0');
         const shards = FormattingUtils.parseNumericValue(session.rerollShardsEarned || session.reroll_shards_earned || '0');
 
+        // Debug logging
+        console.log('💰 Coins/Hour Calculation Debug:');
+        console.log('  Time String:', timeStr);
+        console.log('  Parsed Hours:', hours);
+        console.log('  Total Coins:', FormattingUtils.formatNumber(coins));
+        console.log('  Coins/Hour:', hours > 0 ? FormattingUtils.formatNumber(coins / hours) : '0');
+
+        // Validate - coins per hour shouldn't exceed total coins
         const coinsPerHour = hours > 0 ? coins / hours : 0;
         const cellsPerHour = hours > 0 ? cells / hours : 0;
         const shardsPerHour = hours > 0 ? shards / hours : 0;
+
+        // Sanity check - if hourly rate exceeds total, something is wrong
+        if (coinsPerHour > coins) {
+            console.error('⚠️ ERROR: Coins/hour exceeds total coins! Data inconsistency detected.');
+            console.error('  This indicates time parsing error or data mismatch');
+        }
 
         // Update Coins/Hour card
         const coinsHourValue = document.getElementById('coins-hour-value');

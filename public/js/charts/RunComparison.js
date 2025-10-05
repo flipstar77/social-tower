@@ -632,8 +632,30 @@ class RunComparison {
      */
     parseTime(str) {
         if (!str) return 1;
-        const match = str.match(/(\d+)h/);
-        return match ? parseInt(match[1]) : 1;
+
+        let hours = 0;
+        let minutes = 0;
+        let seconds = 0;
+
+        // Match days (e.g., "1d")
+        const daysMatch = str.match(/(\d+)d/);
+        if (daysMatch) hours += parseInt(daysMatch[1]) * 24;
+
+        // Match hours (e.g., "7h")
+        const hoursMatch = str.match(/(\d+)h/);
+        if (hoursMatch) hours += parseInt(hoursMatch[1]);
+
+        // Match minutes (e.g., "25m")
+        const minutesMatch = str.match(/(\d+)m/);
+        if (minutesMatch) minutes = parseInt(minutesMatch[1]);
+
+        // Match seconds (e.g., "32s")
+        const secondsMatch = str.match(/(\d+)s/);
+        if (secondsMatch) seconds = parseInt(secondsMatch[1]);
+
+        // Convert to hours
+        const totalHours = hours + (minutes / 60) + (seconds / 3600);
+        return Math.max(totalHours, 0.01); // Minimum 0.01 hours to avoid division by zero
     }
 
     /**

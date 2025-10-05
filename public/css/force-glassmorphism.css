@@ -324,22 +324,36 @@ body .container .sidebar {
     background-color: #232323 !important;
 }
 
+.sidebar-menu {
+    padding: 0 20px !important;
+}
+
 .menu-item {
     color: #FFFFFF !important;
     transition: all 0.3s ease !important;
     border-radius: 8px !important;
-    margin: 4px 8px !important;
+    margin: 4px 0 !important;
+    padding: 12px 0 !important;
+}
+
+.menu-icon {
+    margin-right: 12px !important;
 }
 
 .menu-item:hover {
     background: rgba(255, 255, 255, 0.1) !important;
     color: #26E2B3 !important;
+    transform: translateX(0) !important;
 }
 
 .menu-item.active {
     background: rgba(38, 226, 179, 0.1) !important;
     color: #26E2B3 !important;
-    border: 1px solid rgba(38, 226, 179, 0.3) !important;
+    border-left: 4px solid #26E2B3 !important;
+    border-right: none !important;
+    border-top: none !important;
+    border-bottom: none !important;
+    padding-left: 0 !important;
 }
 
 /* ========== MAIN CONTENT AREA ========== */
