@@ -455,10 +455,14 @@ class ContentHub {
     setupEventListeners() {
         // Control button interactions
         document.addEventListener('click', (e) => {
+            // Check thumbnail click FIRST (before control buttons)
+            if (e.target.closest('.tile-thumbnail')) {
+                this.handleThumbnailClick(e);
+                return; // Stop here, don't check other handlers
+            }
+
             if (e.target.closest('.control-btn')) {
                 this.handleControlClick(e);
-            } else if (e.target.closest('.tile-thumbnail')) {
-                this.handleThumbnailClick(e);
             } else if (e.target.closest('.tile-component')) {
                 this.handleTileClick(e);
             }
