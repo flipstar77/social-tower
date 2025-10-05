@@ -154,7 +154,7 @@ class ContentHub {
         const matchPercentage = Math.max(70, Math.min(99, 90 - Math.floor(ageHours / 24) * 2));
 
         // Generate gradient based on channel color
-        const channelColor = video.channelColor || '#4CAF50';
+        const channelColor = video.channelColor || video.color || '#4CAF50';
         const gradient = this.generateGradient(channelColor);
 
         // Parse views if they exist
@@ -175,7 +175,7 @@ class ContentHub {
             category: category,
             youtubeId: video.id,
             thumbnail: video.thumbnail,
-            channel: video.channel,
+            channel: video.channelTitle || video.channel,
             channelColor: channelColor,
             publishDate: video.publishDate,
             description: video.description,
