@@ -42,7 +42,9 @@ class RunComparison {
      */
     async checkForNewRuns() {
         try {
-            const response = await fetch('/api/tower/runs?limit=1');
+            const response = window.discordAuth?.authenticatedFetch
+                ? await window.discordAuth.authenticatedFetch('/api/tower/runs?limit=1')
+                : await fetch('/api/tower/runs?limit=1');
             const data = await response.json();
 
             if (data.runs && data.runs.length > 0) {
@@ -155,7 +157,10 @@ class RunComparison {
             if (window.towerMigration?.analyticsManager?.runs) {
                 this.allRuns = window.towerMigration.analyticsManager.runs;
             } else {
-                const response = await fetch('/api/tower/runs?limit=50');
+                // Use authenticated fetch if available
+                const response = window.discordAuth?.authenticatedFetch
+                    ? await window.discordAuth.authenticatedFetch('/api/tower/runs?limit=50')
+                    : await fetch('/api/tower/runs?limit=50');
                 const data = await response.json();
                 this.allRuns = data.runs || [];
             }

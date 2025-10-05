@@ -20,8 +20,10 @@ class ChartDataAdapter {
                 return this.towerData;
             }
 
-            // Fallback to API
-            const response = await fetch('/api/tower/runs?limit=50');
+            // Fallback to API with authentication
+            const response = window.discordAuth?.authenticatedFetch
+                ? await window.discordAuth.authenticatedFetch('/api/tower/runs?limit=50')
+                : await fetch('/api/tower/runs?limit=50');
             const data = await response.json();
             this.towerData = data.runs || [];
             console.log('📊 Loaded tower data from API:', this.towerData.length, 'runs');

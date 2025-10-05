@@ -1,5 +1,6 @@
 const express = require('express');
 const fs = require('fs');
+const { authenticateUser } = require('../../middleware/auth');
 
 /**
  * Factory function to create runs router with dependencies
@@ -7,6 +8,9 @@ const fs = require('fs');
 function createRunsRouter(dependencies) {
     const { upload, runQueries, statsProcessor, dataValidator } = dependencies;
     const router = express.Router();
+
+    // Apply auth middleware to all routes
+    router.use(authenticateUser);
 
     // Upload and parse Tower statistics
     router.post('/upload-stats', upload.single('statsFile'), async (req, res) => {
@@ -26,6 +30,12 @@ function createRunsRouter(dependencies) {
                     success: false,
                     error: 'Failed to parse statistics file'
                 });
+            }
+
+            // Add user ID from auth if available
+            if (req.discordUserId) {
+                parsedStats.discord_user_id = req.discordUserId;
+                parsedStats.source = 'web';
             }
 
             // Save to database
@@ -100,8 +110,11 @@ function createRunsRouter(dependencies) {
             const runs = await runQueries.getAllRuns({
                 limit: limit,
                 offset: offset,
-                session: session
+                session: session,
+                discordUserId: req.discordUserId  // Filter by authenticated user
             });
+
+            console.log(`📊 Fetched ${runs.length} runs for user: ${req.discordUserId || 'anonymous'}`);
 
             res.json({
                 success: true,

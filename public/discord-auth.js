@@ -139,6 +139,47 @@ class DiscordAuth {
     }
 
     /**
+     * Get authentication headers for API requests
+     */
+    async getAuthHeaders() {
+        if (!this.isAuthenticated) {
+            return {};
+        }
+
+        try {
+            const { data: { session } } = await this.supabase.auth.getSession();
+
+            if (session && session.access_token) {
+                return {
+                    'Authorization': `Bearer ${session.access_token}`,
+                    'Content-Type': 'application/json'
+                };
+            }
+        } catch (error) {
+            console.error('Error getting auth headers:', error);
+        }
+
+        return {};
+    }
+
+    /**
+     * Fetch with authentication
+     */
+    async authenticatedFetch(url, options = {}) {
+        const authHeaders = await this.getAuthHeaders();
+
+        const mergedOptions = {
+            ...options,
+            headers: {
+                ...authHeaders,
+                ...options.headers
+            }
+        };
+
+        return fetch(url, mergedOptions);
+    }
+
+    /**
      * Setup UI based on authentication status
      */
     setupUI() {

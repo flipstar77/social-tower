@@ -981,8 +981,15 @@ async function uploadFile(input) {
     formData.append('statsFile', file);
 
     try {
+        // Get auth headers
+        const authHeaders = window.discordAuth ? await window.discordAuth.getAuthHeaders() : {};
+
+        // Remove Content-Type to let browser set it with boundary for FormData
+        delete authHeaders['Content-Type'];
+
         const response = await fetch('/api/tower/runs/upload-stats', {
             method: 'POST',
+            headers: authHeaders,
             body: formData
         });
 
