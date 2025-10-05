@@ -147,7 +147,7 @@ class FieldMappings {
             },
             {
                 category: '👹 Enemies',
-                fields: ['total_enemies', 'basic_enemies', 'fast_enemies', 'tank_enemies', 'ranged_enemies', 'boss_enemies', 'protector_enemies', 'total_elites', 'vampires', 'rays', 'scatters', 'saboteurs', 'commanders', 'overcharges', 'destroyed_by_orbs', 'destroyed_by_thorns', 'destroyed_by_death_ray', 'destroyed_by_land_mine']
+                fields: ['total_enemies', 'basic', 'fast', 'tank', 'ranged', 'boss', 'protector', 'total_elites', 'vampires', 'rays', 'scatters', 'saboteurs', 'commanders', 'overcharges', 'destroyed_by_orbs', 'destroyed_by_thorns', 'destroyed_by_death_ray', 'destroyed_by_land_mine']
             },
             {
                 category: '📈 Progression',

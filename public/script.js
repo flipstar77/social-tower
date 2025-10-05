@@ -855,10 +855,15 @@ class TowerStatsManager {
                 if (typeof displayValue === 'number' && displayValue !== 0) {
                     displayValue = FormattingUtils.formatNumber(displayValue);
                 } else if (typeof displayValue === 'string' && displayValue !== 'N/A') {
-                    // Skip formatting if it has time notation (dhms), multipliers (x), or game suffixes (T, B, M, K, etc.)
-                    const hasSpecialFormat = /[dhms]|x\d|[KMBTQPEZYRΛΠΣΩ]|a[a-z]/.test(displayValue);
-                    if (!hasSpecialFormat && !displayValue.startsWith('$')) {
-                        // Only format plain numeric strings
+                    // Skip formatting only for time notation or multipliers
+                    const hasTimeFormat = /\d+[dhms]/.test(displayValue);
+                    const hasMultiplier = /^x\d/.test(displayValue);
+
+                    if (hasTimeFormat || hasMultiplier) {
+                        // Keep time and multiplier formats as-is
+                    } else {
+                        // Parse and reformat all numeric values (including those with K, M, B, T suffixes)
+                        // This ensures European format (comma decimals) gets converted to English (period decimals)
                         const numValue = FormattingUtils.parseNumericValue(displayValue);
                         if (numValue > 0) {
                             displayValue = FormattingUtils.formatNumber(numValue);
