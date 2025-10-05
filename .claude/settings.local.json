@@ -51,7 +51,13 @@
       "Bash(git branch:*)",
       "Bash(git push:*)",
       "Bash(echo:*)",
-      "Bash(railway whoami:*)"
+      "Bash(railway whoami:*)",
+      "Bash(code --version)",
+      "Bash(claude mcp add:*)",
+      "Read(//c/Users/Администратор/**)",
+      "Bash(npx @playwright/mcp@latest:*)",
+      "Bash(claude mcp:*)",
+      "Bash(start http://localhost:6079/test-charts.html)"
     ],
     "deny": [],
     "ask": []

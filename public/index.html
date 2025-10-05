@@ -167,36 +167,6 @@
                     </div>
                 </div>
 
-                <!-- Main Chart -->
-                <div class="chart-section">
-                    <div class="chart-container">
-                        <div class="chart-background"></div>
-                        <canvas id="mainChart"></canvas>
-                        <div class="chart-overlay" style="display: none;">
-                            <div class="selected-value">
-                                <div class="value-pin"></div>
-                                <div class="value-display" id="chart-value-display">$0</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Chart Legends -->
-                    <div class="chart-legends">
-                        <div class="legend-item">
-                            <div class="legend-dot tier-dot"></div>
-                            <span>TIER</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-dot wave-dot"></div>
-                            <span>WAVE</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-dot coins-dot"></div>
-                            <span>COINS</span>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Comprehensive Stats Grid -->
                 <div class="comprehensive-stats-section">
                     <h2 class="section-title">Run Statistics</h2>
@@ -934,6 +904,7 @@ Or paste raw tournament data from game stats."></textarea>
     <script src="content-hub.js?v=21"></script>
     <!-- Performance Charts -->
     <script src="js/charts/PerformanceCharts.js?v=3"></script>
+    <script src="js/charts/ChartDataAdapter.js?v=1"></script>
     <!-- New Modular Tower Analytics System -->
     <script type="module" src="js/tower/TowerDataService.js?v=4"></script>
     <script type="module" src="js/tower/TowerStatsCalculator.js?v=4"></script>
@@ -974,6 +945,12 @@ Or paste raw tournament data from game stats."></textarea>
                     window.performanceCharts = new PerformanceCharts();
                     await window.performanceCharts.init();
                     console.log('📊 Performance Charts initialized');
+
+                    // Load real tower data into charts
+                    if (window.ChartDataAdapter) {
+                        window.chartDataAdapter = new ChartDataAdapter();
+                        await window.chartDataAdapter.updateAllCharts(window.performanceCharts);
+                    }
                 } else {
                     console.warn('⚠️ ECharts or PerformanceCharts not loaded');
                 }

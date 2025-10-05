@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chart Test - Debug</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #000;
+            font-family: 'Roboto', sans-serif;
+            color: #fff;
+        }
+
+        .debug-info {
+            background: #1a1a1a;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        .chart-card {
+            background: #0A0D10;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            max-width: 600px;
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 300px;
+            background: #151A20;
+            border: 2px solid #324B55;
+        }
+
+        #log {
+            background: #0a0a0a;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #333;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>📊 Chart Debug Test</h1>
+
+    <div class="debug-info">
+        <h2>Debug Log</h2>
+        <div id="log"></div>
+    </div>
+
+    <div class="chart-card">
+        <h3>Test Chart 1 - Simple Bar Chart</h3>
+        <div id="test-chart-1" class="chart-container"></div>
+    </div>
+
+    <div class="chart-card">
+        <h3>Test Chart 2 - Line Chart</h3>
+        <div id="test-chart-2" class="chart-container"></div>
+    </div>
+
+    <!-- ECharts Library -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+
+    <script>
+        // Enhanced logging
+        const logEl = document.getElementById('log');
+        function log(msg, color = '#0f0') {
+            console.log(msg);
+            const line = document.createElement('div');
+            line.style.color = color;
+            line.textContent = `${new Date().toLocaleTimeString()} - ${msg}`;
+            logEl.appendChild(line);
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        log('🎬 Page loaded');
+
+        // Check if ECharts loaded
+        if (typeof echarts === 'undefined') {
+            log('❌ ECharts not loaded!', '#f00');
+        } else {
+            log(`✅ ECharts loaded, version: ${echarts.version}`, '#0f0');
+        }
+
+        // Wait for DOM ready
+        window.addEventListener('load', function() {
+            log('📦 DOM ready, initializing charts...');
+
+            // Test Chart 1 - Bar Chart
+            try {
+                const container1 = document.getElementById('test-chart-1');
+                log(`📏 Container 1 dimensions: ${container1.offsetWidth}x${container1.offsetHeight}px`);
+
+                if (container1.offsetWidth === 0 || container1.offsetHeight === 0) {
+                    log('⚠️ Container 1 has zero dimensions!', '#ff0');
+                }
+
+                const chart1 = echarts.init(container1);
+                log('✅ Chart 1 instance created');
+
+                const option1 = {
+                    backgroundColor: 'transparent',
+                    title: {
+                        text: 'Simple Bar Chart',
+                        textStyle: { color: '#fff' }
+                    },
+                    tooltip: {},
+                    xAxis: {
+                        data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+                        axisLabel: { color: '#fff' }
+                    },
+                    yAxis: {
+                        axisLabel: { color: '#fff' }
+                    },
+                    series: [{
+                        name: 'Sales',
+                        type: 'bar',
+                        data: [5, 20, 36, 10, 10],
+                        itemStyle: {
+                            color: '#F72585',
+                            borderRadius: [10, 10, 0, 0]
+                        }
+                    }]
+                };
+
+                chart1.setOption(option1);
+                log('✅ Chart 1 option set successfully', '#0f0');
+
+                // Force resize
+                setTimeout(() => {
+                    chart1.resize();
+                    log('🔄 Chart 1 resized');
+                }, 100);
+
+            } catch (error) {
+                log(`❌ Error creating Chart 1: ${error.message}`, '#f00');
+                console.error(error);
+            }
+
+            // Test Chart 2 - Line Chart
+            try {
+                const container2 = document.getElementById('test-chart-2');
+                log(`📏 Container 2 dimensions: ${container2.offsetWidth}x${container2.offsetHeight}px`);
+
+                const chart2 = echarts.init(container2);
+                log('✅ Chart 2 instance created');
+
+                const option2 = {
+                    backgroundColor: 'transparent',
+                    title: {
+                        text: 'Simple Line Chart',
+                        textStyle: { color: '#fff' }
+                    },
+                    tooltip: {},
+                    xAxis: {
+                        data: ['A', 'B', 'C', 'D', 'E'],
+                        axisLabel: { color: '#fff' }
+                    },
+                    yAxis: {
+                        axisLabel: { color: '#fff' }
+                    },
+                    series: [{
+                        type: 'line',
+                        data: [10, 25, 18, 30, 22],
+                        smooth: true,
+                        lineStyle: { color: '#00FAFF', width: 3 },
+                        itemStyle: { color: '#00FAFF' }
+                    }]
+                };
+
+                chart2.setOption(option2);
+                log('✅ Chart 2 option set successfully', '#0f0');
+
+                setTimeout(() => {
+                    chart2.resize();
+                    log('🔄 Chart 2 resized');
+                }, 100);
+
+            } catch (error) {
+                log(`❌ Error creating Chart 2: ${error.message}`, '#f00');
+                console.error(error);
+            }
+
+            log('🎉 Chart initialization complete!', '#0ff');
+        });
+    </script>
+</body>
+</html>
