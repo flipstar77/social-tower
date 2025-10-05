@@ -209,7 +209,9 @@ class RunComparison {
             fast: 0,
             tank: 0,
             ranged: 0,
-            boss: 0
+            boss: 0,
+            protector: 0,
+            elites: 0
         };
 
         this.selectedRuns.forEach(run => {
@@ -218,46 +220,78 @@ class RunComparison {
             enemyData.tank += parseInt(run.tank_enemies || 0);
             enemyData.ranged += parseInt(run.ranged_enemies || 0);
             enemyData.boss += parseInt(run.boss_enemies || 0);
+            enemyData.protector += parseInt(run.protector_enemies || 0);
+            enemyData.elites += parseInt(run.total_elites || 0);
         });
+
+        // Filter out categories with very low counts and group small ones
+        const total = Object.values(enemyData).reduce((a, b) => a + b, 0);
+        const chartData = [];
+
+        if (enemyData.basic > 0) chartData.push({ value: enemyData.basic, name: 'Basic', itemStyle: { color: '#4CAF50' } });
+        if (enemyData.fast > 0) chartData.push({ value: enemyData.fast, name: 'Fast', itemStyle: { color: '#FF9800' } });
+        if (enemyData.tank > 0) chartData.push({ value: enemyData.tank, name: 'Tank', itemStyle: { color: '#F44336' } });
+        if (enemyData.ranged > 0) chartData.push({ value: enemyData.ranged, name: 'Ranged', itemStyle: { color: '#2196F3' } });
+
+        // Group small categories as "Other"
+        const otherCount = (enemyData.boss || 0) + (enemyData.protector || 0) + (enemyData.elites || 0);
+        if (otherCount > 0) {
+            chartData.push({
+                value: otherCount,
+                name: 'Boss/Elite/Protector',
+                itemStyle: { color: '#9C27B0' }
+            });
+        }
 
         const option = {
             backgroundColor: 'transparent',
             tooltip: {
                 trigger: 'item',
-                formatter: '{b}: {c} ({d}%)'
+                formatter: '{b}: {c} ({d}%)',
+                backgroundColor: 'rgba(0,0,0,0.8)',
+                textStyle: { color: '#fff' }
             },
             legend: {
                 orient: 'vertical',
                 left: 'left',
-                textStyle: { color: '#fff' }
+                textStyle: { color: '#fff', fontSize: 12 },
+                formatter: (name) => {
+                    const item = chartData.find(d => d.name === name);
+                    if (!item) return name;
+                    const percent = ((item.value / total) * 100).toFixed(1);
+                    return `${name} (${percent}%)`;
+                }
             },
             series: [{
                 type: 'pie',
-                radius: ['40%', '70%'],
-                avoidLabelOverlap: false,
+                radius: ['45%', '75%'],
+                center: ['60%', '50%'],
+                avoidLabelOverlap: true,
                 itemStyle: {
-                    borderRadius: 10,
+                    borderRadius: 8,
                     borderColor: '#0A0D10',
                     borderWidth: 2
                 },
                 label: {
-                    show: false
+                    show: true,
+                    formatter: '{d}%',
+                    color: '#fff',
+                    fontSize: 14,
+                    fontWeight: 'bold'
                 },
                 emphasis: {
                     label: {
                         show: true,
-                        fontSize: 16,
-                        fontWeight: 'bold',
-                        color: '#fff'
+                        fontSize: 18,
+                        fontWeight: 'bold'
+                    },
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
                     }
                 },
-                data: [
-                    { value: enemyData.basic, name: 'Basic', itemStyle: { color: '#4CAF50' } },
-                    { value: enemyData.fast, name: 'Fast', itemStyle: { color: '#FF9800' } },
-                    { value: enemyData.tank, name: 'Tank', itemStyle: { color: '#F44336' } },
-                    { value: enemyData.ranged, name: 'Ranged', itemStyle: { color: '#2196F3' } },
-                    { value: enemyData.boss, name: 'Boss', itemStyle: { color: '#9C27B0' } }
-                ]
+                data: chartData
             }]
         };
 
@@ -289,29 +323,44 @@ class RunComparison {
 
         const tiers = Object.keys(tierData).sort((a, b) => b - a);
         const avgHourly = tiers.map(tier =>
-            (tierData[tier].total / tierData[tier].count).toFixed(2)
+            tierData[tier].total / tierData[tier].count
         );
 
         const option = {
             backgroundColor: 'transparent',
             tooltip: {
                 trigger: 'axis',
-                axisPointer: { type: 'shadow' }
+                axisPointer: { type: 'shadow' },
+                backgroundColor: 'rgba(0,0,0,0.8)',
+                textStyle: { color: '#fff' },
+                formatter: (params) => {
+                    const value = params[0].value;
+                    return `${params[0].name}<br/>Avg: ${this.formatNumber(value)}/hr`;
+                }
             },
             grid: {
-                left: '10%',
-                right: '5%',
-                bottom: '15%',
-                top: '10%'
+                left: '15%',
+                right: '10%',
+                bottom: '20%',
+                top: '10%',
+                containLabel: true
             },
             xAxis: {
                 type: 'category',
                 data: tiers.map(t => `Tier ${t}`),
-                axisLabel: { color: '#fff', rotate: 45 }
+                axisLabel: {
+                    color: '#fff',
+                    rotate: 0,
+                    fontSize: 12
+                },
+                axisTick: { show: false }
             },
             yAxis: {
                 type: 'value',
-                axisLabel: { color: '#fff' },
+                axisLabel: {
+                    color: '#fff',
+                    formatter: (value) => this.formatNumber(value)
+                },
                 splitLine: { lineStyle: { color: '#324B55' } }
             },
             series: [{
@@ -324,7 +373,14 @@ class RunComparison {
                     ]),
                     borderRadius: [10, 10, 0, 0]
                 },
-                barWidth: '60%'
+                barWidth: '50%',
+                label: {
+                    show: true,
+                    position: 'top',
+                    formatter: (params) => this.formatNumber(params.value),
+                    color: '#fff',
+                    fontSize: 11
+                }
             }]
         };
 
@@ -434,6 +490,18 @@ class RunComparison {
         if (!str) return 1;
         const match = str.match(/(\d+)h/);
         return match ? parseInt(match[1]) : 1;
+    }
+
+    /**
+     * Format number with K/M/B/T suffix
+     */
+    formatNumber(num) {
+        if (num >= 1e15) return (num / 1e15).toFixed(1) + 'Q';
+        if (num >= 1e12) return (num / 1e12).toFixed(1) + 'T';
+        if (num >= 1e9) return (num / 1e9).toFixed(1) + 'B';
+        if (num >= 1e6) return (num / 1e6).toFixed(1) + 'M';
+        if (num >= 1e3) return (num / 1e3).toFixed(1) + 'K';
+        return num.toFixed(0);
     }
 }
 
