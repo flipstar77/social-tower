@@ -35,13 +35,27 @@ class ChartManager {
             return;
         }
 
-        // Initialize individual charts
-        this.initVerticalBarChart();
-        this.initHorizontalBars();
-        this.initLineChart();
-        this.initAreaChart();
+        console.log('✅ ECharts library loaded, version:', echarts.version);
 
-        console.log('✅ ChartManager initialized with', this.charts.size, 'charts');
+        // Initialize individual charts with error handling
+        try {
+            this.initVerticalBarChart();
+            this.initHorizontalBars();
+            this.initLineChart();
+            this.initAreaChart();
+
+            console.log('✅ ChartManager initialized with', this.charts.size, 'charts');
+
+            // Log chart container dimensions
+            ['chart-vertical-bars', 'chart-horizontal-bars', 'chart-line', 'chart-area'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    console.log(`📏 ${id}: ${el.offsetWidth}x${el.offsetHeight}px`);
+                }
+            });
+        } catch (error) {
+            console.error('❌ Error initializing charts:', error);
+        }
     }
 
     /**

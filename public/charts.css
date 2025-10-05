@@ -190,15 +190,29 @@ body {
 /* Chart Graphics */
 .chart-graphic {
     width: 100%;
+    min-height: 180px;
     height: 180px;
+    position: relative;
 }
 
 .chart-graphic.horizontal {
+    min-height: 146px;
     height: 146px;
 }
 
 .chart-graphic.area {
+    min-height: 208px;
     height: 208px;
+}
+
+/* Ensure chart containers have explicit dimensions */
+#chart-vertical-bars,
+#chart-horizontal-bars,
+#chart-line,
+#chart-area {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: inherit;
 }
 
 /* Card Footer */
