@@ -165,16 +165,16 @@
 
 /* Hide authenticated content by default */
 .authenticated-content {
-    display: none;
+    display: none !important;
 }
 
 /* Show authenticated content when user is logged in */
 body.authenticated .authenticated-content {
-    display: block;
+    display: block !important;
 }
 
 body.authenticated .landing-page {
-    display: none;
+    display: none !important;
 }
 
 /* Mobile responsiveness */

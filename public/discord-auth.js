@@ -191,6 +191,7 @@ class DiscordAuth {
 
         if (this.isAuthenticated) {
             // Show authenticated content, hide landing page
+            document.body.classList.add('authenticated');
             if (landingPage) landingPage.style.display = 'none';
             if (authenticatedContent) authenticatedContent.classList.add('show');
             if (sidebar) sidebar.style.display = 'flex';
@@ -207,6 +208,7 @@ class DiscordAuth {
             this.initializeNavigation();
         } else {
             // Show landing page ONLY, hide everything else
+            document.body.classList.remove('authenticated');
             if (landingPage) landingPage.style.display = 'block';
             if (authenticatedContent) authenticatedContent.classList.remove('show');
             if (sidebar) sidebar.style.display = 'none';
