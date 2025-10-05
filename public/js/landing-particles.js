@@ -1,9 +1,9 @@
 /**
  * Landing Page Particle Effect
- * Creates colorful squares and triangles that swarm around the logo
+ * Creates colorful squares that swarm around the logo
  *
- * Easter egg: These are the enemies from The Tower game!
- * - Squares and triangles in red, green, and yellow
+ * Easter egg: These are the square enemies from The Tower game!
+ * - Squares in red, green, and yellow
  * - They "attack" the logo when you hover over it
  * - A fun nod to The Tower community! 🎮
  */
@@ -104,7 +104,6 @@ class LogoParticleEffect {
                 y: Math.random() * this.canvas.height,
                 size: Math.random() * 8 + 4,
                 color: this.colors[Math.floor(Math.random() * this.colors.length)],
-                shape: Math.random() > 0.5 ? 'square' : 'triangle', // 50/50 squares and triangles
                 vx: (Math.random() - 0.5) * 2,
                 vy: (Math.random() - 0.5) * 2,
                 rotation: Math.random() * 360,
@@ -185,26 +184,13 @@ class LogoParticleEffect {
             if (particle.y < -20) particle.y = this.canvas.height + 20;
             if (particle.y > this.canvas.height + 20) particle.y = -20;
 
-            // Draw particle (square or triangle enemy from The Tower!)
+            // Draw particle (square enemy from The Tower!)
             this.ctx.save();
             this.ctx.translate(particle.x, particle.y);
             this.ctx.rotate((particle.rotation * Math.PI) / 180);
             this.ctx.globalAlpha = particle.opacity;
             this.ctx.fillStyle = particle.color;
-
-            if (particle.shape === 'square') {
-                // Draw square enemy
-                this.ctx.fillRect(-particle.size / 2, -particle.size / 2, particle.size, particle.size);
-            } else {
-                // Draw triangle enemy
-                this.ctx.beginPath();
-                this.ctx.moveTo(0, -particle.size / 2);
-                this.ctx.lineTo(particle.size / 2, particle.size / 2);
-                this.ctx.lineTo(-particle.size / 2, particle.size / 2);
-                this.ctx.closePath();
-                this.ctx.fill();
-            }
-
+            this.ctx.fillRect(-particle.size / 2, -particle.size / 2, particle.size, particle.size);
             this.ctx.restore();
         });
 
