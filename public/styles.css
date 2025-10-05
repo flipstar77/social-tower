@@ -106,13 +106,13 @@ body {
 
 .sidebar-menu {
     margin-top: 154px;
-    padding: 0 16px;
+    padding: 0 8px;
 }
 
 .menu-item {
     display: flex;
     align-items: center;
-    padding: 18px 16px;
+    padding: 18px 12px;
     margin-bottom: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
