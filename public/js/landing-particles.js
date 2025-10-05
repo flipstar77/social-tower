@@ -22,24 +22,30 @@ class LogoParticleEffect {
     }
 
     init() {
+        console.log('🎨 Initializing particle effect...');
+
         // Find the logo element
         this.logo = document.querySelector('.hero-logo');
         if (!this.logo) {
-            console.log('Logo not found, particles disabled');
+            console.warn('⚠️ Logo element not found (.hero-logo), particles disabled');
             return;
         }
+
+        console.log('✅ Logo found, creating canvas...');
 
         // Create canvas
         this.createCanvas();
 
         // Create particles
         this.createParticles();
+        console.log(`✅ Created ${this.particles.length} particles`);
 
         // Add hover listeners
         this.addEventListeners();
 
         // Start animation
         this.animate();
+        console.log('✅ Particle animation started!');
     }
 
     createCanvas() {
@@ -209,14 +215,22 @@ class LogoParticleEffect {
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('🔮 Landing particles script loaded');
+
     // Only initialize on landing page
     const landingPage = document.getElementById('landing-page');
+    console.log('Landing page element:', landingPage);
+    console.log('Landing page display:', landingPage?.style.display);
+
     if (landingPage && landingPage.style.display !== 'none') {
+        console.log('✅ Landing page is visible, initializing particles...');
         const particleEffect = new LogoParticleEffect();
         particleEffect.init();
 
         // Store globally so it can be cleaned up
         window.logoParticleEffect = particleEffect;
+    } else {
+        console.log('⚠️ Landing page not visible, skipping particle initialization');
     }
 });
 
