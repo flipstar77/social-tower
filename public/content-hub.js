@@ -459,8 +459,14 @@ class ContentHub {
     setupEventListeners() {
         // Control button interactions
         document.addEventListener('click', (e) => {
+            console.log('🔍 Click detected on:', e.target, 'classes:', e.target.className);
+            console.log('🔍 Closest .tile-thumbnail:', e.target.closest('.tile-thumbnail'));
+            console.log('🔍 Closest .control-btn:', e.target.closest('.control-btn'));
+            console.log('🔍 Closest .tile-component:', e.target.closest('.tile-component'));
+
             // Check thumbnail click FIRST (before control buttons)
             if (e.target.closest('.tile-thumbnail')) {
+                console.log('✅ Thumbnail detected, calling handleThumbnailClick');
                 this.handleThumbnailClick(e);
                 return; // Stop here, don't check other handlers
             }
