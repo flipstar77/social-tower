@@ -188,6 +188,34 @@
     color: white;
 }
 
+.chart-type-toggle {
+    display: flex;
+    gap: 8px;
+}
+
+.chart-type-btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    background: #151A20;
+    color: #CED8E1;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.chart-type-btn:hover {
+    background: #1E2125;
+    transform: translateY(-1px);
+}
+
+.chart-type-btn.active {
+    background: linear-gradient(135deg, #F72585, #7209B7);
+    color: white;
+    box-shadow: 0 4px 12px rgba(247, 37, 133, 0.3);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .run-selector-grid {

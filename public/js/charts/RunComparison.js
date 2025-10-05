@@ -8,6 +8,7 @@ class RunComparison {
         this.selectedRuns = [];
         this.allRuns = [];
         this.charts = new Map();
+        this.enemyChartType = 'pie'; // Default chart type
     }
 
     /**
@@ -221,7 +222,13 @@ class RunComparison {
             <div class="comparison-charts-grid">
                 <!-- Enemy Distribution Pie Chart -->
                 <div class="comparison-chart-card">
-                    <h3>Enemy Distribution</h3>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <h3 style="margin: 0;">Enemy Distribution</h3>
+                        <div class="chart-type-toggle">
+                            <button class="chart-type-btn active" data-chart-type="pie">🥧 Pie</button>
+                            <button class="chart-type-btn" data-chart-type="bar">📊 Bar</button>
+                        </div>
+                    </div>
                     <div id="enemy-distribution-chart" style="height: 300px;"></div>
                 </div>
 
@@ -295,6 +302,16 @@ class RunComparison {
                 this.updateComparisonChart(e.target.dataset.metric);
             });
         });
+
+        // Chart type toggle for enemy distribution
+        document.querySelectorAll('.chart-type-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.chart-type-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                this.enemyChartType = e.target.dataset.chartType;
+                this.updateEnemyDistribution();
+            });
+        });
     }
 
     /**
@@ -341,7 +358,7 @@ class RunComparison {
     }
 
     /**
-     * Update enemy distribution pie chart
+     * Update enemy distribution chart (pie or bar)
      */
     updateEnemyDistribution() {
         const chart = this.charts.get('enemy');
@@ -387,60 +404,161 @@ class RunComparison {
             });
         }
 
-        const option = {
-            backgroundColor: 'transparent',
-            tooltip: {
-                trigger: 'item',
-                formatter: '{b}: {c} ({d}%)',
-                backgroundColor: 'rgba(0,0,0,0.8)',
-                textStyle: { color: '#fff' }
-            },
-            legend: {
-                orient: 'vertical',
-                left: 'left',
-                textStyle: { color: '#fff', fontSize: 12 },
-                formatter: (name) => {
-                    const item = chartData.find(d => d.name === name);
-                    if (!item) return name;
-                    const percent = ((item.value / total) * 100).toFixed(1);
-                    return `${name} (${percent}%)`;
-                }
-            },
-            series: [{
-                type: 'pie',
-                radius: ['45%', '75%'],
-                center: ['60%', '50%'],
-                avoidLabelOverlap: true,
-                itemStyle: {
-                    borderRadius: 8,
-                    borderColor: '#0A0D10',
-                    borderWidth: 2
-                },
-                label: {
-                    show: true,
-                    formatter: '{d}%',
-                    color: '#fff',
-                    fontSize: 14,
-                    fontWeight: 'bold'
-                },
-                emphasis: {
-                    label: {
-                        show: true,
-                        fontSize: 18,
-                        fontWeight: 'bold'
+        let option;
+
+        if (this.enemyChartType === 'bar') {
+            // Bar Chart Configuration
+            option = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
                     },
-                    itemStyle: {
-                        shadowBlur: 10,
-                        shadowOffsetX: 0,
-                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    formatter: (params) => {
+                        const item = params[0];
+                        const percent = ((item.value / total) * 100).toFixed(1);
+                        return `${item.name}<br/>Count: ${item.value.toLocaleString()}<br/>Percentage: ${percent}%`;
+                    },
+                    backgroundColor: 'rgba(0,0,0,0.8)',
+                    textStyle: { color: '#fff' }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    top: '10%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: chartData.map(d => d.name),
+                    axisLabel: {
+                        color: '#fff',
+                        fontSize: 12,
+                        rotate: 0
+                    },
+                    axisLine: {
+                        lineStyle: { color: 'rgba(255,255,255,0.2)' }
                     }
                 },
-                data: chartData
-            }]
-        };
+                yAxis: {
+                    type: 'value',
+                    axisLabel: {
+                        color: '#fff',
+                        fontSize: 12,
+                        formatter: (value) => {
+                            if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M';
+                            if (value >= 1000) return (value / 1000).toFixed(1) + 'K';
+                            return value;
+                        }
+                    },
+                    axisLine: {
+                        lineStyle: { color: 'rgba(255,255,255,0.2)' }
+                    },
+                    splitLine: {
+                        lineStyle: { color: 'rgba(255,255,255,0.1)' }
+                    }
+                },
+                series: [{
+                    type: 'bar',
+                    data: chartData.map(d => ({
+                        value: d.value,
+                        itemStyle: d.itemStyle
+                    })),
+                    barWidth: '60%',
+                    itemStyle: {
+                        borderRadius: [8, 8, 0, 0]
+                    },
+                    label: {
+                        show: true,
+                        position: 'top',
+                        color: '#fff',
+                        fontSize: 12,
+                        fontWeight: 'bold',
+                        formatter: (params) => {
+                            const percent = ((params.value / total) * 100).toFixed(1);
+                            return `${percent}%`;
+                        }
+                    },
+                    emphasis: {
+                        itemStyle: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }]
+            };
+        } else {
+            // Pie Chart Configuration (improved label positioning)
+            option = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{b}: {c} ({d}%)',
+                    backgroundColor: 'rgba(0,0,0,0.8)',
+                    textStyle: { color: '#fff' }
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left',
+                    top: 'center',
+                    textStyle: { color: '#fff', fontSize: 12 },
+                    formatter: (name) => {
+                        const item = chartData.find(d => d.name === name);
+                        if (!item) return name;
+                        const percent = ((item.value / total) * 100).toFixed(1);
+                        return `${name} (${percent}%)`;
+                    }
+                },
+                series: [{
+                    type: 'pie',
+                    radius: ['40%', '70%'],
+                    center: ['60%', '50%'],
+                    avoidLabelOverlap: true,
+                    itemStyle: {
+                        borderRadius: 8,
+                        borderColor: '#0A0D10',
+                        borderWidth: 2
+                    },
+                    label: {
+                        show: true,
+                        formatter: '{d}%',
+                        color: '#fff',
+                        fontSize: 13,
+                        fontWeight: 'bold',
+                        distanceToLabelLine: 5
+                    },
+                    labelLine: {
+                        show: true,
+                        length: 15,
+                        length2: 10,
+                        smooth: true,
+                        lineStyle: {
+                            color: 'rgba(255, 255, 255, 0.3)',
+                            width: 1
+                        }
+                    },
+                    emphasis: {
+                        label: {
+                            show: true,
+                            fontSize: 16,
+                            fontWeight: 'bold'
+                        },
+                        itemStyle: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    },
+                    data: chartData
+                }]
+            };
+        }
 
-        chart.setOption(option);
-        console.log('✅ Updated enemy distribution chart');
+        chart.setOption(option, true); // Use notMerge=true for clean replacement
+        console.log(`✅ Updated enemy distribution chart (${this.enemyChartType})`);
     }
 
     /**
