@@ -153,6 +153,7 @@ class RedditRSSManager extends BaseFeedManager {
      * Load mock data as fallback
      */
     loadMockData() {
+        console.log('📋 Loading mock Reddit data (API blocked by CORS)...');
         this.items = [
             {
                 id: 'mock1',
@@ -160,8 +161,8 @@ class RedditRSSManager extends BaseFeedManager {
                 flair: 'Strategy',
                 author: 'TowerMaster',
                 publishDate: new Date(Date.now() - 2 * 60 * 60 * 1000),
-                url: 'https://reddit.com/r/TheTowerGame/mock1',
-                preview: 'Found a new strategy that helped me push past wave 15000...',
+                url: 'https://reddit.com/r/TheTowerGame',
+                preview: 'Found a new strategy that helped me push past wave 15000 using Black Hole and Chain Lightning...',
                 upvotes: 247,
                 comments: 34
             },
@@ -171,16 +172,61 @@ class RedditRSSManager extends BaseFeedManager {
                 flair: 'Bug Report',
                 author: 'GameDebugger',
                 publishDate: new Date(Date.now() - 4 * 60 * 60 * 1000),
-                url: 'https://reddit.com/r/TheTowerGame/mock2',
-                preview: 'The Amplifier module sometimes doesn\'t apply its bonus...',
+                url: 'https://reddit.com/r/TheTowerGame',
+                preview: 'The Amplifier module sometimes doesn\'t apply its bonus after tier 10...',
                 upvotes: 89,
                 comments: 12
+            },
+            {
+                id: 'mock3',
+                title: 'Tier 14 Tournament Winners - Congratulations!',
+                flair: 'News',
+                author: 'TowerOfficial',
+                publishDate: new Date(Date.now() - 6 * 60 * 60 * 1000),
+                url: 'https://reddit.com/r/TheTowerGame',
+                preview: 'Congratulations to all Tier 14 tournament winners! Amazing runs this week...',
+                upvotes: 432,
+                comments: 67
+            },
+            {
+                id: 'mock4',
+                title: 'Question: Best modules for Death Wave build?',
+                flair: 'Question',
+                author: 'NewPlayer2024',
+                publishDate: new Date(Date.now() - 8 * 60 * 60 * 1000),
+                url: 'https://reddit.com/r/TheTowerGame',
+                preview: 'I\'m trying to optimize my Death Wave build. What modules work best?',
+                upvotes: 56,
+                comments: 23
+            },
+            {
+                id: 'mock5',
+                title: 'Update 2.5.0 - New Core Module Released!',
+                flair: 'News',
+                author: 'TowerDev',
+                publishDate: new Date(Date.now() - 12 * 60 * 60 * 1000),
+                url: 'https://reddit.com/r/TheTowerGame',
+                preview: 'Patch notes for version 2.5.0 including the new Quantum Core module...',
+                upvotes: 891,
+                comments: 145
+            },
+            {
+                id: 'mock6',
+                title: 'My first wave 10000! Tips for new players',
+                flair: 'Achievement',
+                author: 'ProgressPlayer',
+                publishDate: new Date(Date.now() - 16 * 60 * 60 * 1000),
+                url: 'https://reddit.com/r/TheTowerGame',
+                preview: 'Finally hit wave 10000! Here are the strategies that worked for me...',
+                upvotes: 178,
+                comments: 41
             }
         ];
 
         this.lastUpdated = new Date();
         this.saveToCache();
         this.updateCarousel();
+        console.log(`✅ Loaded ${this.items.length} mock Reddit posts`);
     }
 
     /**
