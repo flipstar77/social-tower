@@ -121,12 +121,17 @@ class TowerStatsManager {
                         if (cleanRawData.game_time) cleanRawData.game_time = extractTime(cleanRawData.game_time);
                         if (cleanRawData.real_time) cleanRawData.real_time = extractTime(cleanRawData.real_time);
 
-                        // Normalize all number formats (European comma -> English period)
+                        // Normalize all number formats in raw_data (European comma -> English period)
                         Object.keys(cleanRawData).forEach(key => {
                             if (typeof cleanRawData[key] === 'string') {
                                 cleanRawData[key] = normalizeNumberFormat(cleanRawData[key]);
                             }
                         });
+
+                        // Also normalize top-level run fields
+                        const normalizeRunField = (field) => {
+                            return typeof field === 'string' ? normalizeNumberFormat(field) : field;
+                        };
 
                         // Extract all fields from raw_data for comprehensive stats
                         return {
@@ -134,8 +139,8 @@ class TowerStatsManager {
                             timestamp: run.submitted_at || new Date().toISOString(),
                             tier: parseInt(run.tier) || 0,
                             wave: parseInt(run.wave) || 0,
-                            coins: normalizeNumberFormat(run.coins_earned || cleanRawData?.coins || '0'),
-                            damage: normalizeNumberFormat(run.damage_dealt || cleanRawData?.damage || '0'),
+                            coins: normalizeRunField(run.coins_earned) || normalizeRunField(cleanRawData?.coins) || '0',
+                            damage: normalizeRunField(run.damage_dealt) || normalizeRunField(cleanRawData?.damage) || '0',
                             source: run.submission_source || 'api',
                             isDiscordSubmission: run.submission_source === 'discord',
                             isTournament: isTournament,
