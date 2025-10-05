@@ -991,6 +991,11 @@ async function uploadFile(input) {
         if (result.success) {
             showNotification('File uploaded successfully!', 'success');
             loadDashboard(); // Reload data
+
+            // Dispatch event to notify other components
+            window.dispatchEvent(new CustomEvent('runsUpdated', {
+                detail: { source: 'upload', result }
+            }));
         } else {
             showNotification(result.message || 'Upload failed', 'error');
         }

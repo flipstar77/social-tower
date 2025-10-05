@@ -18,6 +18,109 @@ class RunComparison {
         await this.loadRuns();
         this.createComparisonUI();
         this.initializeCharts();
+        this.setupAutoRefresh();
+    }
+
+    /**
+     * Setup auto-refresh when new runs are submitted
+     */
+    setupAutoRefresh() {
+        // Listen for custom event when new runs are added
+        window.addEventListener('runsUpdated', async () => {
+            console.log('🔄 Detected new run submission, refreshing...');
+            await this.refresh();
+        });
+
+        // Also check periodically for new runs (every 30 seconds)
+        this.refreshInterval = setInterval(async () => {
+            await this.checkForNewRuns();
+        }, 30000);
+    }
+
+    /**
+     * Check for new runs and refresh if found
+     */
+    async checkForNewRuns() {
+        try {
+            const response = await fetch('/api/tower/runs?limit=1');
+            const data = await response.json();
+
+            if (data.runs && data.runs.length > 0) {
+                const latestRun = data.runs[0];
+                const latestId = latestRun.id;
+
+                // Check if this is a new run
+                if (this.allRuns.length > 0 && this.allRuns[0].id !== latestId) {
+                    console.log('🆕 New run detected, refreshing...');
+                    this.showRefreshNotification(latestRun);
+                    await this.refresh();
+                }
+            }
+        } catch (error) {
+            console.error('❌ Failed to check for new runs:', error);
+        }
+    }
+
+    /**
+     * Show notification when new run is detected
+     */
+    showRefreshNotification(run) {
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #F72585, #7209B7);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(247, 37, 133, 0.4);
+            z-index: 10000;
+            animation: slideIn 0.3s ease;
+            font-weight: 600;
+        `;
+        notification.innerHTML = `
+            🆕 New run detected: T${run.tier} W${run.wave}
+        `;
+
+        // Add animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(400px); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+        document.body.appendChild(notification);
+
+        // Remove after 3 seconds
+        setTimeout(() => {
+            notification.style.animation = 'slideIn 0.3s ease reverse';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+
+    /**
+     * Refresh the run list and UI
+     */
+    async refresh() {
+        const previousSelection = this.selectedRuns.map(r => r.id);
+        await this.loadRuns();
+        this.createComparisonUI();
+
+        // Restore previous selection if runs still exist
+        previousSelection.forEach(id => {
+            const checkbox = document.getElementById(`run-${id}`);
+            if (checkbox) {
+                checkbox.checked = true;
+                const run = this.allRuns.find(r => r.id === id);
+                if (run) this.selectedRuns.push(run);
+            }
+        });
+
+        this.updateVisualizeButton();
+        console.log('✅ Run comparison refreshed');
     }
 
     /**
