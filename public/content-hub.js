@@ -66,6 +66,7 @@ class ContentHub {
         if (data.success && data.videos) {
             // Convert YouTube videos to content format
             const youtubeVideos = data.videos.slice(0, 20); // Limit to 20 videos
+            console.log('📺 Sample video from API:', youtubeVideos[0]);
 
             // Split into categories
             this.contentData.trending = youtubeVideos.slice(0, 8).map((video, index) => this.convertYouTubeToContentFormat(video, index + 1, 'trending'));
@@ -411,7 +412,10 @@ class ContentHub {
     }
 
     renderSection(sectionName, data) {
+        console.log(`🎨 renderSection called for: ${sectionName} with ${data.length} items`);
         const container = document.querySelector(`.${sectionName}-grid`);
+        console.log(`🔍 Found container .${sectionName}-grid:`, container ? 'YES' : 'NO');
+
         if (!container || !data.length) {
             console.warn(`Container .${sectionName}-grid not found or no data`);
             return;
@@ -915,17 +919,28 @@ class ContentHub {
     }
 
     startRotation(grid) {
-        if (!grid) return;
+        if (!grid) {
+            console.warn('⚠️ startRotation called but no grid found');
+            return;
+        }
 
+        console.log('🔄 Starting rotation for grid:', grid.className);
         grid.classList.add('auto-rotate');
 
         // Update CSS animation duration
         const tilesContainer = grid.querySelector('.tiles-container');
         const progressBar = grid.querySelector('.progress-bar');
 
+        console.log('🔍 Found .tiles-container:', tilesContainer ? 'YES' : 'NO');
+        console.log('🔍 Found .progress-bar:', progressBar ? 'YES' : 'NO');
+
         if (tilesContainer) {
             tilesContainer.style.animationDuration = `${this.rotationSettings.speed}s`;
+            console.log(`✅ Set animation duration to ${this.rotationSettings.speed}s`);
+        } else {
+            console.warn('⚠️ No .tiles-container found - rotation will not work!');
         }
+
         if (progressBar) {
             progressBar.style.animationDuration = `${this.rotationSettings.speed}s`;
         }
