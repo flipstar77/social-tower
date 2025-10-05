@@ -459,18 +459,6 @@ class ContentHub {
     setupEventListeners() {
         // Control button interactions
         document.addEventListener('click', (e) => {
-            console.log('🔍 Click detected on:', e.target, 'classes:', e.target.className);
-            console.log('🔍 Closest .tile-thumbnail:', e.target.closest('.tile-thumbnail'));
-            console.log('🔍 Closest .control-btn:', e.target.closest('.control-btn'));
-            console.log('🔍 Closest .tile-component:', e.target.closest('.tile-component'));
-
-            // Check thumbnail click FIRST (before control buttons)
-            if (e.target.closest('.tile-thumbnail')) {
-                console.log('✅ Thumbnail detected, calling handleThumbnailClick');
-                this.handleThumbnailClick(e);
-                return; // Stop here, don't check other handlers
-            }
-
             if (e.target.closest('.control-btn')) {
                 this.handleControlClick(e);
             } else if (e.target.closest('.tile-component')) {
@@ -550,13 +538,34 @@ class ContentHub {
         const tile = e.target.closest('.tile-component');
         const tileId = tile?.dataset.tileId;
 
-        // Skip Reddit tiles and YouTube tiles - they have their own click handlers
-        if (tile && (tile.classList.contains('reddit-tile') || tile.classList.contains('video-tile'))) {
+        // Skip control buttons (play, add, etc.)
+        if (e.target.closest('.control-btn')) {
+            console.log('⏸️ Control button clicked, skipping tile action');
             return;
         }
 
-        if (tileId && !e.target.closest('.control-btn') && !e.target.closest('.tile-thumbnail')) {
-            this.showContentDetails(tileId);
+        // For YouTube videos, clicking anywhere on tile should play the video
+        if (tileId) {
+            console.log('🎬 Tile clicked, attempting to play content:', tileId);
+
+            // Find the content to check if it's a video
+            const allContent = [
+                ...this.contentData.trending,
+                ...this.contentData.recent,
+                ...this.contentData.strategies,
+                ...this.contentData.reddit
+            ];
+            const content = allContent.find(item => item.id == tileId);
+
+            if (content && (content.youtubeId || content.url)) {
+                // It's a YouTube video or has a URL - play it
+                console.log('✅ Found YouTube/URL content, playing...');
+                this.playContent(tileId);
+            } else {
+                // No URL - show details modal
+                console.log('ℹ️ No URL found, showing details modal');
+                this.showContentDetails(tileId);
+            }
         }
     }
 
@@ -719,6 +728,21 @@ class ContentHub {
 
         modal.querySelector('.modal-backdrop').addEventListener('click', () => {
             modal.remove();
+        });
+
+        // Add Play Now button functionality
+        modal.querySelector('.btn-primary').addEventListener('click', () => {
+            console.log('🎬 Play Now clicked from modal');
+            modal.remove();
+            this.playContent(content.id);
+        });
+
+        // Add "Add to List" button functionality
+        modal.querySelector('.btn-secondary').addEventListener('click', () => {
+            console.log('➕ Add to List clicked from modal');
+            this.addToList(content.id);
+            modal.remove();
+            this.showNotification(`Added "${content.title}" to your list`);
         });
 
         // Add animation
