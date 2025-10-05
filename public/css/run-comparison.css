@@ -1,0 +1,184 @@
+/* Run Comparison Styles */
+
+#run-comparison-container {
+    margin: 40px 0;
+    padding: 20px;
+}
+
+.comparison-controls {
+    background: #0A0D10;
+    border-radius: 20px;
+    padding: 25px;
+    margin-bottom: 30px;
+}
+
+.run-selector-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.run-selector-card {
+    background: #151A20;
+    border-radius: 12px;
+    padding: 15px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.run-selector-card:hover {
+    background: #1E2125;
+    transform: translateY(-2px);
+}
+
+.run-checkbox {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: #F72585;
+}
+
+.run-label {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.run-tier {
+    font-size: 24px;
+    font-weight: 700;
+    color: #F72585;
+}
+
+.run-wave {
+    font-size: 14px;
+    color: #CED8E1;
+}
+
+.run-coins {
+    font-size: 16px;
+    font-weight: 600;
+    color: #FFC300;
+}
+
+.run-time {
+    font-size: 12px;
+    color: #8B8B8B;
+}
+
+.comparison-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.visualize-btn,
+.clear-btn {
+    padding: 15px 30px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.visualize-btn {
+    background: linear-gradient(135deg, #F72585, #7209B7);
+    color: white;
+}
+
+.visualize-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(247, 37, 133, 0.4);
+}
+
+.visualize-btn:disabled {
+    background: #333;
+    color: #666;
+    cursor: not-allowed;
+}
+
+.clear-btn {
+    background: #324B55;
+    color: white;
+}
+
+.clear-btn:hover {
+    background: #3F5A66;
+}
+
+.comparison-charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 25px;
+}
+
+.comparison-chart-card {
+    background: #0A0D10;
+    border-radius: 20px;
+    padding: 25px;
+}
+
+.comparison-chart-card.full-width {
+    grid-column: 1 / -1;
+}
+
+.comparison-chart-card h3 {
+    color: #FFFFFF;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.metric-selector {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.metric-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    background: #151A20;
+    color: #CED8E1;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.metric-btn:hover {
+    background: #1E2125;
+}
+
+.metric-btn.active {
+    background: linear-gradient(135deg, #F72585, #7209B7);
+    color: white;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .run-selector-grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    }
+
+    .comparison-charts-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .comparison-actions {
+        flex-direction: column;
+    }
+
+    .visualize-btn,
+    .clear-btn {
+        width: 100%;
+    }
+}
