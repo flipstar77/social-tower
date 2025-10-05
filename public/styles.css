@@ -53,6 +53,15 @@ body {
     position: relative;
 }
 
+/* Authenticated content - hidden by default until JS shows it */
+.authenticated-content {
+    display: none !important;
+}
+
+.authenticated-content.show {
+    display: block !important;
+}
+
 /* Sidebar Styles */
 .sidebar {
     width: 273px;
