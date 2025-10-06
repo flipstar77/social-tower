@@ -234,9 +234,7 @@ class TowerChatbot {
 
         // Create response based on top result
         const topResult = results[0];
-        let response = `Based on community discussions, here's what I found:\n\n`;
-        response += `**${topResult.title}**\n\n`;
-        response += topResult.content; // Show full content instead of truncating
+        const formattedContent = this.formatContent(topResult.content, question);
 
         // Add sources (only if URL exists and is not placeholder)
         const sourcesHTML = results
@@ -247,21 +245,102 @@ class TowerChatbot {
                 </a>
             `).join('');
 
+        // Generate related questions based on content
+        const relatedQuestions = this.generateRelatedQuestions(topResult.content, question);
+        const relatedQuestionsHTML = relatedQuestions.length > 0 ? `
+            <div class="related-questions">
+                <strong>💡 Related questions:</strong>
+                ${relatedQuestions.map(q => `
+                    <button class="quick-question-btn" data-question="${q}">
+                        ${q}
+                    </button>
+                `).join('')}
+            </div>
+        ` : '';
+
         const messageHTML = `
             <div class="chatbot-message bot-message">
                 <div class="message-avatar">🏰</div>
                 <div class="message-content">
-                    <p>${response}</p>
-                    <div class="message-sources">
-                        <strong>Sources:</strong>
-                        ${sourcesHTML}
-                    </div>
+                    ${formattedContent}
+                    ${sourcesHTML ? `
+                        <div class="message-sources">
+                            <strong>Sources:</strong>
+                            ${sourcesHTML}
+                        </div>
+                    ` : ''}
+                    ${relatedQuestionsHTML}
                 </div>
             </div>
         `;
 
         messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
         this.scrollToBottom();
+    }
+
+    /**
+     * Format content for better readability
+     */
+    formatContent(content, question) {
+        // Extract key information based on question context
+        const lowerQuestion = question.toLowerCase();
+
+        // For UW/Ultimate Weapon questions, format structured response
+        if (lowerQuestion.includes('uw') || lowerQuestion.includes('ultimate weapon') ||
+            lowerQuestion.includes('first') || lowerQuestion.includes('unlock')) {
+
+            const unlockOrder = content.match(/UNLOCK ORDER:([^.]+\.)/)?.[1] || '';
+            const syncConcept = content.match(/THE SYNC CONCEPT:([^.]+\.)/)?.[1] || '';
+            const labPriority = content.match(/LAB PRIORITY:([^.]+\.)/)?.[1] || '';
+            const keyAdvice = content.match(/KEY ADVICE:([^.]+\.)/)?.[1] || '';
+
+            let formatted = `<div class="formatted-response">`;
+
+            if (unlockOrder) {
+                formatted += `<p><strong>📋 Unlock Order:</strong><br>${unlockOrder}</p>`;
+            }
+
+            if (syncConcept) {
+                formatted += `<p><strong>⚡ The Sync Concept:</strong><br>${syncConcept}</p>`;
+            }
+
+            if (labPriority) {
+                formatted += `<p><strong>🔬 Lab Priority:</strong><br>${labPriority}</p>`;
+            }
+
+            if (keyAdvice) {
+                formatted += `<p><strong>💡 Key Advice:</strong><br>${keyAdvice}</p>`;
+            }
+
+            formatted += `</div>`;
+            return formatted;
+        }
+
+        // Default: Add line breaks for readability
+        return `<p>${content.replace(/\. ([A-Z])/g, '.<br><br>$1')}</p>`;
+    }
+
+    /**
+     * Generate related questions based on content
+     */
+    generateRelatedQuestions(content, originalQuestion) {
+        const questions = [];
+
+        // UW-related follow-ups
+        if (content.includes('UNLOCK ORDER')) {
+            if (!originalQuestion.toLowerCase().includes('sync')) {
+                questions.push('How does UW sync work?');
+            }
+            if (!originalQuestion.toLowerCase().includes('lab')) {
+                questions.push('What labs should I prioritize?');
+            }
+            if (!originalQuestion.toLowerCase().includes('stone')) {
+                questions.push('How many stones do I need?');
+            }
+        }
+
+        // Limit to 3 questions
+        return questions.slice(0, 3);
     }
 
     /**
