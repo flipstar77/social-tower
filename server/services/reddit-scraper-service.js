@@ -153,7 +153,7 @@ class RedditScraperService {
         // Wait for run to complete
         let status = 'READY';
         let attempts = 0;
-        const maxAttempts = 60; // 60 seconds max wait
+        const maxAttempts = 120; // 120 seconds max wait (2 minutes)
 
         while (!['SUCCEEDED', 'FAILED', 'ABORTED'].includes(status) && attempts < maxAttempts) {
             await new Promise(resolve => setTimeout(resolve, 1000));

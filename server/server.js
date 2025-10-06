@@ -18,6 +18,7 @@ const RedditScraperService = require('./services/reddit-scraper-service');
 // Import route modules
 const redditRouter = require('./routes/reddit');
 const createRedditRAGRouter = require('./routes/reddit-rag');
+const createGuidesRouter = require('./routes/guides');
 const { router: videosRouter, getCacheStatus, fetchAllVideos, YOUTUBE_CHANNELS } = require('./routes/videos');
 const createTowerRouter = require('./routes/tower');
 const createWikiRouter = require('./routes/wiki');
@@ -91,6 +92,10 @@ app.post('/api/reddit/scraper/mega', async (req, res) => {
 // Mount Reddit RAG router
 const redditRAGRouter = createRedditRAGRouter(supabase);
 app.use('/api/reddit-rag', redditRAGRouter);
+
+// Mount Guides router
+const guidesRouter = createGuidesRouter(supabase);
+app.use('/api/guides', guidesRouter);
 
 // Mount Discord route modules
 const discordAuthRouter = createDiscordAuthRouter(discordAuth, supabase);
