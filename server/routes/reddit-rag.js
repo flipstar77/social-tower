@@ -20,7 +20,7 @@ function createRedditRAGRouter(supabase) {
         try {
             const query = req.query.q || '';
             const limit = Math.min(parseInt(req.query.limit) || 5, 20);
-            const threshold = parseFloat(req.query.threshold) || 0.5;
+            const threshold = parseFloat(req.query.threshold) || 0.2;
 
             if (!query.trim()) {
                 return res.status(400).json({
