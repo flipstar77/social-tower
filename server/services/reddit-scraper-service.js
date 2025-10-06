@@ -56,14 +56,22 @@ class RedditScraperService {
 
         try {
             // Fetch posts from Apify
-            const posts = await this.fetchPosts(50); // Get 50 posts
+            const posts = await this.fetchPosts(100); // Get 100 posts
             console.log(`✅ Fetched ${posts.length} posts from Reddit`);
 
-            // Store posts in Supabase
-            await this.storePosts(posts);
+            // Filter out duplicates
+            const newPosts = await this.filterDuplicates(posts);
+            console.log(`🔍 Filtered to ${newPosts.length} new posts (${posts.length - newPosts.length} duplicates skipped)`);
 
-            // Vectorize important threads for RAG
-            await this.vectorizeThreads(posts);
+            // Store posts in Supabase
+            if (newPosts.length > 0) {
+                await this.storePosts(newPosts);
+
+                // Vectorize important threads for RAG
+                await this.vectorizeThreads(newPosts);
+            } else {
+                console.log('⚠️ No new posts to store');
+            }
 
             this.lastScrapeTime = new Date();
             console.log(`✅ Reddit scrape completed successfully`);
@@ -72,6 +80,42 @@ class RedditScraperService {
             console.error('❌ Reddit scrape failed:', error.message);
         } finally {
             this.isRunning = false;
+        }
+    }
+
+    /**
+     * Filter out posts that already exist in database
+     */
+    async filterDuplicates(posts) {
+        if (!this.supabase || !this.supabase.supabase) {
+            console.log('⚠️ Supabase not configured, cannot filter duplicates');
+            return posts;
+        }
+
+        try {
+            // Get all reddit_ids from fetched posts
+            const redditIds = posts.map(post => post.parsedId);
+
+            // Query database for existing posts
+            const { data: existingPosts, error } = await this.supabase.supabase
+                .from('reddit_posts')
+                .select('reddit_id')
+                .in('reddit_id', redditIds);
+
+            if (error) {
+                console.error('❌ Error checking for duplicates:', error.message);
+                return posts; // Return all if check fails
+            }
+
+            // Create set of existing IDs
+            const existingIds = new Set(existingPosts?.map(p => p.reddit_id) || []);
+
+            // Filter out duplicates
+            return posts.filter(post => !existingIds.has(post.parsedId));
+
+        } catch (error) {
+            console.error('❌ Duplicate filtering failed:', error.message);
+            return posts; // Return all if filtering fails
         }
     }
 
@@ -185,9 +229,15 @@ class RedditScraperService {
 
         console.log(`🔍 Found ${importantPosts.length} high-quality posts to vectorize`);
 
-        for (const post of importantPosts.slice(0, 10)) { // Limit to 10 per run to save costs
+        // Sort by score to prioritize best content
+        const sortedPosts = importantPosts.sort((a, b) => b.upVotes - a.upVotes);
+
+        // Vectorize top 20 posts per run
+        for (const post of sortedPosts.slice(0, 20)) {
             await this.vectorizePost(post);
         }
+
+        console.log(`✅ Vectorized ${Math.min(sortedPosts.length, 20)} posts for RAG`);
     }
 
     /**
