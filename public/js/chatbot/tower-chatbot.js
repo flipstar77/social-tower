@@ -178,18 +178,25 @@ class TowerChatbot {
         this.showTyping();
 
         try {
-            // Search RAG for relevant content
-            const response = await fetch(`${this.apiBase}/api/reddit-rag/search?q=${encodeURIComponent(question)}&limit=3`);
+            // Call AI-powered answer endpoint
+            const response = await fetch(`${this.apiBase}/api/reddit-rag/ask`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ question })
+            });
+
             const data = await response.json();
 
             // Remove typing indicator
             this.hideTyping();
 
-            if (data.success && data.results.length > 0) {
-                // Format response with sources
-                this.addRAGResponse(data.results, question);
+            if (data.success && data.answer) {
+                // Add AI-generated answer with sources
+                this.addAIAnswer(data.answer, data.sources, question);
             } else {
-                this.addMessage("I couldn't find any relevant information about that. Try asking in a different way!", 'bot');
+                this.addMessage(data.answer || "I couldn't find any relevant information about that. Try asking in a different way!", 'bot');
             }
 
         } catch (error) {
@@ -227,7 +234,77 @@ class TowerChatbot {
     }
 
     /**
-     * Add RAG response with sources
+     * Add AI-generated answer with sources
+     */
+    addAIAnswer(answer, sources, question) {
+        const messagesContainer = document.getElementById('chatbot-messages');
+
+        // Extract related questions from AI answer (if present)
+        const relatedQuestionsMatch = answer.match(/(?:Related|Follow-up) (?:questions|Questions):?\s*\n((?:[-•]\s*.+\n?)+)/i);
+        let cleanAnswer = answer;
+        let relatedQuestions = [];
+
+        if (relatedQuestionsMatch) {
+            // Remove related questions from answer
+            cleanAnswer = answer.replace(relatedQuestionsMatch[0], '').trim();
+
+            // Extract questions
+            relatedQuestions = relatedQuestionsMatch[1]
+                .split('\n')
+                .map(q => q.replace(/^[-•]\s*/, '').trim())
+                .filter(q => q.length > 0)
+                .slice(0, 3);
+        }
+
+        // Format answer with markdown-like styling
+        const formattedAnswer = cleanAnswer
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\n\n/g, '</p><p>')
+            .replace(/\n/g, '<br>');
+
+        // Build sources HTML
+        const sourcesHTML = sources && sources.length > 0 ? sources
+            .filter(s => s.url && !s.url.includes('reddit.com/r/TheTowerGame/'))
+            .map(s => `
+                <a href="${s.url}" target="_blank" class="source-link">
+                    📄 ${s.title} ${s.score ? `(${s.score} upvotes)` : ''}
+                </a>
+            `).join('') : '';
+
+        // Build related questions HTML
+        const relatedQuestionsHTML = relatedQuestions.length > 0 ? `
+            <div class="related-questions">
+                <strong>💡 Related questions:</strong>
+                ${relatedQuestions.map(q => `
+                    <button class="quick-question-btn" data-question="${q}">
+                        ${q}
+                    </button>
+                `).join('')}
+            </div>
+        ` : '';
+
+        const messageHTML = `
+            <div class="chatbot-message bot-message">
+                <div class="message-avatar">🏰</div>
+                <div class="message-content">
+                    <p>${formattedAnswer}</p>
+                    ${sourcesHTML ? `
+                        <div class="message-sources">
+                            <strong>Sources:</strong>
+                            ${sourcesHTML}
+                        </div>
+                    ` : ''}
+                    ${relatedQuestionsHTML}
+                </div>
+            </div>
+        `;
+
+        messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
+        this.scrollToBottom();
+    }
+
+    /**
+     * Add RAG response with sources (legacy - keeping for fallback)
      */
     addRAGResponse(results, question) {
         const messagesContainer = document.getElementById('chatbot-messages');
