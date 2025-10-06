@@ -239,16 +239,24 @@ class TowerChatbot {
     addAIAnswer(answer, sources, question) {
         const messagesContainer = document.getElementById('chatbot-messages');
 
-        // Extract related questions from AI answer (if present)
-        const relatedQuestionsMatch = answer.match(/(?:Related|Follow-up) (?:questions|Questions):?\s*\n((?:[-•]\s*.+\n?)+)/i);
-        let cleanAnswer = answer;
+        // Extract sections from AI answer
+        const quickAnswerMatch = answer.match(/##\s*Quick Answer\s*\n([\s\S]*?)(?=\n##|$)/i);
+        const detailsMatch = answer.match(/##\s*Details\s*\n([\s\S]*?)(?=\n##|$)/i);
+        const relatedQuestionsMatch = answer.match(/##\s*Related Questions\s*\n((?:[-•]\s*.+\n?)+)/i);
+
+        let quickAnswer = '';
+        let details = '';
         let relatedQuestions = [];
 
-        if (relatedQuestionsMatch) {
-            // Remove related questions from answer
-            cleanAnswer = answer.replace(relatedQuestionsMatch[0], '').trim();
+        if (quickAnswerMatch) {
+            quickAnswer = quickAnswerMatch[1].trim();
+        }
 
-            // Extract questions
+        if (detailsMatch) {
+            details = detailsMatch[1].trim();
+        }
+
+        if (relatedQuestionsMatch) {
             relatedQuestions = relatedQuestionsMatch[1]
                 .split('\n')
                 .map(q => q.replace(/^[-•]\s*/, '').trim())
@@ -256,9 +264,16 @@ class TowerChatbot {
                 .slice(0, 3);
         }
 
-        // Format answer with markdown-like styling
-        const formattedAnswer = cleanAnswer
+        // If no sections found, use the whole answer
+        if (!quickAnswer && !details) {
+            details = answer;
+        }
+
+        // Format sections with markdown-like styling
+        const formatText = (text) => text
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/^- (.+)$/gm, '<li>$1</li>')
+            .replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>')
             .replace(/\n\n/g, '</p><p>')
             .replace(/\n/g, '<br>');
 
@@ -274,7 +289,7 @@ class TowerChatbot {
         // Build related questions HTML
         const relatedQuestionsHTML = relatedQuestions.length > 0 ? `
             <div class="related-questions">
-                <strong>💡 Related questions:</strong>
+                <strong>💡 You might also ask:</strong>
                 ${relatedQuestions.map(q => `
                     <button class="quick-question-btn" data-question="${q}">
                         ${q}
@@ -283,18 +298,39 @@ class TowerChatbot {
             </div>
         ` : '';
 
+        // Build the complete message
+        let contentHTML = '';
+
+        if (quickAnswer) {
+            contentHTML += `
+                <div class="quick-answer">
+                    <div class="section-header">📌 Quick Answer</div>
+                    <p>${formatText(quickAnswer)}</p>
+                </div>
+            `;
+        }
+
+        if (details) {
+            contentHTML += `
+                <div class="details-section">
+                    ${quickAnswer ? '<div class="section-header">📖 Details</div>' : ''}
+                    <p>${formatText(details)}</p>
+                </div>
+            `;
+        }
+
         const messageHTML = `
             <div class="chatbot-message bot-message">
                 <div class="message-avatar">🏰</div>
                 <div class="message-content">
-                    <p>${formattedAnswer}</p>
+                    ${contentHTML}
+                    ${relatedQuestionsHTML}
                     ${sourcesHTML ? `
                         <div class="message-sources">
                             <strong>Sources:</strong>
                             ${sourcesHTML}
                         </div>
                     ` : ''}
-                    ${relatedQuestionsHTML}
                 </div>
             </div>
         `;
