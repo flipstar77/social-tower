@@ -18,6 +18,7 @@ app.use(express.json());
 const redditRouter = require('../server/routes/reddit');
 const { router: videosRouter } = require('../server/routes/videos-vercel');
 const createTowerRouter = require('../server/routes/tower-vercel');
+const createRedditRAGRouter = require('../server/routes/reddit-rag');
 
 // Initialize Supabase for database routes
 const SupabaseManager = require('../server/supabase-config');
@@ -36,9 +37,13 @@ app.use('/api/videos', videosRouter);
 // Only mount database routes if Supabase is available
 if (supabase && supabase.supabase) {
     app.use('/api/tower', createTowerRouter(supabase));
+    app.use('/api/reddit-rag', createRedditRAGRouter(supabase));
 } else {
     console.warn('⚠️ Supabase not configured - database routes disabled');
     app.use('/api/tower', (req, res) => {
+        res.status(503).json({ error: 'Database not configured' });
+    });
+    app.use('/api/reddit-rag', (req, res) => {
         res.status(503).json({ error: 'Database not configured' });
     });
 }
