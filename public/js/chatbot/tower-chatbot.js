@@ -204,9 +204,18 @@ class TowerChatbot {
      */
     addMessage(content, type = 'bot') {
         const messagesContainer = document.getElementById('chatbot-messages');
+
+        // Get user avatar from Discord auth
+        let avatar = '👤';
+        if (type === 'user' && window.discordAuth?.user?.user_metadata?.avatar_url) {
+            avatar = `<img src="${window.discordAuth.user.user_metadata.avatar_url}" alt="User" class="user-avatar">`;
+        } else if (type === 'bot') {
+            avatar = '🏰';
+        }
+
         const messageHTML = `
             <div class="chatbot-message ${type}-message">
-                <div class="message-avatar">${type === 'bot' ? '🏰' : '👤'}</div>
+                <div class="message-avatar">${avatar}</div>
                 <div class="message-content">
                     <p>${content}</p>
                 </div>
@@ -227,14 +236,16 @@ class TowerChatbot {
         const topResult = results[0];
         let response = `Based on community discussions, here's what I found:\n\n`;
         response += `**${topResult.title}**\n\n`;
-        response += topResult.content.substring(0, 300) + '...';
+        response += topResult.content; // Show full content instead of truncating
 
-        // Add sources
-        const sourcesHTML = results.map((result, index) => `
-            <a href="${result.url}" target="_blank" class="source-link">
-                📄 ${result.title} (${result.score} upvotes)
-            </a>
-        `).join('');
+        // Add sources (only if URL exists and is not placeholder)
+        const sourcesHTML = results
+            .filter(result => result.url && !result.url.includes('reddit.com/r/TheTowerGame/'))
+            .map((result, index) => `
+                <a href="${result.url}" target="_blank" class="source-link">
+                    📄 ${result.title} ${result.score ? `(${result.score} upvotes)` : ''}
+                </a>
+            `).join('');
 
         const messageHTML = `
             <div class="chatbot-message bot-message">
