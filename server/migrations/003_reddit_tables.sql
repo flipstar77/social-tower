@@ -41,5 +41,25 @@ CREATE INDEX IF NOT EXISTS idx_reddit_rag_content_search
 -- Index for filtering high-quality content
 CREATE INDEX IF NOT EXISTS idx_reddit_rag_content_score ON reddit_rag_content(score DESC);
 
+-- Reddit Comments Table
+CREATE TABLE IF NOT EXISTS reddit_comments (
+    id SERIAL PRIMARY KEY,
+    comment_id VARCHAR(20) UNIQUE NOT NULL,
+    post_id VARCHAR(20) NOT NULL,
+    parent_id VARCHAR(20),
+    author VARCHAR(100),
+    body TEXT NOT NULL,
+    score INTEGER DEFAULT 0,
+    created_at TIMESTAMP NOT NULL,
+    scraped_at TIMESTAMP DEFAULT NOW(),
+    FOREIGN KEY (post_id) REFERENCES reddit_posts(reddit_id) ON DELETE CASCADE
+);
+
+-- Indexes for comments
+CREATE INDEX IF NOT EXISTS idx_reddit_comments_post_id ON reddit_comments(post_id);
+CREATE INDEX IF NOT EXISTS idx_reddit_comments_score ON reddit_comments(score DESC);
+CREATE INDEX IF NOT EXISTS idx_reddit_comments_created_at ON reddit_comments(created_at DESC);
+
 COMMENT ON TABLE reddit_posts IS 'Stores scraped Reddit posts from r/TheTowerGame';
 COMMENT ON TABLE reddit_rag_content IS 'High-quality Reddit content indexed for RAG/semantic search';
+COMMENT ON TABLE reddit_comments IS 'Stores comments from Reddit posts with upvote scores';

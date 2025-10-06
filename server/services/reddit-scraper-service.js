@@ -55,17 +55,22 @@ class RedditScraperService {
         console.log(`📡 Starting Reddit scrape for r/${this.subreddit}...`);
 
         try {
-            // Fetch posts from Apify
-            const posts = await this.fetchPosts(100); // Get 100 posts
-            console.log(`✅ Fetched ${posts.length} posts from Reddit`);
+            // Fetch posts and comments from Apify
+            const { posts, comments } = await this.fetchPosts(100); // Get 100 posts
+            console.log(`✅ Fetched ${posts.length} posts and ${comments.length} comments from Reddit`);
 
             // Filter out duplicates
             const newPosts = await this.filterDuplicates(posts);
             console.log(`🔍 Filtered to ${newPosts.length} new posts (${posts.length - newPosts.length} duplicates skipped)`);
 
-            // Store posts in Supabase
+            // Store posts and comments in Supabase
             if (newPosts.length > 0) {
                 await this.storePosts(newPosts);
+
+                // Store comments (filter to only comments for new posts)
+                const newPostIds = new Set(newPosts.map(p => p.parsedId));
+                const commentsForNewPosts = comments.filter(c => newPostIds.has(c.postId?.replace('t3_', '')));
+                await this.storeComments(commentsForNewPosts);
 
                 // Vectorize important threads for RAG
                 await this.vectorizeThreads(newPosts);
@@ -130,7 +135,7 @@ class RedditScraperService {
                 startUrls: [{ url: `https://www.reddit.com/r/${this.subreddit}/` }],
                 maxItems: limit,
                 maxPostCount: limit,
-                maxComments: 10 // Get some comments for context
+                maxComments: 50 // Get more comments for better context
             },
             {
                 headers: {
@@ -176,7 +181,10 @@ class RedditScraperService {
             { headers: { 'Authorization': `Bearer ${this.apifyApiKey}` } }
         );
 
-        return datasetResponse.data.filter(item => item.dataType === 'post');
+        const posts = datasetResponse.data.filter(item => item.dataType === 'post');
+        const comments = datasetResponse.data.filter(item => item.dataType === 'comment');
+
+        return { posts, comments };
     }
 
     /**
@@ -213,6 +221,36 @@ class RedditScraperService {
             console.error('❌ Error storing posts:', error.message);
         } else {
             console.log(`✅ Stored ${formattedPosts.length} posts in database`);
+        }
+    }
+
+    /**
+     * Store comments in Supabase
+     */
+    async storeComments(comments) {
+        if (!this.supabase || !this.supabase.supabase || comments.length === 0) {
+            return;
+        }
+
+        const formattedComments = comments.map(comment => ({
+            comment_id: comment.parsedId,
+            post_id: comment.postId?.replace('t3_', ''), // Remove Reddit prefix
+            parent_id: comment.parentId?.replace(/^t[13]_/, ''), // Remove prefix from parent
+            author: comment.username,
+            body: comment.body || '',
+            score: comment.upVotes || 0,
+            created_at: new Date(comment.createdAt)
+        }));
+
+        // Upsert comments
+        const { data, error } = await this.supabase.supabase
+            .from('reddit_comments')
+            .upsert(formattedComments, { onConflict: 'comment_id' });
+
+        if (error) {
+            console.error('❌ Error storing comments:', error.message);
+        } else {
+            console.log(`✅ Stored ${formattedComments.length} comments in database`);
         }
     }
 
