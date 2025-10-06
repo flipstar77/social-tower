@@ -13,6 +13,7 @@ const YTDlpWrap = require('yt-dlp-wrap').default;
 const TowerWikiScraper = require('./wiki-scraper');
 const DiscordAuth = require('./discord-auth');
 const SupabaseManager = require('./supabase-config');
+const RedditScraperService = require('./services/reddit-scraper-service');
 
 // Import route modules
 const redditRouter = require('./routes/reddit');
@@ -38,6 +39,9 @@ const discordAuth = new DiscordAuth();
 // Initialize Supabase
 const supabase = new SupabaseManager();
 
+// Initialize Reddit scraper service
+const redditScraper = new RedditScraperService(supabase);
+
 // Debug: Check if Discord endpoints should be loaded
 console.log('🔧 Debug - Supabase instance check:');
 console.log('   supabase object exists:', !!supabase);
@@ -59,6 +63,20 @@ app.use('/js', express.static(path.join(__dirname, '../js')));
 // Mount route modules
 app.use('/api/reddit', redditRouter);
 app.use('/api/videos', videosRouter);
+
+// Reddit scraper control endpoints
+app.get('/api/reddit/scraper/status', (req, res) => {
+    res.json(redditScraper.getStatus());
+});
+
+app.post('/api/reddit/scraper/trigger', async (req, res) => {
+    try {
+        await redditScraper.triggerScrape();
+        res.json({ success: true, message: 'Reddit scrape triggered' });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
 
 // Mount Discord route modules
 const discordAuthRouter = createDiscordAuthRouter(discordAuth, supabase);
@@ -167,6 +185,9 @@ app.listen(PORT, () => {
 
     // Initial fetch
     fetchAllVideos();
+
+    // Start Reddit scraper (runs twice daily at 8 AM and 8 PM)
+    redditScraper.start();
 });
 
 // Graceful shutdown
