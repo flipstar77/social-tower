@@ -4,7 +4,7 @@ const router = express.Router();
 
 // Apify configuration
 const APIFY_API_KEY = process.env.APIFY_API_KEY || 'apify_api_PNttwixh8cILCQi2ablqxObbHQNlml2FMQjZ';
-const APIFY_ACTOR_ID = 'trudax/reddit-scraper-lite';
+const APIFY_ACTOR_ID = 'oAuCIx3ItNrs2okjQ';
 
 // In-memory cache for Reddit posts
 let cachedPosts = null;
@@ -36,13 +36,10 @@ router.get('/', async (req, res) => {
         const runResponse = await axios.post(
             `https://api.apify.com/v2/acts/${APIFY_ACTOR_ID}/runs`,
             {
-                startUrls: [`https://www.reddit.com/r/${subreddit}/`],
+                startUrls: [{ url: `https://www.reddit.com/r/${subreddit}/` }],
                 maxItems: limit,
                 maxPostCount: limit,
-                maxComments: 0, // Don't fetch comments for faster performance
-                proxy: {
-                    useApifyProxy: true
-                }
+                maxComments: 0
             },
             {
                 headers: {
@@ -54,14 +51,15 @@ router.get('/', async (req, res) => {
         );
 
         const runId = runResponse.data.data.id;
+        const datasetId = runResponse.data.data.defaultDatasetId;
         console.log(`🚀 Apify run started: ${runId}`);
 
         // Wait for run to complete (with timeout)
-        let status = 'RUNNING';
+        let status = 'READY';
         let attempts = 0;
         const maxAttempts = 30; // 30 seconds max wait
 
-        while (status === 'RUNNING' && attempts < maxAttempts) {
+        while (!['SUCCEEDED', 'FAILED', 'ABORTED'].includes(status) && attempts < maxAttempts) {
             await new Promise(resolve => setTimeout(resolve, 1000));
 
             const statusResponse = await axios.get(
@@ -81,7 +79,6 @@ router.get('/', async (req, res) => {
         }
 
         // Fetch results from dataset
-        const datasetId = runResponse.data.data.defaultDatasetId;
         const datasetResponse = await axios.get(
             `https://api.apify.com/v2/datasets/${datasetId}/items`,
             {
@@ -101,9 +98,10 @@ router.get('/', async (req, res) => {
                 score: post.upVotes,
                 num_comments: post.numberOfComments,
                 selftext: post.body || '',
-                thumbnail: post.body?.match(/Thumbnail: (https?:\/\/[^\s]+)/)?.[1] || '',
+                thumbnail: post.thumbnailUrl && post.thumbnailUrl.startsWith('http') ? post.thumbnailUrl : '',
                 is_video: post.isVideo,
-                over_18: post.over18
+                over_18: post.over18,
+                link_flair_text: post.flair || ''
             }));
 
         console.log(`✅ Successfully fetched ${posts.length} Reddit posts via Apify`);

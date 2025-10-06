@@ -59,7 +59,8 @@
       "Bash(claude mcp:*)",
       "Bash(start http://localhost:6079/test-charts.html)",
       "Bash(vercel env add:*)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(npm run dev:*)"
     ],
     "deny": [],
     "ask": []
