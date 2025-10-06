@@ -325,6 +325,77 @@ class RedditScraperService {
     }
 
     /**
+     * Mega scrape - initial knowledge base builder (1000 posts)
+     */
+    async megaScrape() {
+        if (this.isRunning) {
+            console.log('⚠️ Scrape already in progress, skipping...');
+            return { success: false, message: 'Scrape already running' };
+        }
+
+        this.isRunning = true;
+        console.log('🚀 Starting MEGA SCRAPE (1000 posts)...');
+
+        try {
+            // Fetch 1000 posts with lots of comments
+            const { posts, comments } = await this.fetchPosts(1000);
+            console.log(`✅ Fetched ${posts.length} posts and ${comments.length} comments`);
+
+            // Filter duplicates
+            const newPosts = await this.filterDuplicates(posts);
+            console.log(`🔍 Filtered to ${newPosts.length} new posts`);
+
+            if (newPosts.length > 0) {
+                // Store all posts
+                await this.storePosts(newPosts);
+
+                // Store all comments
+                const newPostIds = new Set(newPosts.map(p => p.parsedId));
+                const commentsForNewPosts = comments.filter(c => newPostIds.has(c.postId?.replace('t3_', '')));
+                await this.storeComments(commentsForNewPosts);
+
+                // Vectorize ALL high-quality posts (no limit)
+                const importantPosts = newPosts.filter(post => {
+                    const isHighEngagement = post.upVotes > 10 || post.numberOfComments > 5;
+                    const isGuideOrStrategy = ['Guide', 'Strategy', 'Discussion'].includes(post.flair);
+                    return isHighEngagement || isGuideOrStrategy;
+                });
+
+                console.log(`🔍 Vectorizing ${importantPosts.length} high-quality posts...`);
+
+                // Vectorize in batches of 50
+                for (let i = 0; i < importantPosts.length; i += 50) {
+                    const batch = importantPosts.slice(i, i + 50);
+                    for (const post of batch) {
+                        await this.vectorizePost(post);
+                    }
+                    console.log(`   Vectorized ${Math.min(i + 50, importantPosts.length)}/${importantPosts.length} posts`);
+                }
+            }
+
+            this.lastScrapeTime = new Date();
+            console.log('🎉 MEGA SCRAPE COMPLETE!');
+
+            return {
+                success: true,
+                postsScraped: posts.length,
+                newPosts: newPosts.length,
+                comments: comments.length,
+                message: 'Mega scrape completed successfully'
+            };
+
+        } catch (error) {
+            console.error('❌ Mega scrape failed:', error.message);
+            return {
+                success: false,
+                error: error.message
+            };
+        } finally {
+            this.isRunning = false;
+        }
+    }
+
+    /**
      * Get scraper status
      */
     getStatus() {

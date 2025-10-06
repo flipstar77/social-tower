@@ -79,6 +79,15 @@ app.post('/api/reddit/scraper/trigger', async (req, res) => {
     }
 });
 
+app.post('/api/reddit/scraper/mega', async (req, res) => {
+    try {
+        const result = await redditScraper.megaScrape();
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
 // Mount Reddit RAG router
 const redditRAGRouter = createRedditRAGRouter(supabase);
 app.use('/api/reddit-rag', redditRAGRouter);
