@@ -711,6 +711,9 @@ class TowerStatsManager {
             this.saveToStorage();
             this.updateDisplay();
 
+            // Notify other components (like RunComparison) that runs were updated
+            window.dispatchEvent(new CustomEvent('runsUpdated'));
+
             this.showSuccessMessage('Run deleted successfully!');
         } else {
             console.error('Session not found for deletion');
