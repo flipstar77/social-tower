@@ -7,8 +7,11 @@
     "start": "cd server && node bot-launcher.js",
     "start:server": "node server/server.js",
     "start:bot": "cd server && node bot-launcher.js",
-    "build": "cd server && npm install",
+    "build": "vite build",
+    "build:server": "cd server && npm install",
     "dev": "node server/server.js",
+    "dev:vite": "vite",
+    "preview": "vite preview",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
@@ -50,11 +53,13 @@
   "author": "Your Name",
   "license": "MIT",
   "devDependencies": {
+    "@vitejs/plugin-legacy": "^7.2.1",
     "eslint": "^9.37.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
     "jest": "^30.2.0",
     "prettier": "^3.6.2",
-    "supertest": "^7.1.4"
+    "supertest": "^7.1.4",
+    "vite": "^7.1.9"
   }
 }
