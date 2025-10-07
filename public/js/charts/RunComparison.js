@@ -372,7 +372,12 @@ class RunComparison {
             ranged: 0,
             boss: 0,
             protector: 0,
-            elites: 0
+            vampires: 0,
+            rays: 0,
+            scatters: 0,
+            saboteurs: 0,
+            commanders: 0,
+            overcharges: 0
         };
 
         this.selectedRuns.forEach(run => {
@@ -382,22 +387,35 @@ class RunComparison {
             enemyData.ranged += parseInt(run.ranged_enemies || 0);
             enemyData.boss += parseInt(run.boss_enemies || 0);
             enemyData.protector += parseInt(run.protector_enemies || 0);
-            enemyData.elites += parseInt(run.total_elites || 0);
+            enemyData.vampires += parseInt(run.vampires || 0);
+            enemyData.rays += parseInt(run.rays || 0);
+            enemyData.scatters += parseInt(run.scatters || 0);
+            enemyData.saboteurs += parseInt(run.saboteurs || 0);
+            enemyData.commanders += parseInt(run.commanders || 0);
+            enemyData.overcharges += parseInt(run.overcharges || 0);
         });
 
         // Filter out categories with very low counts and group small ones
         const total = Object.values(enemyData).reduce((a, b) => a + b, 0);
         const chartData = [];
 
+        // Main enemy types
         if (enemyData.basic > 0) chartData.push({ value: enemyData.basic, name: 'Basic', itemStyle: { color: '#4CAF50' } });
         if (enemyData.fast > 0) chartData.push({ value: enemyData.fast, name: 'Fast', itemStyle: { color: '#FF9800' } });
         if (enemyData.tank > 0) chartData.push({ value: enemyData.tank, name: 'Tank', itemStyle: { color: '#F44336' } });
         if (enemyData.ranged > 0) chartData.push({ value: enemyData.ranged, name: 'Ranged', itemStyle: { color: '#2196F3' } });
 
-        // Add each enemy type separately
+        // Special enemy types
         if (enemyData.boss > 0) chartData.push({ value: enemyData.boss, name: 'Boss', itemStyle: { color: '#9C27B0' } });
         if (enemyData.protector > 0) chartData.push({ value: enemyData.protector, name: 'Protector', itemStyle: { color: '#673AB7' } });
-        if (enemyData.elites > 0) chartData.push({ value: enemyData.elites, name: 'Elites', itemStyle: { color: '#E91E63' } });
+
+        // Elite enemy types
+        if (enemyData.vampires > 0) chartData.push({ value: enemyData.vampires, name: 'Vampires', itemStyle: { color: '#E91E63' } });
+        if (enemyData.rays > 0) chartData.push({ value: enemyData.rays, name: 'Rays', itemStyle: { color: '#00BCD4' } });
+        if (enemyData.scatters > 0) chartData.push({ value: enemyData.scatters, name: 'Scatters', itemStyle: { color: '#8BC34A' } });
+        if (enemyData.saboteurs > 0) chartData.push({ value: enemyData.saboteurs, name: 'Saboteurs', itemStyle: { color: '#FFC107' } });
+        if (enemyData.commanders > 0) chartData.push({ value: enemyData.commanders, name: 'Commanders', itemStyle: { color: '#FF5722' } });
+        if (enemyData.overcharges > 0) chartData.push({ value: enemyData.overcharges, name: 'Overcharges', itemStyle: { color: '#607D8B' } });
 
         let option;
 
