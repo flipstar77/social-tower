@@ -668,9 +668,14 @@ class TowerStatsManager {
         if (session.sessionId) {
             try {
                 console.log(`🗑️ Deleting run ID ${session.sessionId} from Supabase...`);
-                const response = await fetch(`/api/tower/runs/${session.sessionId}`, {
-                    method: 'DELETE'
-                });
+                // Use authenticated fetch for DELETE request
+                const response = window.discordAuth?.authenticatedFetch
+                    ? await window.discordAuth.authenticatedFetch(`/api/tower/runs/${session.sessionId}`, {
+                        method: 'DELETE'
+                    })
+                    : await fetch(`/api/tower/runs/${session.sessionId}`, {
+                        method: 'DELETE'
+                    });
 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
