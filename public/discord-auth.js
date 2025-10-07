@@ -290,11 +290,35 @@ class DiscordAuth {
 
         // Update user avatar if available
         const userAvatarElement = document.querySelector('.user-avatar');
-        if (userAvatarElement && this.user.user_metadata?.avatar_url) {
-            userAvatarElement.style.backgroundImage = `url(${this.user.user_metadata.avatar_url})`;
-            userAvatarElement.style.backgroundSize = 'cover';
-            userAvatarElement.style.backgroundPosition = 'center';
+        if (userAvatarElement) {
+            // Discord avatar URL can be in multiple places in Supabase metadata
+            const avatarUrl = this.user.user_metadata?.avatar_url ||
+                             this.user.user_metadata?.picture ||
+                             this.getDiscordAvatarUrl();
+
+            if (avatarUrl) {
+                userAvatarElement.style.backgroundImage = `url(${avatarUrl})`;
+                userAvatarElement.style.backgroundSize = 'cover';
+                userAvatarElement.style.backgroundPosition = 'center';
+            }
         }
+    }
+
+    /**
+     * Construct Discord avatar URL from user metadata
+     */
+    getDiscordAvatarUrl() {
+        if (!this.user?.user_metadata) return null;
+
+        const providerId = this.user.user_metadata.provider_id;
+        const avatar = this.user.user_metadata.avatar;
+
+        if (providerId && avatar) {
+            // Discord CDN URL format
+            return `https://cdn.discordapp.com/avatars/${providerId}/${avatar}.png`;
+        }
+
+        return null;
     }
 
     /**
