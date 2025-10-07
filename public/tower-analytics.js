@@ -93,7 +93,6 @@ class TowerAnalytics {
         this.lastTotals = null;
         this.lastRates = null;
         this.allCards = [];
-        this.categoryToggles = this.loadCategoryToggles();
 
         // Chart preferences
         this.chartOptions = {
@@ -137,9 +136,6 @@ class TowerAnalytics {
                 presetSelect.value = savedPreset;
             }
         }
-
-        // Initialize category toggle button states
-        this.initializeCategoryButtons();
 
         await this.loadDashboard();
         this.setupEventListeners();
@@ -750,28 +746,24 @@ class TowerAnalytics {
 
         // Apply preset filtering first, then filter out hidden cards
         const presetCards = this.getPresetCards(allCards);
-
         const visibleCards = presetCards.filter((card, index) => {
             // Find the original index in allCards to check if it's hidden
             const originalIndex = allCards.indexOf(card);
             return !this.hiddenCards || !this.hiddenCards.has(originalIndex);
         });
-        targetGrid.innerHTML = visibleCards.map((card, index) => {
-            const category = this.getCategoryForLabel(card.label);
-            return `
+
+        targetGrid.innerHTML = visibleCards.map((card, index) => `
             <div class="analytics-stat-card"
                  draggable="true"
                  data-card-id="${index}"
-                 data-card-label="${card.label}"
-                 data-category="${category}">
+                 data-card-label="${card.label}">
                 <div class="analytics-stat-value">${card.icon} ${card.value}</div>
                 <div class="analytics-stat-label">
                     ${card.label}
                     <button class="analytics-card-toggle" onclick="window.towerAnalytics.toggleCard(${index})" title="Hide this tile">×</button>
                 </div>
             </div>
-        `;
-        }).join('');
+        `).join('');
 
         // Store cards data and initialize drag & drop
         this.allCards = allCards;
@@ -2151,115 +2143,3 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('🔥 TowerAnalytics initialized and loadDashboard called');
     }
 });
-    // Category toggle methods
-    getCategoryForLabel(label) {
-        // Basic stats
-        const basicLabels = ['Game Time', 'Real Time', 'Tier', 'Wave', 'Killed By', 'Average Tier', 'Average Wave', 'Latest Run', 'Total Runs', 'Tier Reached', 'Highest Tier', 'Wave Reached', 'Highest Wave'];
-        if (basicLabels.includes(label)) return 'basic';
-
-        // Combat stats
-        const combatLabels = ['Damage Dealt', 'Damage Taken', 'Projectiles Damage', 'Projectiles Count', 'Rend Armor Damage', 'Max Damage Dealt'];
-        if (combatLabels.includes(label)) return 'combat';
-
-        // Damage types
-        const damageLabels = ['Thorn Damage', 'Orb Damage', 'Land Mine Damage', 'Death Ray Damage', 'Smart Missile Damage', 'Chain Lightning Damage', 'Death Wave Damage', 'Swamp Damage', 'Black Hole Damage', 'Inner Land Mine Damage', 'Orb Hits', 'Land Mines Spawned', 'Destroyed by Orbs', 'Destroyed by Thorns', 'Destroyed by Death ray', 'Destroyed by Land Mine'];
-        if (damageLabels.includes(label)) return 'damage';
-
-        // Economy stats
-        const economyLabels = ['Coins Earned', 'Cash Earned', 'Interest Earned', 'Total Coins', 'Coins/Hour', 'Coins/Wave', 'Cash from Golden Tower', 'Coins from Golden Tower', 'Coins from Blackhole', 'Coins from Spotlight', 'Coins from Orbs', 'Coins from Coin Upgrade', 'Coins from Coin Bonuses', 'Coins from Death Wave', 'Golden bot coins earned', 'Golden Bot Coins', 'Coins Stolen', 'Coins Fetched'];
-        if (economyLabels.includes(label)) return 'economy';
-
-        // Enemy stats
-        const enemyLabels = ['Total Enemies', 'Basic', 'Fast', 'Tank', 'Ranged', 'Boss', 'Protector', 'Total Elites', 'Vampires', 'Rays', 'Scatters', 'Saboteurs', 'Commanders', 'Overcharges', 'Basic Enemies', 'Fast Enemies', 'Tank Enemies', 'Ranged Enemies', 'Boss Enemies', 'Protector Enemies', 'Enemies Defeated'];
-        if (enemyLabels.includes(label)) return 'enemies';
-
-        // Resources
-        const resourceLabels = ['Gems', 'Cells Earned', 'Total Cells', 'Cells/Hour', 'Reroll Shards', 'Reroll Shards Earned', 'Reroll Shards/Hour', 'Cannon Shards', 'Armor Shards', 'Generator Shards', 'Core Shards', 'Common Modules', 'Rare Modules', 'Medals', 'Gem Blocks Tapped', 'Free Attack Upgrade', 'Free Defense Upgrade', 'Free Utility Upgrade', 'Waves Skipped'];
-        if (resourceLabels.includes(label)) return 'resources';
-
-        // Bots
-        const botLabels = ['Flame bot damage', 'Flame Bot Damage', 'Thunder bot stuns', 'Thunder Bot Stuns', 'Golden bot coins earned', 'Guardian catches', 'Guardian Catches', 'Coins Fetched', 'Fetch Bot Reroll Shards'];
-        if (botLabels.includes(label)) return 'bots';
-
-        // Survivability
-        const survivabilityLabels = ['Death Defy', 'Death Defy Uses', 'Lifesteal', 'Total Lifesteal', 'HP From Death Wave', 'HP from Death Wave', 'Recovery Packages', 'Damage Taken Wall', 'Damage Taken While Berserked', 'Damage While Berserked', 'Damage Gain From Berserk', 'Total Damage Taken', 'Wall Damage Taken', 'Berserked Damage', 'Avg Berserk Multiplier'];
-        if (survivabilityLabels.includes(label)) return 'survivability';
-
-        // Default to basic if no category matches
-        return 'basic';
-    }
-
-    loadCategoryToggles() {
-        const saved = localStorage.getItem('towerAnalyticsCategoryToggles');
-        if (saved) {
-            try {
-                return JSON.parse(saved);
-            } catch (e) {
-                console.error('Failed to parse category toggles:', e);
-            }
-        }
-        // Default: all categories enabled
-        return {
-            basic: true,
-            combat: true,
-            damage: true,
-            economy: true,
-            enemies: true,
-            resources: true,
-            bots: true,
-            survivability: true
-        };
-    }
-
-    saveCategoryToggles() {
-        localStorage.setItem('towerAnalyticsCategoryToggles', JSON.stringify(this.categoryToggles));
-    }
-
-    toggleCategory(category) {
-        // Toggle the category state
-        this.categoryToggles[category] = !this.categoryToggles[category];
-
-        // Update the button's active class and opacity
-        const button = document.querySelector(\`button[data-category="\${category}"]\`);
-        if (button) {
-            if (isVisible) {
-                button.classList.add('active');
-                button.style.opacity = '1.0';
-            } else {
-                button.classList.remove('active');
-                button.style.opacity = '0.5';
-            }
-        }
-
-        // Toggle visibility of all cards with this category using CSS
-        const cards = document.querySelectorAll(`[data-category="${category}"]`);
-        cards.forEach(card => {
-            card.style.display = isVisible ? '' : 'none';
-        });
-
-        // Save to localStorage
-        this.saveCategoryToggles();
-    }
-
-    initializeCategoryButtons() {
-        // Set initial button states based on saved toggles
-        Object.keys(this.categoryToggles).forEach(category => {
-            const button = document.querySelector(\`button[data-category="\${category}"]\`);
-            const isVisible = this.categoryToggles[category];
-            if (button) {
-                if (isVisible) {
-                    button.classList.add('active');
-                    button.style.opacity = '1.0';
-                } else {
-                    button.classList.remove('active');
-                    button.style.opacity = '0.5';
-                }
-            }
-        });
-            
-            // Apply initial visibility to cards
-            const cards = document.querySelectorAll(`[data-category="${category}"]`);
-            cards.forEach(card => {
-                card.style.display = isVisible ? '' : 'none';
-            });
-    }
