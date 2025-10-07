@@ -1,119 +1,83 @@
 /**
- * Logger
- * Centralized logging utilities
+ * Logger - Enhanced with Winston
+ * Centralized logging utilities with structured logging support
  */
 
-const fs = require('fs');
+const winston = require('winston');
 const path = require('path');
+const fs = require('fs');
 
-class Logger {
-    constructor(logDir) {
-        this.logDir = logDir;
-
-        // Ensure log directory exists
-        if (!fs.existsSync(this.logDir)) {
-            fs.mkdirSync(this.logDir, { recursive: true });
-        }
-    }
-
-    /**
-     * Log to file
-     */
-    log(filename, message) {
-        const logFile = path.join(this.logDir, filename);
-        const timestamp = new Date().toISOString();
-        const logMessage = `[${timestamp}] ${message}\n`;
-
-        fs.appendFileSync(logFile, logMessage);
-    }
-
-    /**
-     * Log info
-     */
-    info(message, service = 'system') {
-        const msg = `[INFO] ${message}`;
-        console.log(msg);
-        this.log(`${service}.log`, msg);
-    }
-
-    /**
-     * Log error
-     */
-    error(message, service = 'system') {
-        const msg = `[ERROR] ${message}`;
-        console.error(msg);
-        this.log(`${service}.error.log`, msg);
-    }
-
-    /**
-     * Log warning
-     */
-    warn(message, service = 'system') {
-        const msg = `[WARN] ${message}`;
-        console.warn(msg);
-        this.log(`${service}.log`, msg);
-    }
-
-    /**
-     * Log debug (only if DEBUG env var is set)
-     */
-    debug(message, service = 'system') {
-        if (process.env.DEBUG) {
-            const msg = `[DEBUG] ${message}`;
-            console.log(msg);
-            this.log(`${service}.debug.log`, msg);
-        }
-    }
-
-    /**
-     * Get log file path
-     */
-    getLogPath(filename) {
-        return path.join(this.logDir, filename);
-    }
-
-    /**
-     * Read log file
-     */
-    readLog(filename, lines = 100) {
-        const logFile = path.join(this.logDir, filename);
-
-        if (!fs.existsSync(logFile)) {
-            return null;
-        }
-
-        const content = fs.readFileSync(logFile, 'utf8');
-        const allLines = content.split('\n');
-
-        return allLines.slice(-lines).join('\n');
-    }
-
-    /**
-     * List all log files
-     */
-    listLogs() {
-        return fs.readdirSync(this.logDir);
-    }
-
-    /**
-     * Clear log file
-     */
-    clearLog(filename) {
-        const logFile = path.join(this.logDir, filename);
-        if (fs.existsSync(logFile)) {
-            fs.unlinkSync(logFile);
-        }
-    }
-
-    /**
-     * Clear all logs
-     */
-    clearAllLogs() {
-        const files = fs.readdirSync(this.logDir);
-        files.forEach(file => {
-            fs.unlinkSync(path.join(this.logDir, file));
-        });
-    }
+// Ensure logs directory exists
+const logsDir = path.join(__dirname, '../logs');
+if (!fs.existsSync(logsDir)) {
+    fs.mkdirSync(logsDir, { recursive: true });
 }
 
-module.exports = Logger;
+// Define log format
+const logFormat = winston.format.combine(
+    winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+    winston.format.errors({ stack: true }),
+    winston.format.splat(),
+    winston.format.json()
+);
+
+// Console format (pretty print for development)
+const consoleFormat = winston.format.combine(
+    winston.format.colorize(),
+    winston.format.timestamp({ format: 'HH:mm:ss' }),
+    winston.format.printf(({ timestamp, level, message, ...meta }) => {
+        let msg = `${timestamp} [${level}]: ${message}`;
+        if (Object.keys(meta).length > 0) {
+            msg += ` ${JSON.stringify(meta)}`;
+        }
+        return msg;
+    })
+);
+
+// Create Winston logger
+const logger = winston.createLogger({
+    level: process.env.LOG_LEVEL || (process.env.NODE_ENV === 'production' ? 'info' : 'debug'),
+    format: logFormat,
+    transports: [
+        // Console transport
+        new winston.transports.Console({
+            format: consoleFormat,
+        }),
+        // Error log file
+        new winston.transports.File({
+            filename: path.join(logsDir, 'error.log'),
+            level: 'error',
+            maxsize: 5242880, // 5MB
+            maxFiles: 5,
+        }),
+        // Combined log file
+        new winston.transports.File({
+            filename: path.join(logsDir, 'combined.log'),
+            maxsize: 5242880, // 5MB
+            maxFiles: 5,
+        }),
+    ],
+    // Don't exit on uncaught exceptions
+    exitOnError: false,
+});
+
+// Add request logging helper
+logger.logRequest = (req, statusCode, duration) => {
+    logger.http('HTTP Request', {
+        method: req.method,
+        url: req.url,
+        statusCode,
+        duration: `${duration}ms`,
+        ip: req.ip || req.connection.remoteAddress,
+    });
+};
+
+// Add error logging helper
+logger.logError = (error, context = {}) => {
+    logger.error(error.message, {
+        stack: error.stack,
+        ...context,
+    });
+};
+
+module.exports = logger;
