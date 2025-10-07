@@ -36,6 +36,18 @@ class TournamentsManager {
         if (section) {
             section.style.display = 'block';
             this.loadDashboard();
+            // Initialize bracket difficulty when tournaments section is shown
+            this.initBracketDifficulty();
+        }
+    }
+
+    async initBracketDifficulty() {
+        // Wait for discord auth and bracket difficulty manager to be ready
+        if (window.discordAuth && window.bracketDifficulty && window.discordAuth.user) {
+            const discordUserId = window.discordAuth.user.user_metadata?.provider_id;
+            if (discordUserId) {
+                await window.bracketDifficulty.init(discordUserId);
+            }
         }
     }
 

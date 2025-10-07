@@ -61,7 +61,9 @@
       "Bash(vercel env add:*)",
       "Bash(git reset:*)",
       "Bash(npm run dev:*)",
-      "Bash(npm run start:server:*)"
+      "Bash(npm run start:server:*)",
+      "Bash(npx playwright install:*)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []

@@ -409,7 +409,243 @@ Rules:
         }
     });
 
+    /**
+     * Ask about user's run data
+     * POST /api/reddit-rag/ask-runs
+     * Body: { question: "which mob kills me the most?", discordUserId: "123..." }
+     */
+    router.post('/ask-runs', async (req, res) => {
+        try {
+            const { question, discordUserId } = req.body;
+
+            if (!question?.trim()) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Question is required'
+                });
+            }
+
+            if (!discordUserId) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Discord user ID is required'
+                });
+            }
+
+            console.log(`🤖 Run analytics question from ${discordUserId}: "${question}"`);
+
+            // Fetch user's run data (last 90 days)
+            const ninetyDaysAgo = new Date();
+            ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+
+            const { data: runs, error } = await supabase.supabase
+                .from('tower_runs')
+                .select('*')
+                .eq('discord_user_id', discordUserId)
+                .gte('submitted_at', ninetyDaysAgo.toISOString())
+                .order('submitted_at', { ascending: false })
+                .limit(500); // Last 500 runs max
+
+            if (error) {
+                throw new Error(`Failed to fetch runs: ${error.message}`);
+            }
+
+            if (!runs || runs.length === 0) {
+                return res.json({
+                    success: true,
+                    answer: "I couldn't find any run data for your account in the last 90 days. Start submitting runs to get personalized analytics!",
+                    stats: {}
+                });
+            }
+
+            // Calculate analytics from runs
+            const analytics = calculateRunAnalytics(runs);
+
+            // Build context for AI
+            const context = `
+User Run Statistics (Last ${runs.length} runs, past 90 days):
+
+GENERAL STATS:
+- Total Runs: ${analytics.totalRuns}
+- Date Range: ${new Date(analytics.firstRun).toLocaleDateString()} to ${new Date(analytics.lastRun).toLocaleDateString()}
+- Max Tier: ${analytics.maxTier}, Max Wave: ${analytics.maxWave}
+- Average Tier: ${analytics.avgTier.toFixed(1)}, Average Wave: ${analytics.avgWave.toFixed(1)}
+- Total Coins Earned: ${analytics.totalCoins}
+- Average Coins per Run: ${analytics.avgCoins}
+
+DEATH ANALYSIS:
+${analytics.deathsByMob.slice(0, 10).map((d, i) => `${i + 1}. ${d.mob}: ${d.count} deaths (${d.percentage}%)`).join('\n')}
+
+TIME ANALYSIS:
+- Last 7 Days: ${analytics.runsLast7Days} runs, ${analytics.coinsLast7Days} coins
+- Last 30 Days: ${analytics.runsLast30Days} runs, ${analytics.coinsLast30Days} coins
+- Best Hourly Income: ${analytics.bestHourly} coins/hour (Tier ${analytics.bestHourlyTier})
+- Average Hourly Income: ${analytics.avgHourly} coins/hour
+
+DAMAGE BREAKDOWN (Top Sources):
+${analytics.damageBreakdown.slice(0, 5).map((d, i) => `${i + 1}. ${d.source}: ${d.total}`).join('\n')}
+
+RECENT PERFORMANCE (Last 10 runs):
+${analytics.recentRuns.map((r, i) => `${i + 1}. T${r.tier}W${r.wave} - ${r.coins} coins - Killed by ${r.killedBy || 'Unknown'}`).join('\n')}
+`;
+
+            // Call Grok API
+            const grokResponse = await fetch(GROK_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${GROK_API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: 'grok-3',
+                    temperature: 0.5,
+                    messages: [
+                        {
+                            role: 'system',
+                            content: `You are a Tower Game analytics assistant. Answer questions about the user's run data using the statistics provided.
+
+Format your answer conversationally and helpfully. Use specific numbers and insights from the data. Be concise but informative.
+
+If the question is about:
+- Deaths/killed by: Use the DEATH ANALYSIS section
+- Coins/earnings: Use GENERAL STATS and TIME ANALYSIS
+- Time periods (last 7 days, etc): Use TIME ANALYSIS
+- Performance: Use RECENT PERFORMANCE and GENERAL STATS
+- Damage: Use DAMAGE BREAKDOWN
+
+Always include relevant numbers and percentages. Make it personal and actionable.`
+                        },
+                        {
+                            role: 'user',
+                            content: `Question: ${question}\n\nUser's Run Data:\n${context}\n\nAnswer the question based on this data.`
+                        }
+                    ]
+                })
+            });
+
+            if (!grokResponse.ok) {
+                const errorText = await grokResponse.text();
+                throw new Error(`Grok API error: ${errorText}`);
+            }
+
+            const grokData = await grokResponse.json();
+            const answer = grokData.choices[0]?.message?.content || 'No response generated';
+
+            console.log(`✅ Run analytics answer generated (${grokData.usage?.total_tokens} tokens)`);
+
+            res.json({
+                success: true,
+                answer: answer,
+                stats: {
+                    runsAnalyzed: runs.length,
+                    dateRange: `${new Date(analytics.firstRun).toLocaleDateString()} - ${new Date(analytics.lastRun).toLocaleDateString()}`,
+                    topKiller: analytics.deathsByMob[0]?.mob || 'Unknown'
+                },
+                usage: grokData.usage
+            });
+
+        } catch (error) {
+            console.error('❌ Run analytics failed:', error.message);
+            res.status(500).json({
+                success: false,
+                error: error.message
+            });
+        }
+    });
+
     return router;
+}
+
+/**
+ * Helper function to calculate analytics from runs
+ */
+function calculateRunAnalytics(runs) {
+    const parseValue = (val) => {
+        if (!val) return 0;
+        const str = String(val);
+        const suffixes = { 'K': 1e3, 'M': 1e6, 'B': 1e9, 'T': 1e12, 'q': 1e15, 'Q': 1e18 };
+        const match = str.match(/^([\d,\.]+)([A-Za-z]?)$/);
+        if (!match) return parseFloat(str) || 0;
+        const num = parseFloat(match[1].replace(/,/g, ''));
+        return num * (suffixes[match[2]] || 1);
+    };
+
+    const formatValue = (val) => {
+        if (val >= 1e15) return (val / 1e15).toFixed(2) + 'q';
+        if (val >= 1e12) return (val / 1e12).toFixed(2) + 'T';
+        if (val >= 1e9) return (val / 1e9).toFixed(2) + 'B';
+        if (val >= 1e6) return (val / 1e6).toFixed(2) + 'M';
+        if (val >= 1e3) return (val / 1e3).toFixed(2) + 'K';
+        return val.toFixed(0);
+    };
+
+    // Death analysis
+    const deathsByMob = {};
+    runs.forEach(run => {
+        const mob = run.killed_by || 'Unknown';
+        deathsByMob[mob] = (deathsByMob[mob] || 0) + 1;
+    });
+    const deathsArray = Object.entries(deathsByMob)
+        .map(([mob, count]) => ({
+            mob,
+            count,
+            percentage: ((count / runs.length) * 100).toFixed(1)
+        }))
+        .sort((a, b) => b.count - a.count);
+
+    // Time-based analysis
+    const now = new Date();
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+    const runsLast7Days = runs.filter(r => new Date(r.submitted_at) >= sevenDaysAgo).length;
+    const runsLast30Days = runs.filter(r => new Date(r.submitted_at) >= thirtyDaysAgo).length;
+    const coinsLast7Days = formatValue(runs.filter(r => new Date(r.submitted_at) >= sevenDaysAgo)
+        .reduce((sum, r) => sum + parseValue(r.coins_earned), 0));
+    const coinsLast30Days = formatValue(runs.filter(r => new Date(r.submitted_at) >= thirtyDaysAgo)
+        .reduce((sum, r) => sum + parseValue(r.coins_earned), 0));
+
+    // Hourly calculations
+    const runsWithHourly = runs.map(r => ({
+        ...r,
+        hourly: parseValue(r.run_duration) > 0 ? parseValue(r.coins_earned) / (parseValue(r.run_duration) / 3600) : 0
+    }));
+    const bestHourlyRun = runsWithHourly.reduce((best, r) => r.hourly > best.hourly ? r : best, runsWithHourly[0]);
+
+    // Damage breakdown
+    const damageTypes = ['projectiles_damage', 'orb_damage', 'death_wave_damage', 'black_hole_damage',
+                         'chain_lightning_damage', 'land_mine_damage', 'smart_missile_damage', 'thorn_damage'];
+    const damageBreakdown = damageTypes.map(type => ({
+        source: type.replace('_damage', '').replace(/_/g, ' '),
+        total: formatValue(runs.reduce((sum, r) => sum + parseValue(r[type]), 0))
+    })).sort((a, b) => parseValue(b.total) - parseValue(a.total));
+
+    return {
+        totalRuns: runs.length,
+        maxTier: Math.max(...runs.map(r => parseInt(r.tier) || 0)),
+        maxWave: Math.max(...runs.map(r => parseInt(r.wave) || 0)),
+        avgTier: runs.reduce((sum, r) => sum + (parseInt(r.tier) || 0), 0) / runs.length,
+        avgWave: runs.reduce((sum, r) => sum + (parseInt(r.wave) || 0), 0) / runs.length,
+        totalCoins: formatValue(runs.reduce((sum, r) => sum + parseValue(r.coins_earned), 0)),
+        avgCoins: formatValue(runs.reduce((sum, r) => sum + parseValue(r.coins_earned), 0) / runs.length),
+        deathsByMob: deathsArray,
+        firstRun: runs[runs.length - 1]?.submitted_at || new Date().toISOString(),
+        lastRun: runs[0]?.submitted_at || new Date().toISOString(),
+        runsLast7Days,
+        runsLast30Days,
+        coinsLast7Days,
+        coinsLast30Days,
+        bestHourly: formatValue(bestHourlyRun?.hourly || 0),
+        bestHourlyTier: bestHourlyRun?.tier || 'N/A',
+        avgHourly: formatValue(runsWithHourly.reduce((sum, r) => sum + r.hourly, 0) / runsWithHourly.length),
+        damageBreakdown,
+        recentRuns: runs.slice(0, 10).map(r => ({
+            tier: r.tier,
+            wave: r.wave,
+            coins: formatValue(parseValue(r.coins_earned)),
+            killedBy: r.killed_by
+        }))
+    };
 }
 
 module.exports = createRedditRAGRouter;

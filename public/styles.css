@@ -323,10 +323,12 @@ body.authenticated .main-content {
 }
 
 .user-avatar {
-    width: 25.48px;
-    height: 25.48px;
+    width: 25.48px !important;
+    height: 25.48px !important;
     background: linear-gradient(45deg, #FF409A, #53B9EA);
-    border-radius: 2.73px;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
 }
 
 .user-name {

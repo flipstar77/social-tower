@@ -14,6 +14,7 @@ class RedditScraperService {
         this.isRunning = false;
         this.lastScrapeTime = null;
         this.cronJob = null;
+        this.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36';
     }
 
     /**
@@ -125,17 +126,136 @@ class RedditScraperService {
     }
 
     /**
-     * Fetch posts from Apify
+     * Fetch posts using Reddit's JSON API (more reliable than Apify)
      */
-    async fetchPosts(limit = 50) {
+    async fetchPostsDirectly(limit = 100, sort = 'hot', after = null) {
+        try {
+            const sortUrls = {
+                hot: `https://www.reddit.com/r/${this.subreddit}/hot.json`,
+                top: `https://www.reddit.com/r/${this.subreddit}/top.json?t=all`,
+                new: `https://www.reddit.com/r/${this.subreddit}/new.json`
+            };
+
+            let url = sortUrls[sort] || sortUrls.hot;
+            url += `${url.includes('?') ? '&' : '?'}limit=${Math.min(limit, 100)}`;
+            if (after) {
+                url += `&after=${after}`;
+            }
+
+            const response = await axios.get(url, {
+                headers: { 'User-Agent': this.userAgent },
+                timeout: 10000
+            });
+
+            const posts = response.data.data.children
+                .filter(child => child.kind === 't3')
+                .map(child => {
+                    const data = child.data;
+                    return {
+                        parsedId: data.id,
+                        title: data.title,
+                        username: data.author,
+                        parsedCommunityName: data.subreddit,
+                        body: data.selftext || '',
+                        flair: data.link_flair_text || null,
+                        url: `https://www.reddit.com${data.permalink}`,
+                        upVotes: data.score,
+                        numberOfComments: data.num_comments,
+                        createdAt: new Date(data.created_utc * 1000).toISOString(),
+                        thumbnailUrl: data.thumbnail && data.thumbnail.startsWith('http') ? data.thumbnail : null,
+                        isVideo: data.is_video || false
+                    };
+                });
+
+            const nextAfter = response.data.data.after;
+
+            return { posts, comments: [], nextAfter };
+
+        } catch (error) {
+            console.error('❌ Direct Reddit API fetch failed:', error.message);
+            return { posts: [], comments: [], nextAfter: null };
+        }
+    }
+
+    /**
+     * Fetch comments for a specific post using Reddit's JSON API
+     */
+    async fetchCommentsForPost(postId, limit = 150) {
+        try {
+            const url = `https://www.reddit.com/comments/${postId}.json?limit=${limit}&depth=10&sort=top`;
+
+            const response = await axios.get(url, {
+                headers: { 'User-Agent': this.userAgent },
+                timeout: 15000
+            });
+
+            if (!response.data || !Array.isArray(response.data) || response.data.length < 2) {
+                return [];
+            }
+
+            // Reddit returns [post_data, comments_data]
+            const commentsData = response.data[1];
+            const comments = [];
+
+            // Recursive function to extract all comments
+            const extractComments = (children) => {
+                if (!children) return;
+
+                for (const child of children) {
+                    if (child.kind === 't1' && child.data) {
+                        const data = child.data;
+                        comments.push({
+                            parsedId: data.id,
+                            postId: `t3_${postId}`,
+                            parentId: data.parent_id,
+                            username: data.author,
+                            body: data.body || '',
+                            upVotes: data.score,
+                            createdAt: new Date(data.created_utc * 1000).toISOString()
+                        });
+
+                        // Recursively get replies
+                        if (data.replies && data.replies.data && data.replies.data.children) {
+                            extractComments(data.replies.data.children);
+                        }
+                    }
+                }
+            };
+
+            if (commentsData.data && commentsData.data.children) {
+                extractComments(commentsData.data.children);
+            }
+
+            return comments.slice(0, limit); // Limit to requested amount
+
+        } catch (error) {
+            console.error(`❌ Failed to fetch comments for post ${postId}:`, error.message);
+            return [];
+        }
+    }
+
+    /**
+     * Fetch posts from Apify (legacy fallback)
+     */
+    async fetchPosts(limit = 50, sort = 'hot') {
+        // Build Reddit URL with sorting
+        const sortUrls = {
+            hot: `https://www.reddit.com/r/${this.subreddit}/hot/`,
+            top: `https://www.reddit.com/r/${this.subreddit}/top/?t=all`,
+            new: `https://www.reddit.com/r/${this.subreddit}/new/`
+        };
+
+        const url = sortUrls[sort] || sortUrls.hot;
+
         // Start Apify actor run
         const runResponse = await axios.post(
             `https://api.apify.com/v2/acts/${this.apifyActorId}/runs`,
             {
-                startUrls: [{ url: `https://www.reddit.com/r/${this.subreddit}/` }],
+                startUrls: [{ url }],
                 maxItems: limit,
                 maxPostCount: limit,
-                maxComments: 50 // Get more comments for better context
+                maxComments: 50, // Get more comments for better context
+                scrollTimeout: 40 // Longer scroll timeout for more posts
             },
             {
                 headers: {
@@ -258,11 +378,12 @@ class RedditScraperService {
      * Vectorize important threads for RAG system
      */
     async vectorizeThreads(posts) {
-        // Filter high-quality posts for RAG
+        // Filter high-quality posts for RAG (exclude memes)
         const importantPosts = posts.filter(post => {
+            const isMeme = post.flair && (post.flair.toLowerCase().includes('meme') || post.flair.toLowerCase().includes('humor'));
             const isHighEngagement = post.upVotes > 10 || post.numberOfComments > 5;
             const isGuideOrStrategy = ['Guide', 'Strategy', 'Discussion'].includes(post.flair);
-            return isHighEngagement || isGuideOrStrategy;
+            return !isMeme && (isHighEngagement || isGuideOrStrategy);
         });
 
         console.log(`🔍 Found ${importantPosts.length} high-quality posts to vectorize`);
@@ -279,20 +400,39 @@ class RedditScraperService {
     }
 
     /**
-     * Vectorize a single post and store embedding
+     * Vectorize a single post with comments and store embedding
      */
-    async vectorizePost(post) {
+    async vectorizePost(post, comments = []) {
         if (!this.supabase || !this.supabase.supabase) {
             console.log('⚠️ Supabase not configured, skipping vectorization');
             return;
         }
 
         try {
-            // Create text content for embedding
-            const content = `Title: ${post.title}\n\nBody: ${post.body || 'No content'}\n\nFlair: ${post.flair || 'None'}`;
+            const { generateEmbedding } = require('./embeddings');
+
+            // Create text content for embedding including top comments
+            let content = `Title: ${post.title}\n\nBody: ${post.body || 'No content'}\n\nFlair: ${post.flair || 'None'}`;
+
+            // Add top 10 comments for richer context (sorted by score)
+            if (comments && comments.length > 0) {
+                const topComments = comments
+                    .filter(c => c.body && c.body.length > 10)
+                    .sort((a, b) => b.upVotes - a.upVotes)
+                    .slice(0, 10);
+
+                if (topComments.length > 0) {
+                    content += '\n\nTop Community Comments:\n';
+                    topComments.forEach((comment, i) => {
+                        content += `\n${i + 1}. ${comment.username} (${comment.upVotes} upvotes): ${comment.body.substring(0, 300)}`;
+                    });
+                }
+            }
+
+            // Generate embedding using OpenAI
+            const embedding = await generateEmbedding(content);
 
             // Store in vector table for RAG
-            // Note: We'll use Supabase's pgvector or a simple text search for now
             const { data, error } = await this.supabase.supabase
                 .from('reddit_rag_content')
                 .upsert({
@@ -302,6 +442,7 @@ class RedditScraperService {
                     flair: post.flair,
                     score: post.upVotes,
                     url: post.url,
+                    embedding: embedding,
                     created_at: new Date(post.createdAt),
                     indexed_at: new Date()
                 }, { onConflict: 'reddit_id' });
@@ -325,7 +466,8 @@ class RedditScraperService {
     }
 
     /**
-     * Mega scrape - initial knowledge base builder (1000 posts)
+     * Mega scrape - initial knowledge base builder (1000 posts with 150 comments each)
+     * Uses Reddit's JSON API directly with pagination
      */
     async megaScrape() {
         if (this.isRunning) {
@@ -334,42 +476,124 @@ class RedditScraperService {
         }
 
         this.isRunning = true;
-        console.log('🚀 Starting MEGA SCRAPE (1000 posts)...');
+        console.log('🚀 Starting MEGA SCRAPE with COMMENTS using Reddit JSON API directly...');
 
         try {
-            // Fetch 1000 posts with lots of comments
-            const { posts, comments } = await this.fetchPosts(1000);
-            console.log(`✅ Fetched ${posts.length} posts and ${comments.length} comments`);
+            let allPosts = [];
+            let allComments = [];
+            const sortMethods = ['top', 'hot', 'new'];
+
+            // PHASE 1: Fetch posts
+            for (const sort of sortMethods) {
+                console.log(`📦 Fetching posts from r/${this.subreddit}/${sort}...`);
+                let after = null;
+                let pagesForThisSort = 0;
+                const maxPagesPerSort = 4; // 4 pages × 100 posts × 3 sorts = 1200 posts
+
+                while (pagesForThisSort < maxPagesPerSort) {
+                    const { posts, nextAfter } = await this.fetchPostsDirectly(100, sort, after);
+
+                    if (posts.length === 0) {
+                        console.log(`   ⚠️ No more posts available for ${sort}`);
+                        break;
+                    }
+
+                    allPosts.push(...posts);
+                    pagesForThisSort++;
+                    console.log(`   ✅ Page ${pagesForThisSort}: Got ${posts.length} posts (total: ${allPosts.length})`);
+
+                    after = nextAfter;
+                    if (!after) {
+                        console.log(`   ⚠️ Reached end of ${sort} listing`);
+                        break;
+                    }
+
+                    // Small delay to respect Reddit's rate limits
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                }
+
+                console.log(`✅ Finished ${sort}: collected ${pagesForThisSort} pages`);
+            }
+
+            console.log(`✅ Total fetched: ${allPosts.length} posts`);
 
             // Filter duplicates
-            const newPosts = await this.filterDuplicates(posts);
+            const newPosts = await this.filterDuplicates(allPosts);
             console.log(`🔍 Filtered to ${newPosts.length} new posts`);
 
             if (newPosts.length > 0) {
-                // Store all posts
+                // Store all posts first
                 await this.storePosts(newPosts);
 
-                // Store all comments
-                const newPostIds = new Set(newPosts.map(p => p.parsedId));
-                const commentsForNewPosts = comments.filter(c => newPostIds.has(c.postId?.replace('t3_', '')));
-                await this.storeComments(commentsForNewPosts);
-
-                // Vectorize ALL high-quality posts (no limit)
+                // Filter high-quality posts for comment fetching (exclude memes)
                 const importantPosts = newPosts.filter(post => {
-                    const isHighEngagement = post.upVotes > 10 || post.numberOfComments > 5;
-                    const isGuideOrStrategy = ['Guide', 'Strategy', 'Discussion'].includes(post.flair);
-                    return isHighEngagement || isGuideOrStrategy;
+                    const isMeme = post.flair && (post.flair.toLowerCase().includes('meme') || post.flair.toLowerCase().includes('humor'));
+                    const hasComments = post.numberOfComments > 0;
+                    const isHighEngagement = post.upVotes > 5 || post.numberOfComments > 3;
+                    const isGuideOrStrategy = ['Guide', 'Strategy', 'Discussion', 'Question'].includes(post.flair);
+                    return !isMeme && hasComments && (isHighEngagement || isGuideOrStrategy);
                 });
 
-                console.log(`🔍 Vectorizing ${importantPosts.length} high-quality posts...`);
+                console.log(`📝 Fetching comments for ${importantPosts.length} high-quality posts (up to 150 per post)...`);
 
-                // Vectorize in batches of 50
-                for (let i = 0; i < importantPosts.length; i += 50) {
-                    const batch = importantPosts.slice(i, i + 50);
-                    for (const post of batch) {
-                        await this.vectorizePost(post);
+                // PHASE 2: Fetch comments for important posts
+                let commentsProcessed = 0;
+                for (let i = 0; i < importantPosts.length; i++) {
+                    const post = importantPosts[i];
+                    console.log(`   💬 [${i + 1}/${importantPosts.length}] Fetching comments for: ${post.title.substring(0, 60)}...`);
+
+                    const comments = await this.fetchCommentsForPost(post.parsedId, 150);
+
+                    if (comments.length > 0) {
+                        allComments.push(...comments);
+                        commentsProcessed++;
+                        console.log(`      ✅ Got ${comments.length} comments (Total: ${allComments.length})`);
                     }
-                    console.log(`   Vectorized ${Math.min(i + 50, importantPosts.length)}/${importantPosts.length} posts`);
+
+                    // Delay between comment requests to respect rate limits
+                    if ((i + 1) % 10 === 0) {
+                        console.log(`   ⏸️  Pausing for 5 seconds after 10 requests...`);
+                        await new Promise(resolve => setTimeout(resolve, 5000));
+                    } else {
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                    }
+                }
+
+                console.log(`✅ Fetched ${allComments.length} total comments from ${commentsProcessed} posts`);
+
+                // Store all comments
+                if (allComments.length > 0) {
+                    await this.storeComments(allComments);
+                }
+
+                // PHASE 3: Vectorize posts with their comments
+                console.log(`🔍 Vectorizing ${importantPosts.length} posts with comment context...`);
+
+                // Create a map of post ID to comments for efficient lookup
+                const commentsByPost = {};
+                allComments.forEach(comment => {
+                    const postId = comment.postId?.replace('t3_', '');
+                    if (!commentsByPost[postId]) {
+                        commentsByPost[postId] = [];
+                    }
+                    commentsByPost[postId].push(comment);
+                });
+
+                // Vectorize in batches of 20 to avoid rate limits
+                for (let i = 0; i < importantPosts.length; i += 20) {
+                    const batch = importantPosts.slice(i, i + 20);
+
+                    for (const post of batch) {
+                        const postComments = commentsByPost[post.parsedId] || [];
+                        await this.vectorizePost(post, postComments);
+                    }
+
+                    console.log(`   ✅ Vectorized ${Math.min(i + 20, importantPosts.length)}/${importantPosts.length} posts`);
+
+                    // Pause between batches to respect rate limits
+                    if (i + 20 < importantPosts.length) {
+                        await new Promise(resolve => setTimeout(resolve, 3000));
+                    }
                 }
             }
 
@@ -378,10 +602,10 @@ class RedditScraperService {
 
             return {
                 success: true,
-                postsScraped: posts.length,
+                postsScraped: allPosts.length,
                 newPosts: newPosts.length,
-                comments: comments.length,
-                message: 'Mega scrape completed successfully'
+                commentsScraped: allComments.length,
+                message: 'Mega scrape with comments completed successfully'
             };
 
         } catch (error) {

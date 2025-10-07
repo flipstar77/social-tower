@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tournament Bracket Difficulty Analyzer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .search-box {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        input[type="text"], select {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .example-text {
+            color: #666;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .results {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .difficulty-badge {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+
+        .difficulty-very-easy { background: #4caf50; color: white; }
+        .difficulty-easy { background: #8bc34a; color: white; }
+        .difficulty-medium { background: #ff9800; color: white; }
+        .difficulty-hard { background: #ff5722; color: white; }
+        .difficulty-very-hard { background: #f44336; color: white; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: 700;
+            color: #667eea;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .chart-container {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 10px;
+        }
+
+        .bar-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .bar-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .bar-label {
+            width: 100px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .bar-wrapper {
+            flex: 1;
+            background: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            height: 30px;
+            position: relative;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            color: white;
+            font-weight: 600;
+        }
+
+        .bracket-list {
+            margin-top: 20px;
+        }
+
+        .bracket-item {
+            padding: 15px;
+            margin: 10px 0;
+            background: #f5f5f5;
+            border-left: 4px solid #667eea;
+            border-radius: 5px;
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏆 Tournament Bracket Difficulty Analyzer</h1>
+            <p>Discover how lucky (or unlucky) you got with your tournament bracket!</p>
+        </div>
+
+        <div class="search-box">
+            <div class="input-group">
+                <input type="text" id="playerId" placeholder="Enter your Player ID" value="188EAC641A3EBC7A">
+                <select id="league">
+                    <option value="Legend">Legend</option>
+                    <option value="Champion">Champion</option>
+                    <option value="Platinum">Platinum</option>
+                    <option value="Gold">Gold</option>
+                    <option value="Silver">Silver</option>
+                    <option value="Copper">Copper</option>
+                </select>
+                <button onclick="analyzeBracket()">Analyze</button>
+            </div>
+            <p class="example-text">
+                💡 Find your Player ID at <a href="https://thetower.lol/player" target="_blank" style="color: #667eea;">thetower.lol/player</a>
+                <br>Example: 188EAC641A3EBC7A
+            </p>
+        </div>
+
+        <div id="results" class="results"></div>
+    </div>
+
+    <script>
+        async function analyzeBracket() {
+            const playerId = document.getElementById('playerId').value.trim();
+            const league = document.getElementById('league').value;
+            const resultsDiv = document.getElementById('results');
+
+            if (!playerId) {
+                resultsDiv.innerHTML = '<div class="error">Please enter a Player ID</div>';
+                resultsDiv.classList.add('show');
+                return;
+            }
+
+            // Show loading
+            resultsDiv.innerHTML = '<div class="loading"><div class="spinner"></div><p>Analyzing your bracket difficulty...</p></div>';
+            resultsDiv.classList.add('show');
+
+            try {
+                const response = await fetch(`/api/tournament-brackets/difficulty/${playerId}?league=${league}`);
+                const data = await response.json();
+
+                if (!data.success) {
+                    resultsDiv.innerHTML = `<div class="error">${data.error}</div>`;
+                    return;
+                }
+
+                displayResults(data);
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            }
+        }
+
+        function displayResults(data) {
+            const { player, analysis, league } = data;
+            const difficultyClass = analysis.difficultyLabel.toLowerCase().replace(' ', '-');
+
+            const rankDist = Object.entries(analysis.rankDistribution)
+                .sort((a, b) => parseInt(a[0]) - parseInt(b[0]));
+
+            const maxCount = Math.max(...rankDist.map(r => r[1]));
+
+            const html = `
+                <h2>Analysis for ${player.realName || player.name}</h2>
+                <p style="color: #666; margin: 10px 0;">League: ${league} | Wave: ${player.wave} | Actual Rank: ${player.actualRank}</p>
+
+                <div class="difficulty-badge difficulty-${difficultyClass}">
+                    ${analysis.difficultyLabel} Bracket (${analysis.difficultyScore}/100)
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Best Possible Rank</div>
+                        <div class="stat-value">#${analysis.bestPossibleRank}</div>
+                        <div class="stat-label">In easiest bracket</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Worst Possible Rank</div>
+                        <div class="stat-value">#${analysis.worstPossibleRank}</div>
+                        <div class="stat-label">In hardest bracket</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Average Rank</div>
+                        <div class="stat-value">#${analysis.averageRank}</div>
+                        <div class="stat-label">Across all brackets</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Brackets Analyzed</div>
+                        <div class="stat-value">${analysis.totalBracketsAnalyzed}</div>
+                        <div class="stat-label">Total in ${league}</div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <h3>Your Hypothetical Rankings Across All Brackets</h3>
+                    <div class="bar-chart">
+                        ${rankDist.map(([rank, count]) => {
+                            const percentage = (count / analysis.totalBracketsAnalyzed * 100).toFixed(1);
+                            const width = (count / maxCount * 100);
+                            return `
+                                <div class="bar-item">
+                                    <div class="bar-label">Rank #${rank}</div>
+                                    <div class="bar-wrapper">
+                                        <div class="bar-fill" style="width: ${width}%">${count} brackets (${percentage}%)</div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <h3>📊 What This Means</h3>
+                    <p style="line-height: 1.6; color: #333;">
+                        ${getInterpretation(analysis, player.actualRank)}
+                    </p>
+                </div>
+
+                <div class="bracket-list">
+                    <h3>🏆 Top 5 Easiest Brackets (You Would've Ranked Best)</h3>
+                    ${analysis.easiestBrackets.map((b, i) => `
+                        <div class="bracket-item">
+                            <strong>Bracket ${b.bracketId}</strong><br>
+                            You would rank: <strong>#${b.hypotheticalRank}</strong> |
+                            Winner had: ${b.winnerWave} waves |
+                            Median: ${b.medianWave} waves
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="bracket-list">
+                    <h3>😰 Top 5 Hardest Brackets (You Would've Struggled)</h3>
+                    ${analysis.hardestBrackets.map((b, i) => `
+                        <div class="bracket-item">
+                            <strong>Bracket ${b.bracketId}</strong><br>
+                            You would rank: <strong>#${b.hypotheticalRank}</strong> |
+                            Winner had: ${b.winnerWave} waves |
+                            Median: ${b.medianWave} waves
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function getInterpretation(analysis, actualRank) {
+            const score = parseFloat(analysis.difficultyScore);
+            let interpretation = '';
+
+            if (score >= 80) {
+                interpretation = `🍀 <strong>You got VERY lucky!</strong> Your bracket was one of the easiest. With ${analysis.rankDistribution[actualRank] || 0} brackets where you'd get the same rank, you performed in the top tier. `;
+            } else if (score >= 60) {
+                interpretation = `😊 <strong>You got a favorable bracket.</strong> Your performance was solid, and the competition was below average difficulty. `;
+            } else if (score >= 40) {
+                interpretation = `⚖️ <strong>You got an average bracket.</strong> The competition level was typical for this league. Your performance was fair and representative. `;
+            } else if (score >= 20) {
+                interpretation = `😤 <strong>You faced tough competition!</strong> Your bracket was harder than most. Your actual performance is better than your rank suggests. `;
+            } else {
+                interpretation = `💪 <strong>You got UNLUCKY!</strong> Your bracket was one of the hardest. You faced elite competition - your true skill is higher than your rank shows! `;
+            }
+
+            interpretation += `You would have ranked better than ${analysis.percentileBetterThanWinners}% of bracket winners.`;
+
+            return interpretation;
+        }
+
+        // Allow Enter key to submit
+        document.getElementById('playerId').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') analyzeBracket();
+        });
+    </script>
+</body>
+</html>

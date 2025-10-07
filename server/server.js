@@ -14,6 +14,7 @@ const TowerWikiScraper = require('./wiki-scraper');
 const DiscordAuth = require('./discord-auth');
 const SupabaseManager = require('./supabase-config');
 const RedditScraperService = require('./services/reddit-scraper-service');
+const TournamentAutomationService = require('./services/tournament-automation-service');
 
 // Import route modules
 const redditRouter = require('./routes/reddit');
@@ -24,6 +25,7 @@ const createTowerRouter = require('./routes/tower');
 const createWikiRouter = require('./routes/wiki');
 const createDiscordAuthRouter = require('./routes/discord-auth');
 const createDiscordApiRouter = require('./routes/discord-api');
+const tournamentBracketsRouter = require('./routes/tournament-brackets');
 
 const app = express();
 const PORT = process.env.PORT || 6078;
@@ -43,6 +45,9 @@ const supabase = new SupabaseManager();
 
 // Initialize Reddit scraper service
 const redditScraper = new RedditScraperService(supabase);
+
+// Initialize Tournament Automation service
+const tournamentAutomation = new TournamentAutomationService(supabase);
 
 // Debug: Check if Discord endpoints should be loaded
 console.log('🔧 Debug - Supabase instance check:');
@@ -103,6 +108,11 @@ app.use('/auth', discordAuthRouter);
 
 const discordApiRouter = createDiscordApiRouter(supabase);
 app.use('/api', discordApiRouter);
+
+// Mount Tournament Brackets router
+app.locals.supabase = supabase;
+app.locals.tournamentAutomation = tournamentAutomation;
+app.use('/api/tournament-brackets', tournamentBracketsRouter);
 
 
 // Database initialization handled by unifiedDatabase.js
@@ -207,6 +217,9 @@ app.listen(PORT, () => {
 
     // Start Reddit scraper (runs twice daily at 8 AM and 8 PM)
     redditScraper.start();
+
+    // Start Tournament Automation (runs every 3 days at 2 AM)
+    tournamentAutomation.startScheduledScraping();
 });
 
 // Graceful shutdown
