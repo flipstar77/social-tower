@@ -330,7 +330,8 @@ class TowerAnalytics {
 
             this.renderCharts();
             this.renderRunsTable();
-            this.loadSessions();
+            // Disabled: /api/tower/sessions endpoint doesn't exist
+            // this.loadSessions();
 
         } catch (error) {
             console.error('❌ Error loading Tower Analytics from Supabase API:', error);
