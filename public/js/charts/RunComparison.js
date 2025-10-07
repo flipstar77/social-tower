@@ -229,7 +229,7 @@ class RunComparison {
                             <button class="chart-type-btn" data-chart-type="bar">📊 Bar</button>
                         </div>
                     </div>
-                    <div id="enemy-distribution-chart" style="height: 350px;"></div>
+                    <div id="enemy-distribution-chart" style="height: 400px;"></div>
                 </div>
 
                 <!-- Hourly Coins by Tier -->
@@ -498,8 +498,9 @@ class RunComparison {
                 legend: {
                     orient: 'horizontal',
                     left: 'center',
-                    bottom: 10,
-                    textStyle: { color: '#fff', fontSize: 11 },
+                    bottom: 5,
+                    textStyle: { color: '#fff', fontSize: 10 },
+                    itemGap: 15,
                     formatter: (name) => {
                         const item = chartData.find(d => d.name === name);
                         if (!item) return name;
@@ -509,8 +510,8 @@ class RunComparison {
                 },
                 series: [{
                     type: 'pie',
-                    radius: ['35%', '65%'],
-                    center: ['50%', '45%'],
+                    radius: ['40%', '75%'],
+                    center: ['50%', '42%'],
                     avoidLabelOverlap: true,
                     itemStyle: {
                         borderRadius: 8,
@@ -521,14 +522,14 @@ class RunComparison {
                         show: true,
                         formatter: '{d}%',
                         color: '#fff',
-                        fontSize: 13,
+                        fontSize: 14,
                         fontWeight: 'bold',
-                        distanceToLabelLine: 5
+                        distanceToLabelLine: 3
                     },
                     labelLine: {
                         show: true,
-                        length: 15,
-                        length2: 10,
+                        length: 10,
+                        length2: 5,
                         smooth: true,
                         lineStyle: {
                             color: 'rgba(255, 255, 255, 0.3)',
