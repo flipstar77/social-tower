@@ -26,6 +26,7 @@
     <link rel="stylesheet" href="css/run-comparison.css?v=2">
     <!-- Chatbot Styles -->
     <link rel="stylesheet" href="css/chatbot.css?v=1">
+    <link rel="stylesheet" href="css/bracket-difficulty.css?v=1">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Helvetica+Neue:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -513,6 +514,25 @@ Wave    8541
                 </div>
             </div>
 
+            <!-- Tournament Bracket Difficulty Analysis -->
+            <div class="bracket-difficulty-section">
+                <h2 class="section-title">🎯 Bracket Difficulty Analysis</h2>
+                <p class="section-description">See how your tournament brackets compared to other brackets in your league</p>
+
+                <!-- Latest Bracket Analysis Card -->
+                <div id="latestBracketAnalysis" class="latest-bracket-card">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+
+                <!-- Bracket History -->
+                <div class="bracket-history-container">
+                    <h3 class="subsection-title">Your Bracket History</h3>
+                    <div id="bracketHistoryList" class="bracket-history-list">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
             <!-- Add Tournament Modal -->
             <div id="addTournamentModal" class="tournament-modal" style="display: none;">
                 <div class="tournament-modal-content">
@@ -893,7 +913,7 @@ Or paste raw tournament data from game stats."></textarea>
     <script src="js/dashboard/DashboardController.js?v=1"></script> -->
 
     <!-- Main Application Scripts -->
-    <script src="script.js?v=9"></script>
+    <script src="script.js?v=10"></script>
     <script src="content-hub.js?v=21"></script>
     <!-- Performance Charts -->
     <script src="js/charts/PerformanceCharts.js?v=3"></script>
@@ -1033,5 +1053,8 @@ Or paste raw tournament data from game stats."></textarea>
 
     <!-- Tower Chatbot -->
     <script src="js/chatbot/tower-chatbot.js?v=5"></script>
+
+    <!-- Bracket Difficulty -->
+    <script src="js/bracket-difficulty.js?v=1"></script>
 </body>
 </html>

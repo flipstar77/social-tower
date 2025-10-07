@@ -17,7 +17,7 @@ class TowerStatsManager {
 
     init() {
         // Always run old init for now - keep dashboard working
-        this.loadStoredData();
+        // REMOVED: this.loadStoredData(); - Now loading ONLY from Supabase API
         this.setupEventListeners();
         this.initializeChart();
         this.updateTrendCards();
@@ -149,10 +149,8 @@ class TowerStatsManager {
                         };
                     });
 
-                    // Merge with local sessions, removing duplicates (API takes priority)
-                    const apiSessionIds = new Set(apiSessions.map(s => s.sessionId));
-                    const localSessionsFiltered = this.sessions.filter(s => !apiSessionIds.has(s.sessionId));
-                    this.sessions = [...apiSessions, ...localSessionsFiltered];
+                    // Use ONLY API sessions (no localStorage)
+                    this.sessions = apiSessions;
 
                     // Set currentSession to the latest session if not already set
                     if (!this.currentSession && this.sessions.length > 0) {
