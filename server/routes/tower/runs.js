@@ -1,6 +1,7 @@
 const express = require('express');
 const fs = require('fs');
 const { authenticateUser } = require('../../middleware/auth');
+const { validate, schemas } = require('../../middleware/validation');
 
 /**
  * Factory function to create runs router with dependencies
@@ -101,9 +102,9 @@ function createRunsRouter(dependencies) {
     });
 
     // Get all Tower runs
-    router.get('/', async (req, res) => {
-        const limit = parseInt(req.query.limit) || 50;
-        const offset = parseInt(req.query.offset) || 0;
+    router.get('/', validate(schemas.runsQuery, 'query'), async (req, res) => {
+        const limit = req.query.limit;
+        const offset = req.query.offset;
         const session = req.query.session;
 
         try {
@@ -131,7 +132,7 @@ function createRunsRouter(dependencies) {
     });
 
     // Get single Tower run
-    router.get('/:id', async (req, res) => {
+    router.get('/:id', validate(schemas.objectId, 'params'), async (req, res) => {
         const runId = req.params.id;
 
         try {
@@ -158,7 +159,7 @@ function createRunsRouter(dependencies) {
     });
 
     // Delete a Tower run
-    router.delete('/:id', async (req, res) => {
+    router.delete('/:id', validate(schemas.objectId, 'params'), async (req, res) => {
         const runId = req.params.id;
 
         try {
@@ -185,18 +186,12 @@ function createRunsRouter(dependencies) {
     });
 
     // Update run category
-    router.patch('/:id/category', async (req, res) => {
+    router.patch('/:id/category',
+        validate(schemas.objectId, 'params'),
+        validate(schemas.runCategory),
+        async (req, res) => {
         const runId = req.params.id;
         const { category } = req.body;
-
-        // Validate category
-        const validCategories = ['milestone', 'tournament', 'farm', '', null, undefined];
-        if (category !== null && category !== undefined && category !== '' && !['milestone', 'tournament', 'farm'].includes(category)) {
-            return res.status(400).json({
-                success: false,
-                error: 'Invalid category. Must be: milestone, tournament, farm, or empty'
-            });
-        }
 
         try {
             const result = await runQueries.updateRunCategory(runId, category);

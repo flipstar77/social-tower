@@ -110,6 +110,18 @@ const schemas = {
         code: Joi.string().required(),
         state: Joi.string(),
     }),
+
+    // Tower runs query
+    runsQuery: Joi.object({
+        limit: Joi.number().integer().min(1).max(100).default(50),
+        offset: Joi.number().integer().min(0).default(0),
+        session: Joi.string().max(100),
+    }),
+
+    // Run category update
+    runCategory: Joi.object({
+        category: Joi.string().valid('milestone', 'tournament', 'farm', '').allow(null).default(null),
+    }),
 };
 
 /**
