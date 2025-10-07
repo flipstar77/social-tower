@@ -7,6 +7,8 @@ const xml2js = require('xml2js');
 const cron = require('node-cron');
 const path = require('path');
 const compression = require('compression');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 // SQLite removed - using Supabase only
 const multer = require('multer');
 const cookieParser = require('cookie-parser');
@@ -59,6 +61,21 @@ console.log('   Will load Discord endpoints:', !!(supabase && supabase.supabase)
 
 
 // Middleware
+// Security headers (must be first)
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.jsdelivr.net"],
+            styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+            fontSrc: ["'self'", "https://fonts.gstatic.com"],
+            imgSrc: ["'self'", "data:", "https:", "http:"],
+            connectSrc: ["'self'", "https://api.supabase.co", "wss://realtime.supabase.co"],
+        },
+    },
+    crossOriginEmbedderPolicy: false,
+}));
+
 // Compression (must be before routes)
 app.use(compression({
     filter: (req, res) => {
@@ -87,10 +104,42 @@ app.use(cors({
     credentials: true
 }));
 app.use(cookieParser());
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(express.static(path.join(__dirname, '../public')));
 app.use('/css', express.static(path.join(__dirname, '../css')));
 app.use('/js', express.static(path.join(__dirname, '../js')));
+
+// Rate limiting for API routes
+const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per windowMs
+    message: 'Too many requests from this IP, please try again later.',
+    standardHeaders: true,
+    legacyHeaders: false,
+    handler: (req, res) => {
+        logger.warn('Rate limit exceeded', {
+            ip: req.ip,
+            path: req.path,
+            method: req.method,
+        });
+        res.status(429).json({
+            success: false,
+            error: 'Too many requests, please try again later.',
+        });
+    },
+});
+
+// Stricter rate limiting for authentication endpoints
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 10, // Limit auth attempts
+    message: 'Too many authentication attempts, please try again later.',
+});
+
+// Apply rate limiting to API routes
+app.use('/api/', apiLimiter);
+app.use('/auth/', authLimiter);
 
 // Mount route modules
 app.use('/api/reddit', redditRouter);

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const NodeCache = require('node-cache');
 const logger = require('../core/logger');
+const { validate, schemas } = require('../middleware/validation');
 
 // Cache for 5 minutes (300 seconds)
 const cache = new NodeCache({ stdTTL: 300, checkperiod: 60 });
@@ -11,7 +12,7 @@ const cache = new NodeCache({ stdTTL: 300, checkperiod: 60 });
  * The posts are automatically scraped twice daily by the RedditScraperService
  * Cached for 5 minutes to reduce database load
  */
-router.get('/', async (req, res) => {
+router.get('/', validate(schemas.redditQuery, 'query'), async (req, res) => {
     try {
         const subreddit = req.query.subreddit || 'TheTowerGame';
         const limit = Math.min(parseInt(req.query.limit) || 25, 100);
