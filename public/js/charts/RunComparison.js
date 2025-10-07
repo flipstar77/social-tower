@@ -229,7 +229,7 @@ class RunComparison {
                             <button class="chart-type-btn" data-chart-type="bar">📊 Bar</button>
                         </div>
                     </div>
-                    <div id="enemy-distribution-chart" style="height: 300px;"></div>
+                    <div id="enemy-distribution-chart" style="height: 350px;"></div>
                 </div>
 
                 <!-- Hourly Coins by Tier -->
@@ -394,15 +394,10 @@ class RunComparison {
         if (enemyData.tank > 0) chartData.push({ value: enemyData.tank, name: 'Tank', itemStyle: { color: '#F44336' } });
         if (enemyData.ranged > 0) chartData.push({ value: enemyData.ranged, name: 'Ranged', itemStyle: { color: '#2196F3' } });
 
-        // Group small categories as "Other"
-        const otherCount = (enemyData.boss || 0) + (enemyData.protector || 0) + (enemyData.elites || 0);
-        if (otherCount > 0) {
-            chartData.push({
-                value: otherCount,
-                name: 'Boss/Elite/Protector',
-                itemStyle: { color: '#9C27B0' }
-            });
-        }
+        // Add each enemy type separately
+        if (enemyData.boss > 0) chartData.push({ value: enemyData.boss, name: 'Boss', itemStyle: { color: '#9C27B0' } });
+        if (enemyData.protector > 0) chartData.push({ value: enemyData.protector, name: 'Protector', itemStyle: { color: '#673AB7' } });
+        if (enemyData.elites > 0) chartData.push({ value: enemyData.elites, name: 'Elites', itemStyle: { color: '#E91E63' } });
 
         let option;
 
@@ -501,10 +496,10 @@ class RunComparison {
                     textStyle: { color: '#fff' }
                 },
                 legend: {
-                    orient: 'vertical',
-                    left: 'left',
-                    top: 'center',
-                    textStyle: { color: '#fff', fontSize: 12 },
+                    orient: 'horizontal',
+                    left: 'center',
+                    bottom: 10,
+                    textStyle: { color: '#fff', fontSize: 11 },
                     formatter: (name) => {
                         const item = chartData.find(d => d.name === name);
                         if (!item) return name;
@@ -514,8 +509,8 @@ class RunComparison {
                 },
                 series: [{
                     type: 'pie',
-                    radius: ['40%', '70%'],
-                    center: ['60%', '50%'],
+                    radius: ['35%', '65%'],
+                    center: ['50%', '45%'],
                     avoidLabelOverlap: true,
                     itemStyle: {
                         borderRadius: 8,
