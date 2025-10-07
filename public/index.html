@@ -622,6 +622,17 @@ Or paste raw tournament data from game stats."></textarea>
                             <option value="all">All Stats</option>
                         </select>
                     </div>
+                    <div class="analytics-category-toggles" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                        <label class="analytics-label" style="margin-right: 8px;">Filter Categories:</label>
+                        <button class="category-toggle-btn active" data-category="basic" onclick="window.towerAnalytics?.toggleCategory('basic')" style="padding: 6px 12px; background: rgba(75, 192, 192, 0.2); border: 1px solid rgba(75, 192, 192, 0.6); color: #4bc0c0; border-radius: 4px; cursor: pointer; font-size: 11px; transition: all 0.2s;">📊 Basic</button>
+                        <button class="category-toggle-btn active" data-category="combat" onclick="window.towerAnalytics?.toggleCategory('combat')" style="padding: 6px 12px; background: rgba(255, 99, 132, 0.2); border: 1px solid rgba(255, 99, 132, 0.6); color: #ff6384; border-radius: 4px; cursor: pointer; font-size: 11px; transition: all 0.2s;">⚔️ Combat</button>
+                        <button class="category-toggle-btn active" data-category="damage" onclick="window.towerAnalytics?.toggleCategory('damage')" style="padding: 6px 12px; background: rgba(255, 159, 64, 0.2); border: 1px solid rgba(255, 159, 64, 0.6); color: #ff9f40; border-radius: 4px; cursor: pointer; font-size: 11px; transition: all 0.2s;">💥 Damage</button>
+                        <button class="category-toggle-btn active" data-category="economy" onclick="window.towerAnalytics?.toggleCategory('economy')" style="padding: 6px 12px; background: rgba(255, 206, 86, 0.2); border: 1px solid rgba(255, 206, 86, 0.6); color: #ffce56; border-radius: 4px; cursor: pointer; font-size: 11px; transition: all 0.2s;">🪙 Economy</button>
+                        <button class="category-toggle-btn active" data-category="enemies" onclick="window.towerAnalytics?.toggleCategory('enemies')" style="padding: 6px 12px; background: rgba(153, 102, 255, 0.2); border: 1px solid rgba(153, 102, 255, 0.6); color: #9966ff; border-radius: 4px; cursor: pointer; font-size: 11px; transition: all 0.2s;">👾 Enemies</button>
+                        <button class="category-toggle-btn active" data-category="resources" onclick="window.towerAnalytics?.toggleCategory('resources')" style="padding: 6px 12px; background: rgba(54, 162, 235, 0.2); border: 1px solid rgba(54, 162, 235, 0.6); color: #36a2eb; border-radius: 4px; cursor: pointer; font-size: 11px; transition: all 0.2s;">💎 Resources</button>
+                        <button class="category-toggle-btn active" data-category="bots" onclick="window.towerAnalytics?.toggleCategory('bots')" style="padding: 6px 12px; background: rgba(75, 255, 192, 0.2); border: 1px solid rgba(75, 255, 192, 0.6); color: #4bffc0; border-radius: 4px; cursor: pointer; font-size: 11px; transition: all 0.2s;">🤖 Bots</button>
+                        <button class="category-toggle-btn active" data-category="survivability" onclick="window.towerAnalytics?.toggleCategory('survivability')" style="padding: 6px 12px; background: rgba(255, 99, 99, 0.2); border: 1px solid rgba(255, 99, 99, 0.6); color: #ff6363; border-radius: 4px; cursor: pointer; font-size: 11px; transition: all 0.2s;">❤️ Survival</button>
+                    </div>
                     <button class="analytics-btn upload-btn" onclick="ModalManager.showDataModal()">
                         📊 Import Farm Data
                     </button>
@@ -913,7 +924,7 @@ Or paste raw tournament data from game stats."></textarea>
     <script src="js/dashboard/DashboardController.js?v=1"></script> -->
 
     <!-- Main Application Scripts -->
-    <script src="script.js?v=15"></script>
+    <script src="script.js?v=16"></script>
     <script src="content-hub.js?v=21"></script>
     <!-- Performance Charts -->
     <script src="js/charts/PerformanceCharts.js?v=3"></script>
@@ -927,7 +938,7 @@ Or paste raw tournament data from game stats."></textarea>
     <script type="module" src="js/tower/TowerMigrationCoordinator.js?v=4"></script>
 
     <!-- Legacy Monolithic System (will be gradually replaced) -->
-    <script src="tower-analytics.js?v=11"></script>
+    <script src="tower-analytics.js?v=12"></script>
     <script src="tournaments.js?v=1"></script>
 
     <script>
