@@ -42,6 +42,11 @@ Thumbs.db
 *.tmp
 *.temp
 
+# Backup files
+*.bak
+*.backup
+*.old
+
 # Local data files
 *.json.local
 wiki-data.json
@@ -52,3 +57,10 @@ tower-wiki-*.json
 .cache/
 .npm/
 .yarn/
+
+# Playwright/Browser artifacts
+.playwright-mcp/
+*.png
+scraped-brackets.json
+scraping-progress.json
+*.txt
