@@ -7,11 +7,8 @@ const winston = require('winston');
 const path = require('path');
 const fs = require('fs');
 
-// Ensure logs directory exists
-const logsDir = path.join(__dirname, '../logs');
-if (!fs.existsSync(logsDir)) {
-    fs.mkdirSync(logsDir, { recursive: true });
-}
+// Detect serverless environment (Vercel, AWS Lambda, etc.)
+const isServerless = process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.LAMBDA_TASK_ROOT;
 
 // Define log format
 const logFormat = winston.format.combine(
@@ -34,30 +31,41 @@ const consoleFormat = winston.format.combine(
     })
 );
 
-// Create Winston logger
-const logger = winston.createLogger({
-    level: process.env.LOG_LEVEL || (process.env.NODE_ENV === 'production' ? 'info' : 'debug'),
-    format: logFormat,
-    transports: [
-        // Console transport
-        new winston.transports.Console({
-            format: consoleFormat,
-        }),
-        // Error log file
+// Build transports array
+const transports = [
+    // Console transport (always available)
+    new winston.transports.Console({
+        format: consoleFormat,
+    })
+];
+
+// Only add file transports if NOT in serverless environment
+if (!isServerless) {
+    const logsDir = path.join(__dirname, '../logs');
+    if (!fs.existsSync(logsDir)) {
+        fs.mkdirSync(logsDir, { recursive: true });
+    }
+
+    transports.push(
         new winston.transports.File({
             filename: path.join(logsDir, 'error.log'),
             level: 'error',
             maxsize: 5242880, // 5MB
             maxFiles: 5,
         }),
-        // Combined log file
         new winston.transports.File({
             filename: path.join(logsDir, 'combined.log'),
             maxsize: 5242880, // 5MB
             maxFiles: 5,
-        }),
-    ],
-    // Don't exit on uncaught exceptions
+        })
+    );
+}
+
+// Create Winston logger
+const logger = winston.createLogger({
+    level: process.env.LOG_LEVEL || (process.env.NODE_ENV === 'production' ? 'info' : 'debug'),
+    format: logFormat,
+    transports,
     exitOnError: false,
 });
 
