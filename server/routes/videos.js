@@ -2,6 +2,7 @@ const express = require('express');
 const axios = require('axios');
 const xml2js = require('xml2js');
 const YTDlpWrap = require('yt-dlp-wrap').default;
+const { validate, schemas } = require('../middleware/validation');
 const router = express.Router();
 
 // Import centralized channel configuration
@@ -171,7 +172,7 @@ router.post('/refresh', async (req, res) => {
 });
 
 // YouTube transcript endpoint
-router.get('/transcript/:videoId', async (req, res) => {
+router.get('/transcript/:videoId', validate(schemas.videoId, 'params'), async (req, res) => {
     const { videoId } = req.params;
     const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
 

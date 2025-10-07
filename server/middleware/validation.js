@@ -122,6 +122,35 @@ const schemas = {
     runCategory: Joi.object({
         category: Joi.string().valid('milestone', 'tournament', 'farm', '').allow(null).default(null),
     }),
+
+    // Video transcript request
+    videoId: Joi.object({
+        videoId: Joi.string().alphanum().min(11).max(11).required(),
+    }),
+
+    // Tournament bracket queries
+    tournamentPlayerId: Joi.object({
+        playerId: Joi.string().required(),
+    }),
+
+    tournamentLeague: Joi.object({
+        league: Joi.string().valid('bronze', 'silver', 'gold', 'platinum', 'diamond', 'master', 'grandmaster').required(),
+    }),
+
+    tournamentUserId: Joi.object({
+        discordUserId: Joi.string().required(),
+    }),
+
+    tournamentRunId: Joi.object({
+        runId: Joi.alternatives().try(Joi.string().uuid(), Joi.number().integer()).required(),
+    }),
+
+    // Tournament scrape body
+    tournamentScrapeBody: Joi.object({
+        playerId: Joi.string().required(),
+        playerName: Joi.string().max(100),
+        manualTrigger: Joi.boolean().default(false),
+    }),
 };
 
 /**

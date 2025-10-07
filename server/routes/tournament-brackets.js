@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const TowerLolScraper = require('../services/tower-lol-scraper');
+const { validate, schemas } = require('../middleware/validation');
 
 /**
  * Tournament bracket difficulty analysis API
@@ -21,17 +22,10 @@ router.use((req, res, next) => {
  * GET /api/tournament-brackets/difficulty/:playerId
  * Get bracket difficulty analysis for a player
  */
-router.get('/difficulty/:playerId', async (req, res) => {
+router.get('/difficulty/:playerId', validate(schemas.tournamentPlayerId, 'params'), async (req, res) => {
     try {
         const { playerId } = req.params;
         const { league = 'Legend' } = req.query;
-
-        if (!playerId) {
-            return res.status(400).json({
-                success: false,
-                error: 'Player ID is required'
-            });
-        }
 
         console.log(`📊 Analyzing bracket difficulty for player ${playerId} in ${league} league...`);
 
