@@ -63,7 +63,10 @@
       "Bash(npm run dev:*)",
       "Bash(npm run start:server:*)",
       "Bash(npx playwright install:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(git mv:*)",
+      "Bash(git rm:*)",
+      "Bash(git merge:*)"
     ],
     "deny": [],
     "ask": []

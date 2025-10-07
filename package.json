@@ -8,7 +8,13 @@
     "start:server": "node server/server.js",
     "start:bot": "cd server && node bot-launcher.js",
     "build": "cd server && npm install",
-    "dev": "node server/server.js"
+    "dev": "node server/server.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint server/**/*.js public/**/*.js",
+    "lint:fix": "eslint server/**/*.js public/**/*.js --fix",
+    "format": "prettier --write \"**/*.{js,json,md}\""
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.58.0",
@@ -19,11 +25,15 @@
     "discord.js": "^14.14.1",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "express-rate-limit": "^8.1.0",
+    "helmet": "^8.1.0",
+    "joi": "^18.0.1",
     "node-fetch": "^2.6.7",
     "playwright": "^1.56.0",
     "puppeteer": "^24.23.0",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "winston": "^3.18.3",
     "xml2js": "^0.6.2"
   },
   "engines": {
@@ -36,5 +46,13 @@
     "railway"
   ],
   "author": "Your Name",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^9.37.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "jest": "^30.2.0",
+    "prettier": "^3.6.2",
+    "supertest": "^7.1.4"
+  }
 }
