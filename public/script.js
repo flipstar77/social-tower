@@ -18,6 +18,14 @@ class TowerStatsManager {
     init() {
         // Always run old init for now - keep dashboard working
         // REMOVED: this.loadStoredData(); - Now loading ONLY from Supabase API
+
+        // One-time migration: Clear old localStorage
+        if (localStorage.getItem('towerStats')) {
+            console.log('🧹 Clearing old localStorage (migrating to Supabase-only)');
+            localStorage.removeItem('towerStats');
+            localStorage.removeItem('farmSessions');
+        }
+
         this.setupEventListeners();
         this.initializeChart();
         this.updateTrendCards();
