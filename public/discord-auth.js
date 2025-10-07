@@ -297,17 +297,26 @@ class DiscordAuth {
 
         // Update user avatar if available
         const userAvatarElement = document.querySelector('.user-avatar');
-        if (userAvatarElement) {
+        console.log('🖼️ Avatar element found:', userAvatarElement);
+
+        if (userAvatarElement && this.user?.user_metadata) {
             // Discord avatar URL can be in multiple places in Supabase metadata
-            const avatarUrl = this.user.user_metadata?.avatar_url ||
-                             this.user.user_metadata?.picture ||
+            const avatarUrl = this.user.user_metadata.avatar_url ||
+                             this.user.user_metadata.picture ||
                              this.getDiscordAvatarUrl();
+
+            console.log('🖼️ Avatar URL:', avatarUrl);
 
             if (avatarUrl) {
                 userAvatarElement.style.backgroundImage = `url(${avatarUrl})`;
                 userAvatarElement.style.backgroundSize = 'cover';
                 userAvatarElement.style.backgroundPosition = 'center';
+                console.log('✅ Avatar set successfully');
+            } else {
+                console.warn('⚠️ No avatar URL found in metadata');
             }
+        } else {
+            console.warn('⚠️ Avatar element not found or no user metadata');
         }
     }
 
