@@ -78,7 +78,10 @@ class TowerStatsManager {
     async loadRunsFromAPI() {
         try {
             console.log('📥 Loading runs from API for Recent Sessions...');
-            const response = await fetch('/api/tower/runs?limit=10');
+            // Use authenticated fetch if available
+            const response = window.discordAuth?.authenticatedFetch
+                ? await window.discordAuth.authenticatedFetch('/api/tower/runs?limit=10')
+                : await fetch('/api/tower/runs?limit=10');
             if (response.ok) {
                 const data = await response.json();
                 if (data.success && data.runs && data.runs.length > 0) {
