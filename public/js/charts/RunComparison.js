@@ -229,7 +229,7 @@ class RunComparison {
                             <button class="chart-type-btn" data-chart-type="bar">📊 Bar</button>
                         </div>
                     </div>
-                    <div id="enemy-distribution-chart" style="height: 400px;"></div>
+                    <div id="enemy-distribution-chart" style="height: 450px;"></div>
                 </div>
 
                 <!-- Hourly Coins by Tier -->
@@ -516,9 +516,12 @@ class RunComparison {
                 legend: {
                     orient: 'horizontal',
                     left: 'center',
-                    bottom: 5,
-                    textStyle: { color: '#fff', fontSize: 10 },
-                    itemGap: 15,
+                    bottom: 0,
+                    textStyle: { color: '#fff', fontSize: 9 },
+                    itemWidth: 12,
+                    itemHeight: 12,
+                    itemGap: 8,
+                    padding: [5, 0, 0, 0],
                     formatter: (name) => {
                         const item = chartData.find(d => d.name === name);
                         if (!item) return name;
