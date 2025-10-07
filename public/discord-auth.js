@@ -84,6 +84,13 @@ class DiscordAuth {
                 this.isAuthenticated = true;
                 this.user = session.user;
                 console.log('User authenticated:', this.user);
+                console.log('User metadata:', this.user.user_metadata);
+                console.log('Available avatar fields:', {
+                    avatar_url: this.user.user_metadata?.avatar_url,
+                    picture: this.user.user_metadata?.picture,
+                    avatar: this.user.user_metadata?.avatar,
+                    provider_id: this.user.user_metadata?.provider_id
+                });
             } else {
                 this.isAuthenticated = false;
                 this.user = null;
