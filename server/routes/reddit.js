@@ -1,16 +1,30 @@
 const express = require('express');
 const router = express.Router();
+const NodeCache = require('node-cache');
+const logger = require('../core/logger');
+
+// Cache for 5 minutes (300 seconds)
+const cache = new NodeCache({ stdTTL: 300, checkperiod: 60 });
 
 /**
  * Reddit API endpoint - Returns scraped posts from Supabase database
  * The posts are automatically scraped twice daily by the RedditScraperService
+ * Cached for 5 minutes to reduce database load
  */
 router.get('/', async (req, res) => {
     try {
         const subreddit = req.query.subreddit || 'TheTowerGame';
         const limit = Math.min(parseInt(req.query.limit) || 25, 100);
 
-        console.log(`📡 Fetching Reddit r/${subreddit} from Supabase with limit ${limit}...`);
+        // Check cache first
+        const cacheKey = `reddit:${subreddit}:${limit}`;
+        const cached = cache.get(cacheKey);
+        if (cached) {
+            logger.info('Reddit cache hit', { subreddit, limit });
+            return res.json(cached);
+        }
+
+        logger.info('Reddit cache miss - fetching from database', { subreddit, limit });
 
         // Get Supabase client from app locals (set in server.js)
         const supabase = req.app.locals.supabase;
@@ -48,22 +62,35 @@ router.get('/', async (req, res) => {
             link_flair_text: post.flair || ''
         }));
 
-        console.log(`✅ Successfully fetched ${posts.length} Reddit posts from Supabase`);
+        logger.info('Successfully fetched Reddit posts', {
+            count: posts.length,
+            subreddit,
+            source: 'database'
+        });
 
-        res.json({
+        const response = {
             success: true,
             posts: posts,
             subreddit: subreddit,
             count: posts.length,
             source: 'database'
-        });
+        };
+
+        // Store in cache
+        cache.set(cacheKey, response);
+
+        res.json(response);
 
     } catch (error) {
-        console.error('❌ Error fetching Reddit data from Supabase:', error.message);
+        logger.logError(error, {
+            route: '/api/reddit',
+            subreddit: req.query.subreddit,
+            limit: req.query.limit
+        });
 
         res.status(500).json({
             success: false,
-            error: error.message
+            error: 'Failed to fetch Reddit posts'
         });
     }
 });

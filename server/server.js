@@ -6,6 +6,7 @@ const axios = require('axios');
 const xml2js = require('xml2js');
 const cron = require('node-cron');
 const path = require('path');
+const compression = require('compression');
 // SQLite removed - using Supabase only
 const multer = require('multer');
 const cookieParser = require('cookie-parser');
@@ -15,6 +16,7 @@ const DiscordAuth = require('./discord-auth');
 const SupabaseManager = require('./supabase-config');
 const RedditScraperService = require('./services/reddit-scraper-service');
 const TournamentAutomationService = require('./services/tournament-automation-service');
+const logger = require('./core/logger');
 
 // Import route modules
 const redditRouter = require('./routes/reddit');
@@ -57,6 +59,29 @@ console.log('   Will load Discord endpoints:', !!(supabase && supabase.supabase)
 
 
 // Middleware
+// Compression (must be before routes)
+app.use(compression({
+    filter: (req, res) => {
+        if (req.headers['x-no-compression']) {
+            return false;
+        }
+        return compression.filter(req, res);
+    },
+    level: 6 // Balance between speed and compression
+}));
+
+// Request logging middleware
+app.use((req, res, next) => {
+    const start = Date.now();
+    res.on('finish', () => {
+        const duration = Date.now() - start;
+        if (req.path.startsWith('/api/')) {
+            logger.logRequest(req, res.statusCode, duration);
+        }
+    });
+    next();
+});
+
 app.use(cors({
     origin: process.env.DASHBOARD_URL || 'https://trackyourstats.vercel.app',
     credentials: true
