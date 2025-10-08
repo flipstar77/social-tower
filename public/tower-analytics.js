@@ -87,7 +87,7 @@ class TowerAnalytics {
             }
         };
 
-        this.currentPreset = 'essential';
+        this.currentPreset = 'all';  // Show all stats by default
         this.hiddenCards = new Set();
         this.lastStats = null;
         this.lastTotals = null;
