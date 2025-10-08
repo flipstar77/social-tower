@@ -47,88 +47,27 @@ class TowerAchievements {
                 rarity: 'common'
             },
 
-            // === TIER PROGRESS ===
-            't1_beat': {
-                id: 't1_beat',
-                title: '🛡️ Tier 1 Conqueror',
-                description: 'Complete Tier 1 - Your first taste of victory',
-                icon: '🥉',
-                category: 'Tier Progress',
-                points: 15,
-                rarity: 'common'
-            },
-            't3_beat': {
-                id: 't3_beat',
-                title: '⚡ Tier 3 Warrior',
-                description: 'Complete Tier 3 - Getting serious',
-                icon: '⚔️',
-                category: 'Tier Progress',
-                points: 20,
-                rarity: 'common'
-            },
-            't5_beat': {
-                id: 't5_beat',
-                title: '🏅 Tier 5 Champion',
-                description: 'Complete Tier 5 - Rising through the ranks',
-                icon: '🥈',
-                category: 'Tier Progress',
-                points: 30,
-                rarity: 'uncommon'
-            },
-            't8_beat': {
-                id: 't8_beat',
-                title: '👑 Tier 8 Elite',
-                description: 'Complete Tier 8 - Elite territory',
-                icon: '💎',
-                category: 'Tier Progress',
-                points: 50,
-                rarity: 'uncommon'
-            },
-            't10_beat': {
-                id: 't10_beat',
-                title: '🌟 Tier 10 Hero',
-                description: 'Complete Tier 10 - Double digits achieved',
-                icon: '🥇',
-                category: 'Tier Progress',
-                points: 75,
-                rarity: 'rare'
-            },
-            't12_beat': {
-                id: 't12_beat',
-                title: '🔥 Tier 12 Veteran',
-                description: 'Complete Tier 12 - Battle-hardened veteran',
-                icon: '🛡️',
-                category: 'Tier Progress',
-                points: 100,
-                rarity: 'rare'
-            },
-            't15_beat': {
-                id: 't15_beat',
-                title: '⭐ Tier 15 Legend',
-                description: 'Complete Tier 15 - Legendary status achieved',
-                icon: '🏆',
-                category: 'Tier Progress',
-                points: 150,
-                rarity: 'epic'
-            },
-            't18_beat': {
-                id: 't18_beat',
-                title: '🌠 Tier 18 Ascended',
-                description: 'Complete Tier 18 - Ascending beyond mortal limits',
-                icon: '✨',
-                category: 'Tier Progress',
-                points: 200,
-                rarity: 'epic'
-            },
-            't20_beat': {
-                id: 't20_beat',
-                title: '💫 Tier 20 Master',
-                description: 'Complete Tier 20 - True mastery achieved',
-                icon: '🌟',
-                category: 'Tier Progress',
-                points: 300,
-                rarity: 'legendary'
-            },
+            // === TIER PROGRESS (All Tiers 1-20) ===
+            't1_beat': { id: 't1_beat', title: '🛡️ Tier 1 Complete', description: 'Complete Tier 1 - First steps', icon: '1️⃣', category: 'Tier Progress', points: 10, rarity: 'common' },
+            't2_beat': { id: 't2_beat', title: '⚔️ Tier 2 Complete', description: 'Complete Tier 2 - Building momentum', icon: '2️⃣', category: 'Tier Progress', points: 15, rarity: 'common' },
+            't3_beat': { id: 't3_beat', title: '🗡️ Tier 3 Complete', description: 'Complete Tier 3 - Getting serious', icon: '3️⃣', category: 'Tier Progress', points: 20, rarity: 'common' },
+            't4_beat': { id: 't4_beat', title: '🏹 Tier 4 Complete', description: 'Complete Tier 4 - Rising power', icon: '4️⃣', category: 'Tier Progress', points: 25, rarity: 'common' },
+            't5_beat': { id: 't5_beat', title: '🏅 Tier 5 Complete', description: 'Complete Tier 5 - Halfway milestone', icon: '5️⃣', category: 'Tier Progress', points: 30, rarity: 'uncommon' },
+            't6_beat': { id: 't6_beat', title: '⚡ Tier 6 Complete', description: 'Complete Tier 6 - Advanced territory', icon: '6️⃣', category: 'Tier Progress', points: 35, rarity: 'uncommon' },
+            't7_beat': { id: 't7_beat', title: '🔥 Tier 7 Complete', description: 'Complete Tier 7 - Lucky seven', icon: '7️⃣', category: 'Tier Progress', points: 40, rarity: 'uncommon' },
+            't8_beat': { id: 't8_beat', title: '💎 Tier 8 Complete', description: 'Complete Tier 8 - Elite status', icon: '8️⃣', category: 'Tier Progress', points: 50, rarity: 'uncommon' },
+            't9_beat': { id: 't9_beat', title: '👑 Tier 9 Complete', description: 'Complete Tier 9 - Almost double digits', icon: '9️⃣', category: 'Tier Progress', points: 60, rarity: 'rare' },
+            't10_beat': { id: 't10_beat', title: '🌟 Tier 10 Complete', description: 'Complete Tier 10 - Double digit glory', icon: '🔟', category: 'Tier Progress', points: 75, rarity: 'rare' },
+            't11_beat': { id: 't11_beat', title: '✨ Tier 11 Complete', description: 'Complete Tier 11 - Into the deep', icon: '1️⃣1️⃣', category: 'Tier Progress', points: 85, rarity: 'rare' },
+            't12_beat': { id: 't12_beat', title: '🛡️ Tier 12 Complete', description: 'Complete Tier 12 - Battle veteran', icon: '1️⃣2️⃣', category: 'Tier Progress', points: 100, rarity: 'rare' },
+            't13_beat': { id: 't13_beat', title: '🔮 Tier 13 Complete', description: 'Complete Tier 13 - Unlucky for enemies', icon: '1️⃣3️⃣', category: 'Tier Progress', points: 110, rarity: 'epic' },
+            't14_beat': { id: 't14_beat', title: '⭐ Tier 14 Complete', description: 'Complete Tier 14 - Near legendary', icon: '1️⃣4️⃣', category: 'Tier Progress', points: 125, rarity: 'epic' },
+            't15_beat': { id: 't15_beat', title: '🏆 Tier 15 Complete', description: 'Complete Tier 15 - Legendary achievement', icon: '1️⃣5️⃣', category: 'Tier Progress', points: 150, rarity: 'epic' },
+            't16_beat': { id: 't16_beat', title: '🌠 Tier 16 Complete', description: 'Complete Tier 16 - Beyond legendary', icon: '1️⃣6️⃣', category: 'Tier Progress', points: 175, rarity: 'epic' },
+            't17_beat': { id: 't17_beat', title: '💫 Tier 17 Complete', description: 'Complete Tier 17 - Ascending higher', icon: '1️⃣7️⃣', category: 'Tier Progress', points: 200, rarity: 'epic' },
+            't18_beat': { id: 't18_beat', title: '🌌 Tier 18 Complete', description: 'Complete Tier 18 - Cosmic power', icon: '1️⃣8️⃣', category: 'Tier Progress', points: 225, rarity: 'legendary' },
+            't19_beat': { id: 't19_beat', title: '🌟 Tier 19 Complete', description: 'Complete Tier 19 - Almost perfection', icon: '1️⃣9️⃣', category: 'Tier Progress', points: 275, rarity: 'legendary' },
+            't20_beat': { id: 't20_beat', title: '👑 Tier 20 Master', description: 'Complete Tier 20 - Ultimate mastery achieved', icon: '2️⃣0️⃣', category: 'Tier Progress', points: 350, rarity: 'legendary' },
 
             // === WAVE MILESTONES ===
             'wave_100': {
@@ -186,43 +125,23 @@ class TowerAchievements {
                 rarity: 'epic'
             },
 
-            // === CASH MILESTONES ===
-            'first_million': {
-                id: 'first_million',
-                title: '💰 Millionaire',
-                description: 'Reach 1 Million coins',
-                icon: '💎',
-                category: 'Coin Milestones',
-                points: 25,
-                rarity: 'uncommon'
-            },
-            'first_billion': {
-                id: 'first_billion',
-                title: '🤑 Billionaire',
-                description: 'Reach 1 Billion coins',
-                icon: '💸',
-                category: 'Coin Milestones',
-                points: 50,
-                rarity: 'rare'
-            },
-            'first_trillion': {
-                id: 'first_trillion',
-                title: '💳 Trillionaire',
-                description: 'Reach 1 Trillion coins',
-                icon: '🏦',
-                category: 'Coin Milestones',
-                points: 100,
-                rarity: 'epic'
-            },
-            'first_quadrillion': {
-                id: 'first_quadrillion',
-                title: '💎 Quadrillionaire',
-                description: 'Reach 1 Quadrillion coins',
-                icon: '💰',
-                category: 'Coin Milestones',
-                points: 200,
-                rarity: 'legendary'
-            },
+            // === COIN MILESTONES (Comprehensive) ===
+            'coins_1k': { id: 'coins_1k', title: '💰 First Thousand', description: 'Earn 1,000 coins in a run', icon: '💵', category: 'Coin Milestones', points: 5, rarity: 'common' },
+            'coins_10k': { id: 'coins_10k', title: '💰 Ten Thousand', description: 'Earn 10,000 coins in a run', icon: '💵', category: 'Coin Milestones', points: 10, rarity: 'common' },
+            'coins_100k': { id: 'coins_100k', title: '💰 Hundred Thousand', description: 'Earn 100,000 coins in a run', icon: '💸', category: 'Coin Milestones', points: 15, rarity: 'common' },
+            'coins_1m': { id: 'coins_1m', title: '💎 Millionaire', description: 'Earn 1 Million coins in a run', icon: '💎', category: 'Coin Milestones', points: 20, rarity: 'uncommon' },
+            'coins_10m': { id: 'coins_10m', title: '💎 Ten Million', description: 'Earn 10 Million coins in a run', icon: '💍', category: 'Coin Milestones', points: 25, rarity: 'uncommon' },
+            'coins_100m': { id: 'coins_100m', title: '💎 Hundred Million', description: 'Earn 100 Million coins in a run', icon: '👑', category: 'Coin Milestones', points: 30, rarity: 'uncommon' },
+            'coins_1b': { id: 'coins_1b', title: '🤑 Billionaire', description: 'Earn 1 Billion coins in a run', icon: '🤑', category: 'Coin Milestones', points: 40, rarity: 'rare' },
+            'coins_10b': { id: 'coins_10b', title: '🤑 Ten Billion', description: 'Earn 10 Billion coins in a run', icon: '💰', category: 'Coin Milestones', points: 50, rarity: 'rare' },
+            'coins_100b': { id: 'coins_100b', title: '🤑 Hundred Billion', description: 'Earn 100 Billion coins in a run', icon: '🏦', category: 'Coin Milestones', points: 60, rarity: 'rare' },
+            'coins_1t': { id: 'coins_1t', title: '💳 Trillionaire', description: 'Earn 1 Trillion coins in a run', icon: '💳', category: 'Coin Milestones', points: 75, rarity: 'epic' },
+            'coins_10t': { id: 'coins_10t', title: '💳 Ten Trillion', description: 'Earn 10 Trillion coins in a run', icon: '🏧', category: 'Coin Milestones', points: 90, rarity: 'epic' },
+            'coins_100t': { id: 'coins_100t', title: '💳 Hundred Trillion', description: 'Earn 100 Trillion coins in a run', icon: '🏛️', category: 'Coin Milestones', points: 110, rarity: 'epic' },
+            'coins_1q': { id: 'coins_1q', title: '👑 Quadrillionaire', description: 'Earn 1 Quadrillion coins in a run', icon: '👑', category: 'Coin Milestones', points: 150, rarity: 'legendary' },
+            'coins_10q': { id: 'coins_10q', title: '👑 Ten Quadrillion', description: 'Earn 10 Quadrillion coins in a run', icon: '💫', category: 'Coin Milestones', points: 200, rarity: 'legendary' },
+            'coins_100q': { id: 'coins_100q', title: '👑 Hundred Quadrillion', description: 'Earn 100 Quadrillion coins in a run', icon: '✨', category: 'Coin Milestones', points: 250, rarity: 'legendary' },
+            'coins_1qn': { id: 'coins_1qn', title: '🌟 Quintillionaire', description: 'Earn 1 Quintillion coins in a run', icon: '🌟', category: 'Coin Milestones', points: 300, rarity: 'legendary' },
 
             // === DAMAGE MILESTONES ===
             'damage_million': {
@@ -459,24 +378,18 @@ class TowerAchievements {
             },
 
             // === ENGAGEMENT & DEDICATION ===
-            'active_user': {
-                id: 'active_user',
-                title: '🔥 Dedicated Player',
-                description: 'Log in 7 days in a row',
-                icon: '💪',
-                category: 'Engagement',
-                points: 50,
-                rarity: 'rare'
-            },
-            'month_veteran': {
-                id: 'month_veteran',
-                title: '🗓️ Month Veteran',
-                description: 'Log in 30 days in a row',
-                icon: '📅',
-                category: 'Engagement',
-                points: 150,
-                rarity: 'epic'
-            },
+            'first_upload': { id: 'first_upload', title: '📤 First Upload', description: 'Upload your first run', icon: '🎉', category: 'Engagement', points: 10, rarity: 'common' },
+            'upload_10': { id: 'upload_10', title: '📤 Regular Uploader', description: 'Upload 10 runs', icon: '📊', category: 'Engagement', points: 25, rarity: 'uncommon' },
+            'upload_50': { id: 'upload_50', title: '📤 Active Tracker', description: 'Upload 50 runs', icon: '📈', category: 'Engagement', points: 50, rarity: 'rare' },
+            'upload_100': { id: 'upload_100', title: '📤 Data Hoarder', description: 'Upload 100 runs', icon: '💾', category: 'Engagement', points: 100, rarity: 'epic' },
+            'upload_500': { id: 'upload_500', title: '📤 Statistics Master', description: 'Upload 500 runs', icon: '🏆', category: 'Engagement', points: 250, rarity: 'legendary' },
+
+            'streak_3': { id: 'streak_3', title: '🔥 3-Day Streak', description: 'Upload runs 3 days in a row', icon: '🔥', category: 'Engagement', points: 15, rarity: 'common' },
+            'streak_7': { id: 'streak_7', title: '🔥 Week Warrior', description: 'Upload runs 7 days in a row', icon: '💪', category: 'Engagement', points: 35, rarity: 'uncommon' },
+            'streak_14': { id: 'streak_14', title: '🔥 Fortnight Fighter', description: 'Upload runs 14 days in a row', icon: '⚡', category: 'Engagement', points: 75, rarity: 'rare' },
+            'streak_30': { id: 'streak_30', title: '🔥 Month Master', description: 'Upload runs 30 days in a row', icon: '📅', category: 'Engagement', points: 150, rarity: 'epic' },
+            'streak_60': { id: 'streak_60', title: '🔥 Dedication Legend', description: 'Upload runs 60 days in a row', icon: '👑', category: 'Engagement', points: 300, rarity: 'legendary' },
+            'streak_100': { id: 'streak_100', title: '🔥 Century Streak', description: 'Upload runs 100 days in a row', icon: '💫', category: 'Engagement', points: 500, rarity: 'legendary' },
 
             // === SPECIAL & CHALLENGE ===
             'speedrun_t1': {
@@ -535,6 +448,10 @@ class TowerAchievements {
             firstLogin: null,
             lastLogin: null,
             loginStreak: 0,
+            uploadStreak: 0,
+            lastUploadDate: null,
+            totalUploads: 0,
+            uploadDates: [], // Track upload dates for streak calculation
             stats: {
                 wikiSearches: 0,
                 dashboardViews: 0,
@@ -757,52 +674,49 @@ class TowerAchievements {
     onCashMilestone(cash) {
         const cashNum = typeof cash === 'string' ? this.parseFormattedNumber(cash) : cash;
 
-        // Check all cash milestones (remove else if to allow multiple unlocks)
-        if (cashNum >= 1e15 && !this.isUnlocked('first_quadrillion')) {
-            this.unlockAchievement('first_quadrillion');
-        }
-        if (cashNum >= 1e12 && !this.isUnlocked('first_trillion')) {
-            this.unlockAchievement('first_trillion');
-        }
-        if (cashNum >= 1e9 && !this.isUnlocked('first_billion')) {
-            this.unlockAchievement('first_billion');
-        }
-        if (cashNum >= 1e6 && !this.isUnlocked('first_million')) {
-            this.unlockAchievement('first_million');
-        }
+        // Check ALL cash milestones from highest to lowest (cascading unlocks)
+        if (cashNum >= 1e18 && !this.isUnlocked('coins_1qn')) this.unlockAchievement('coins_1qn');
+        if (cashNum >= 1e17 && !this.isUnlocked('coins_100q')) this.unlockAchievement('coins_100q');
+        if (cashNum >= 1e16 && !this.isUnlocked('coins_10q')) this.unlockAchievement('coins_10q');
+        if (cashNum >= 1e15 && !this.isUnlocked('coins_1q')) this.unlockAchievement('coins_1q');
+        if (cashNum >= 1e14 && !this.isUnlocked('coins_100t')) this.unlockAchievement('coins_100t');
+        if (cashNum >= 1e13 && !this.isUnlocked('coins_10t')) this.unlockAchievement('coins_10t');
+        if (cashNum >= 1e12 && !this.isUnlocked('coins_1t')) this.unlockAchievement('coins_1t');
+        if (cashNum >= 1e11 && !this.isUnlocked('coins_100b')) this.unlockAchievement('coins_100b');
+        if (cashNum >= 1e10 && !this.isUnlocked('coins_10b')) this.unlockAchievement('coins_10b');
+        if (cashNum >= 1e9 && !this.isUnlocked('coins_1b')) this.unlockAchievement('coins_1b');
+        if (cashNum >= 1e8 && !this.isUnlocked('coins_100m')) this.unlockAchievement('coins_100m');
+        if (cashNum >= 1e7 && !this.isUnlocked('coins_10m')) this.unlockAchievement('coins_10m');
+        if (cashNum >= 1e6 && !this.isUnlocked('coins_1m')) this.unlockAchievement('coins_1m');
+        if (cashNum >= 1e5 && !this.isUnlocked('coins_100k')) this.unlockAchievement('coins_100k');
+        if (cashNum >= 1e4 && !this.isUnlocked('coins_10k')) this.unlockAchievement('coins_10k');
+        if (cashNum >= 1e3 && !this.isUnlocked('coins_1k')) this.unlockAchievement('coins_1k');
     }
 
     onTierComplete(tier) {
         const tierNum = parseInt(tier);
 
-        // Check all tier achievements (remove else if to allow multiple unlocks)
-        if (tierNum >= 20 && !this.isUnlocked('t20_beat')) {
-            this.unlockAchievement('t20_beat');
-        }
-        if (tierNum >= 18 && !this.isUnlocked('t18_beat')) {
-            this.unlockAchievement('t18_beat');
-        }
-        if (tierNum >= 15 && !this.isUnlocked('t15_beat')) {
-            this.unlockAchievement('t15_beat');
-        }
-        if (tierNum >= 12 && !this.isUnlocked('t12_beat')) {
-            this.unlockAchievement('t12_beat');
-        }
-        if (tierNum >= 10 && !this.isUnlocked('t10_beat')) {
-            this.unlockAchievement('t10_beat');
-        }
-        if (tierNum >= 8 && !this.isUnlocked('t8_beat')) {
-            this.unlockAchievement('t8_beat');
-        }
-        if (tierNum >= 5 && !this.isUnlocked('t5_beat')) {
-            this.unlockAchievement('t5_beat');
-        }
-        if (tierNum >= 3 && !this.isUnlocked('t3_beat')) {
-            this.unlockAchievement('t3_beat');
-        }
-        if (tierNum >= 1 && !this.isUnlocked('t1_beat')) {
-            this.unlockAchievement('t1_beat');
-        }
+        // Check ALL tier achievements from highest to lowest (cascading unlocks)
+        if (tierNum >= 20 && !this.isUnlocked('t20_beat')) this.unlockAchievement('t20_beat');
+        if (tierNum >= 19 && !this.isUnlocked('t19_beat')) this.unlockAchievement('t19_beat');
+        if (tierNum >= 18 && !this.isUnlocked('t18_beat')) this.unlockAchievement('t18_beat');
+        if (tierNum >= 17 && !this.isUnlocked('t17_beat')) this.unlockAchievement('t17_beat');
+        if (tierNum >= 16 && !this.isUnlocked('t16_beat')) this.unlockAchievement('t16_beat');
+        if (tierNum >= 15 && !this.isUnlocked('t15_beat')) this.unlockAchievement('t15_beat');
+        if (tierNum >= 14 && !this.isUnlocked('t14_beat')) this.unlockAchievement('t14_beat');
+        if (tierNum >= 13 && !this.isUnlocked('t13_beat')) this.unlockAchievement('t13_beat');
+        if (tierNum >= 12 && !this.isUnlocked('t12_beat')) this.unlockAchievement('t12_beat');
+        if (tierNum >= 11 && !this.isUnlocked('t11_beat')) this.unlockAchievement('t11_beat');
+        if (tierNum >= 10 && !this.isUnlocked('t10_beat')) this.unlockAchievement('t10_beat');
+        if (tierNum >= 9 && !this.isUnlocked('t9_beat')) this.unlockAchievement('t9_beat');
+        if (tierNum >= 8 && !this.isUnlocked('t8_beat')) this.unlockAchievement('t8_beat');
+        if (tierNum >= 7 && !this.isUnlocked('t7_beat')) this.unlockAchievement('t7_beat');
+        if (tierNum >= 6 && !this.isUnlocked('t6_beat')) this.unlockAchievement('t6_beat');
+        if (tierNum >= 5 && !this.isUnlocked('t5_beat')) this.unlockAchievement('t5_beat');
+        if (tierNum >= 4 && !this.isUnlocked('t4_beat')) this.unlockAchievement('t4_beat');
+        if (tierNum >= 3 && !this.isUnlocked('t3_beat')) this.unlockAchievement('t3_beat');
+        if (tierNum >= 2 && !this.isUnlocked('t2_beat')) this.unlockAchievement('t2_beat');
+        if (tierNum >= 1 && !this.isUnlocked('t1_beat')) this.unlockAchievement('t1_beat');
     }
 
     onWaveReached(wave) {
@@ -952,6 +866,96 @@ class TowerAchievements {
         } else if (days >= 7 && !this.isUnlocked('week_warrior')) {
             this.unlockAchievement('week_warrior');
         }
+    }
+
+    // Called when user uploads a run
+    onRunUploaded(runData) {
+        // Initialize upload dates array if it doesn't exist (backwards compatibility)
+        if (!this.userAchievements.uploadDates) {
+            this.userAchievements.uploadDates = [];
+        }
+
+        // Increment total uploads
+        this.userAchievements.totalUploads = (this.userAchievements.totalUploads || 0) + 1;
+
+        // Get today's date (YYYY-MM-DD format)
+        const today = new Date().toISOString().split('T')[0];
+
+        // Track upload date for streak calculation
+        if (!this.userAchievements.uploadDates.includes(today)) {
+            this.userAchievements.uploadDates.push(today);
+        }
+
+        // Update upload streak
+        this.updateUploadStreak();
+
+        // Check upload count achievements
+        const uploads = this.userAchievements.totalUploads;
+        if (uploads >= 500 && !this.isUnlocked('upload_500')) this.unlockAchievement('upload_500');
+        if (uploads >= 100 && !this.isUnlocked('upload_100')) this.unlockAchievement('upload_100');
+        if (uploads >= 50 && !this.isUnlocked('upload_50')) this.unlockAchievement('upload_50');
+        if (uploads >= 10 && !this.isUnlocked('upload_10')) this.unlockAchievement('upload_10');
+        if (uploads >= 1 && !this.isUnlocked('first_upload')) this.unlockAchievement('first_upload');
+
+        // Check streak achievements
+        const streak = this.userAchievements.uploadStreak;
+        if (streak >= 100 && !this.isUnlocked('streak_100')) this.unlockAchievement('streak_100');
+        if (streak >= 60 && !this.isUnlocked('streak_60')) this.unlockAchievement('streak_60');
+        if (streak >= 30 && !this.isUnlocked('streak_30')) this.unlockAchievement('streak_30');
+        if (streak >= 14 && !this.isUnlocked('streak_14')) this.unlockAchievement('streak_14');
+        if (streak >= 7 && !this.isUnlocked('streak_7')) this.unlockAchievement('streak_7');
+        if (streak >= 3 && !this.isUnlocked('streak_3')) this.unlockAchievement('streak_3');
+
+        // Check tier achievement
+        if (runData && runData.tier) {
+            this.onTierComplete(runData.tier);
+        }
+
+        // Check coin achievement
+        if (runData && runData.coins) {
+            this.onCashMilestone(runData.coins);
+        }
+
+        // Check wave achievement
+        if (runData && runData.wave) {
+            this.onWaveReached(runData.wave);
+        }
+
+        this.saveUserAchievements();
+
+        console.log(`📤 Run uploaded! Total: ${uploads}, Streak: ${streak} days 🔥`);
+    }
+
+    // Update upload streak based on upload dates
+    updateUploadStreak() {
+        if (!this.userAchievements.uploadDates || this.userAchievements.uploadDates.length === 0) {
+            this.userAchievements.uploadStreak = 0;
+            return;
+        }
+
+        // Sort dates in descending order (most recent first)
+        const sortedDates = this.userAchievements.uploadDates.sort().reverse();
+        const today = new Date().toISOString().split('T')[0];
+
+        let streak = 0;
+        let checkDate = new Date(today);
+
+        // Count consecutive days backwards from today
+        for (let i = 0; i < sortedDates.length; i++) {
+            const dateStr = checkDate.toISOString().split('T')[0];
+
+            if (sortedDates.includes(dateStr)) {
+                streak++;
+                // Move to previous day
+                checkDate.setDate(checkDate.getDate() - 1);
+            } else {
+                // Streak broken
+                break;
+            }
+        }
+
+        this.userAchievements.uploadStreak = streak;
+        console.log(`🔥 Upload streak: ${streak} days`);
     }
 
     // Parse formatted numbers (e.g., "1.5M" -> 1500000)
