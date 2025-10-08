@@ -5,87 +5,87 @@ class FieldMappings {
     // Get all field mappings for parsing
     static getFieldMappings() {
         return {
-            'Game Time': 'game_time',
-            'Real Time': 'real_time',
+            'Game Time': 'gameTime',
+            'Real Time': 'realTime',
             'Tier': 'tier',
             'Wave': 'wave',
-            'Killed By': 'killed_by',
-            'Coins Earned': 'coins_earned',
-            'Cash Earned': 'cash_earned',
-            'Interest Earned': 'interest_earned',
-            'Gem Blocks Tapped': 'gem_blocks_tapped',
-            'Cells Earned': 'cells_earned',
-            'Reroll Shards Earned': 'reroll_shards_earned',
-            'Damage Taken': 'damage_taken',
-            'Damage Taken Wall': 'damage_taken_wall',
-            'Damage Taken While Berserked': 'damage_taken_while_berserked',
-            'Damage Gain From Berserk': 'damage_gain_from_berserk',
-            'Death Defy': 'death_defy',
-            'Damage Dealt': 'damage_dealt',
-            'Projectiles Damage': 'projectiles_damage',
-            'Rend Armor Damage': 'rend_armor_damage',
-            'Projectiles Count': 'projectiles_count',
+            'Killed By': 'killedBy',
+            'Coins Earned': 'coins',
+            'Cash Earned': 'cashEarned',
+            'Interest Earned': 'interestEarned',
+            'Gem Blocks Tapped': 'gemBlocksTapped',
+            'Cells Earned': 'cellsEarned',
+            'Reroll Shards Earned': 'rerollShardsEarned',
+            'Damage Taken': 'damageTaken',
+            'Damage Taken Wall': 'damageTakenWall',
+            'Damage Taken While Berserked': 'damageTakenWhileBerserked',
+            'Damage Gain From Berserk': 'damageGainFromBerserk',
+            'Death Defy': 'deathDefy',
+            'Damage Dealt': 'damage',
+            'Projectiles Damage': 'projectilesDamage',
+            'Rend Armor Damage': 'rendArmorDamage',
+            'Projectiles Count': 'projectilesCount',
             'Lifesteal': 'lifesteal',
-            'Thorn Damage': 'thorn_damage',
-            'Orb Damage': 'orb_damage',
-            'Orb Hits': 'orb_hits',
-            'Land Mine Damage': 'land_mine_damage',
-            'Land Mines Spawned': 'land_mines_spawned',
-            'Death Ray Damage': 'death_ray_damage',
-            'Smart Missile Damage': 'smart_missile_damage',
-            'Inner Land Mine Damage': 'inner_land_mine_damage',
-            'Chain Lightning Damage': 'chain_lightning_damage',
-            'Death Wave Damage': 'death_wave_damage',
-            'Swamp Damage': 'swamp_damage',
-            'Black Hole Damage': 'black_hole_damage',
-            'Waves Skipped': 'waves_skipped',
-            'Recovery Packages': 'recovery_packages',
-            'Free Attack Upgrade': 'free_attack_upgrade',
-            'Free Defense Upgrade': 'free_defense_upgrade',
-            'Free Utility Upgrade': 'free_utility_upgrade',
-            'HP From Death Wave': 'hp_from_death_wave',
-            'Coins from Death Wave': 'coins_from_death_wave',
-            'Cash from Golden Tower': 'cash_from_golden_tower',
-            'Coins from Golden Tower': 'coins_from_golden_tower',
-            'Coins from Blackhole': 'coins_from_blackhole',
-            'Coins from Spotlight': 'coins_from_spotlight',
-            'Coins from Orbs': 'coins_from_orbs',
-            'Coins from Coin Upgrade': 'coins_from_coin_upgrade',
-            'Coins from Coin Bonuses': 'coins_from_coin_bonuses',
-            'Total Enemies': 'total_enemies',
-            'Basic': 'basic',
-            'Fast': 'fast',
-            'Tank': 'tank',
-            'Ranged': 'ranged',
-            'Boss': 'boss',
-            'Protector': 'protector',
-            'Total Elites': 'total_elites',
+            'Thorn Damage': 'thornDamage',
+            'Orb Damage': 'orbDamage',
+            'Orb Hits': 'orbHits',
+            'Land Mine Damage': 'landMineDamage',
+            'Land Mines Spawned': 'landMinesSpawned',
+            'Death Ray Damage': 'deathRayDamage',
+            'Smart Missile Damage': 'smartMissileDamage',
+            'Inner Land Mine Damage': 'innerLandMineDamage',
+            'Chain Lightning Damage': 'chainLightningDamage',
+            'Death Wave Damage': 'deathWaveDamage',
+            'Swamp Damage': 'swampDamage',
+            'Black Hole Damage': 'blackHoleDamage',
+            'Waves Skipped': 'wavesSkipped',
+            'Recovery Packages': 'recoveryPackages',
+            'Free Attack Upgrade': 'freeAttackUpgrade',
+            'Free Defense Upgrade': 'freeDefenseUpgrade',
+            'Free Utility Upgrade': 'freeUtilityUpgrade',
+            'HP From Death Wave': 'hpFromDeathWave',
+            'Coins from Death Wave': 'coinsFromDeathWave',
+            'Cash from Golden Tower': 'cashFromGoldenTower',
+            'Coins from Golden Tower': 'coinsFromGoldenTower',
+            'Coins from Blackhole': 'coinsFromBlackhole',
+            'Coins from Spotlight': 'coinsFromSpotlight',
+            'Coins from Orbs': 'coinsFromOrbs',
+            'Coins from Coin Upgrade': 'coinsFromCoinUpgrade',
+            'Coins from Coin Bonuses': 'coinsFromCoinBonuses',
+            'Total Enemies': 'totalEnemies',
+            'Basic': 'basicEnemies',
+            'Fast': 'fastEnemies',
+            'Tank': 'tankEnemies',
+            'Ranged': 'rangedEnemies',
+            'Boss': 'bossEnemies',
+            'Protector': 'protectorEnemies',
+            'Total Elites': 'totalElites',
             'Vampires': 'vampires',
             'Rays': 'rays',
             'Scatters': 'scatters',
             'Saboteurs': 'saboteurs',
             'Commanders': 'commanders',
             'Overcharges': 'overcharges',
-            'Destroyed by Orbs': 'destroyed_by_orbs',
-            'Destroyed by Thorns': 'destroyed_by_thorns',
-            'Destroyed by Death ray': 'destroyed_by_death_ray',
-            'Destroyed by Land Mine': 'destroyed_by_land_mine',
-            'Flame bot damage': 'flame_bot_damage',
-            'Thunder bot stuns': 'thunder_bot_stuns',
-            'Golden bot coins earned': 'golden_bot_coins_earned',
+            'Destroyed by Orbs': 'destroyedByOrbs',
+            'Destroyed by Thorns': 'destroyedByThorns',
+            'Destroyed by Death ray': 'destroyedByDeathRay',
+            'Destroyed by Land Mine': 'destroyedByLandMine',
+            'Flame bot damage': 'flameBotDamage',
+            'Thunder bot stuns': 'thunderBotStuns',
+            'Golden bot coins earned': 'goldenBotCoinsEarned',
             'Damage': 'damage',
-            'Coins Stolen': 'coins_stolen',
-            'Guardian catches': 'guardian_catches',
-            'Coins Fetched': 'coins_fetched',
+            'Coins Stolen': 'coinsStolen',
+            'Guardian catches': 'guardianCatches',
+            'Coins Fetched': 'coinsFetched',
             'Gems': 'gems',
             'Medals': 'medals',
-            'Reroll Shards': 'reroll_shards',
-            'Cannon Shards': 'cannon_shards',
-            'Armor Shards': 'armor_shards',
-            'Generator Shards': 'generator_shards',
-            'Core Shards': 'core_shards',
-            'Common Modules': 'common_modules',
-            'Rare Modules': 'rare_modules'
+            'Reroll Shards': 'rerollShards',
+            'Cannon Shards': 'cannonShards',
+            'Armor Shards': 'armorShards',
+            'Generator Shards': 'generatorShards',
+            'Core Shards': 'coreShards',
+            'Common Modules': 'commonModules',
+            'Rare Modules': 'rareModules'
         };
     }
 
@@ -123,43 +123,43 @@ class FieldMappings {
         return [
             {
                 category: '⏱️ Run Overview',
-                fields: ['game_time', 'real_time', 'tier', 'wave', 'killed_by', 'coins_per_hour', 'cells_per_hour', 'reroll_shards_per_hour']
+                fields: ['gameTime', 'realTime', 'tier', 'wave', 'killedBy', 'coinsPerHour', 'cellsPerHour', 'rerollShardsPerHour']
             },
             {
                 category: '💰 Economy',
-                fields: ['coins_earned', 'cash_earned', 'interest_earned', 'gem_blocks_tapped', 'cells_earned', 'reroll_shards_earned']
+                fields: ['coins', 'cashEarned', 'interestEarned', 'gemBlocksTapped', 'cellsEarned', 'rerollShardsEarned']
             },
             {
                 category: '💰 Coin Sources',
-                fields: ['coins_from_death_wave', 'cash_from_golden_tower', 'coins_from_golden_tower', 'coins_from_blackhole', 'coins_from_spotlight', 'coins_from_orbs', 'coins_from_coin_upgrade', 'coins_from_coin_bonuses']
+                fields: ['coinsFromDeathWave', 'cashFromGoldenTower', 'coinsFromGoldenTower', 'coinsFromBlackhole', 'coinsFromSpotlight', 'coinsFromOrbs', 'coinsFromCoinUpgrade', 'coinsFromCoinBonuses']
             },
             {
                 category: '🛡️ Survivability',
-                fields: ['damage_taken', 'damage_taken_wall', 'damage_taken_while_berserked', 'damage_gain_from_berserk', 'death_defy']
+                fields: ['damageTaken', 'damageTakenWall', 'damageTakenWhileBerserked', 'damageGainFromBerserk', 'deathDefy']
             },
             {
                 category: '⚔️ Damage Output',
-                fields: ['damage_dealt', 'projectiles_damage', 'rend_armor_damage', 'projectiles_count', 'lifesteal']
+                fields: ['damage', 'projectilesDamage', 'rendArmorDamage', 'projectilesCount', 'lifesteal']
             },
             {
                 category: '🔮 Tower Abilities',
-                fields: ['thorn_damage', 'orb_damage', 'orb_hits', 'land_mine_damage', 'land_mines_spawned', 'death_ray_damage', 'smart_missile_damage', 'inner_land_mine_damage', 'chain_lightning_damage', 'death_wave_damage', 'swamp_damage', 'black_hole_damage']
+                fields: ['thornDamage', 'orbDamage', 'orbHits', 'landMineDamage', 'landMinesSpawned', 'deathRayDamage', 'smartMissileDamage', 'innerLandMineDamage', 'chainLightningDamage', 'deathWaveDamage', 'swampDamage', 'blackHoleDamage']
             },
             {
                 category: '👹 Enemies',
-                fields: ['total_enemies', 'basic', 'fast', 'tank', 'ranged', 'boss', 'protector', 'total_elites', 'vampires', 'rays', 'scatters', 'saboteurs', 'commanders', 'overcharges', 'destroyed_by_orbs', 'destroyed_by_thorns', 'destroyed_by_death_ray', 'destroyed_by_land_mine']
+                fields: ['totalEnemies', 'basicEnemies', 'fastEnemies', 'tankEnemies', 'rangedEnemies', 'bossEnemies', 'protectorEnemies', 'totalElites', 'vampires', 'rays', 'scatters', 'saboteurs', 'commanders', 'overcharges', 'destroyedByOrbs', 'destroyedByThorns', 'destroyedByDeathRay', 'destroyedByLandMine']
             },
             {
                 category: '📈 Progression',
-                fields: ['waves_skipped', 'recovery_packages', 'free_attack_upgrade', 'free_defense_upgrade', 'free_utility_upgrade', 'hp_from_death_wave']
+                fields: ['wavesSkipped', 'recoveryPackages', 'freeAttackUpgrade', 'freeDefenseUpgrade', 'freeUtilityUpgrade', 'hpFromDeathWave']
             },
             {
                 category: '💎 Loot',
-                fields: ['gems', 'medals', 'reroll_shards', 'cannon_shards', 'armor_shards', 'generator_shards', 'core_shards', 'common_modules', 'rare_modules']
+                fields: ['gems', 'medals', 'rerollShards', 'cannonShards', 'armorShards', 'generatorShards', 'coreShards', 'commonModules', 'rareModules']
             },
             {
                 category: '🤖 Bots',
-                fields: ['flame_bot_damage', 'thunder_bot_stuns', 'golden_bot_coins_earned', 'damage_misc', 'coins_stolen', 'guardian_catches', 'coins_fetched']
+                fields: ['flameBotDamage', 'thunderBotStuns', 'goldenBotCoinsEarned', 'damageMisc', 'coinsStolen', 'guardianCatches', 'coinsFetched']
             }
         ];
     }

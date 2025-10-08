@@ -189,24 +189,24 @@ function createTowerRouter(supabaseManager) {
             const runData = req.body;
 
             // Add authenticated user's Discord ID if available
-            if (req.discordUserId && !runData.discord_user_id) {
-                runData.discord_user_id = req.discordUserId;
+            if (req.discordUserId && !runData.discordUserId) {
+                runData.discordUserId = req.discordUserId;
                 runData.source = 'web';
                 console.log(`📝 Adding user ID to run: ${req.discordUserId}`);
             }
 
-            const { data, error } = await supabaseManager.supabase
-                .from('tower_runs')
-                .insert([runData])
-                .select();
+            // Use saveRun() method which handles field mapping correctly
+            const result = await supabaseManager.saveRun(runData);
 
-            if (error) throw error;
+            if (!result.success) {
+                throw new Error(result.error);
+            }
 
-            console.log(`✅ Created run for user: ${runData.discord_user_id || 'unknown'}`);
+            console.log(`✅ Created run for user: ${runData.discordUserId || 'unknown'}`);
 
             res.json({
                 success: true,
-                run: data[0]
+                run: result.data
             });
         } catch (error) {
             console.error('Error creating run:', error);
