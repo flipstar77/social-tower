@@ -307,7 +307,7 @@ class TowerChatbot {
 
         // Build sources HTML with footnote-style numbering
         const sourcesHTML = sources && sources.length > 0 ? sources
-            .filter(s => s.url && !s.url.includes('reddit.com/r/TheTowerGame/'))
+            .filter(s => s.url)
             .map((s, i) => `
                 <a href="${s.url}" target="_blank" class="source-link" data-index="${i + 1}">
                     ${s.title}${s.score ? ` (${s.score} upvotes)` : ''}
@@ -377,9 +377,9 @@ class TowerChatbot {
         const topResult = results[0];
         const formattedContent = this.formatContent(topResult.content, question);
 
-        // Add sources with footnote-style numbering (only if URL exists and is not placeholder)
+        // Add sources with footnote-style numbering (only if URL exists)
         const sourcesHTML = results
-            .filter(result => result.url && !result.url.includes('reddit.com/r/TheTowerGame/'))
+            .filter(result => result.url)
             .map((result, index) => `
                 <a href="${result.url}" target="_blank" class="source-link" data-index="${index + 1}">
                     ${result.title}${result.score ? ` (${result.score} upvotes)` : ''}
