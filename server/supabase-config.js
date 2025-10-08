@@ -151,7 +151,7 @@ class SupabaseManager {
                 .from('tower_runs')
                 .insert([{
                     discord_user_id: runData.discordUserId,
-                    discord_server_id: runData.serverId,
+                    discord_server_id: runData.serverId || null,
                     tier: runData.tier,
                     wave: runData.wave,
                     damage_dealt: runData.damage,
