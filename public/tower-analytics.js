@@ -209,8 +209,10 @@ class TowerAnalytics {
             console.log('🔥 OLD TowerAnalytics.loadDashboard() called!');
             console.log('📊 Loading Tower Analytics data from API...');
 
-            // Load data from API (Discord bot runs)
-            const response = await fetch(`${this.apiBase}/runs?limit=100`);
+            // Load data from API (Discord bot runs) - Use authenticated fetch if available
+            const response = window.discordAuth?.authenticatedFetch
+                ? await window.discordAuth.authenticatedFetch(`${this.apiBase}/runs?limit=100`)
+                : await fetch(`${this.apiBase}/runs?limit=100`);
             const data = await response.json();
             console.log('🔥 API response:', data);
 
