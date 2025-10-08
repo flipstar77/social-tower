@@ -194,18 +194,19 @@ function createRedditRAGRouter(supabase) {
 
             console.log(`🤖 AI question: "${question}"`);
 
-            // 1. Search RAG for relevant content
+            // 1. Generate embedding for the question
+            const queryEmbedding = await generateEmbedding(question);
+
+            // 2. Search RAG for relevant content using vector semantic search
             const { data: searchResults, error: searchError } = await supabase.supabase
-                .from('reddit_rag_content')
-                .select('*')
-                .textSearch('content', question, {
-                    type: 'websearch',
-                    config: 'english'
-                })
-                .order('score', { ascending: false })
-                .limit(limit);
+                .rpc('search_reddit_rag_semantic', {
+                    query_embedding: queryEmbedding,
+                    match_threshold: 0.2,
+                    match_count: limit
+                });
 
             if (searchError) {
+                console.error('❌ Vector search error:', searchError.message);
                 throw new Error(`RAG search failed: ${searchError.message}`);
             }
 
@@ -217,12 +218,12 @@ function createRedditRAGRouter(supabase) {
                 });
             }
 
-            // 2. Build context from top results
+            // 3. Build context from top results
             const context = searchResults.map((result, i) =>
-                `[Source ${i + 1} - ${result.title} (${result.score} upvotes)]:\n${result.content}`
+                `[Source ${i + 1} - ${result.title} (${result.score || 0} upvotes, similarity: ${(result.similarity * 100).toFixed(0)}%)]:\n${result.content}`
             ).join('\n\n---\n\n');
 
-            // 3. Call Grok API
+            // 4. Call Grok API
             const grokResponse = await fetch(GROK_API_URL, {
                 method: 'POST',
                 headers: {
