@@ -68,14 +68,19 @@ class GameDataParser {
             return parseInt(value.replace('+', ''));
         }
 
-        // Handle currency (remove $ symbol)
+        // Handle currency (parse to number, removing $ symbol)
         if (value.startsWith('$')) {
-            return value; // Keep original formatting with $
+            const withoutDollar = value.substring(1);
+            // Check if it has units like $1.5B
+            if (withoutDollar.match(/[\d,\.]+[KMBTQS]/i)) {
+                return this.parseNumberWithUnits(withoutDollar);
+            }
+            return FormattingUtils.parseEuropeanNumber(withoutDollar);
         }
 
-        // Handle numbers with units (K, M, B, T, q, Q, s, S) but NOT time units
+        // Handle numbers with units (K, M, B, T, q, Q, s, S) but NOT time units - parse to actual number
         if (value.match(/[\d,\.]+[KMBTQS]/i) && !value.match(/[dhm]/i)) {
-            return value; // Keep original formatting
+            return this.parseNumberWithUnits(value);
         }
 
         // Handle regular numbers (including European format)
