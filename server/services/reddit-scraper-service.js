@@ -27,15 +27,15 @@ class RedditScraperService {
             await this.scrapeAndStore(100);
         });
 
-        // Mega scrape: Run at 2:00 AM every day (1000 posts)
+        // Mega scrape: Run at 2:00 AM every day (5000 posts)
         this.megaScrapeJob = cron.schedule('0 2 * * *', async () => {
-            console.log('🌙 Scheduled MEGA Reddit scrape triggered (1000 posts)');
-            await this.scrapeAndStore(1000, true);
+            console.log('🌙 Scheduled MEGA Reddit scrape triggered (5000 posts)');
+            await this.scrapeAndStore(5000, true);
         });
 
         console.log('✅ Reddit scraper scheduled:');
-        console.log('   📅 Light scrapes: 8 AM & 6 PM (100 posts)');
-        console.log('   🌙 Mega scrape: 2 AM (1000 posts)');
+        console.log('   📅 Light scrapes: 8 AM & 6 PM (100 posts via Apify)');
+        console.log('   🌙 Mega scrape: 2 AM (5000 posts via free Reddit JSON API)');
 
         // Run initial light scrape on startup
         setTimeout(() => this.scrapeAndStore(100), 5000);
@@ -70,8 +70,8 @@ class RedditScraperService {
         console.log(`${scrapeType} starting for r/${this.subreddit} (${limit} posts)...`);
 
         try {
-            // Fetch posts and comments from Apify
-            const { posts, comments } = await this.fetchPosts(limit);
+            // Fetch posts using Reddit's free JSON API with pagination
+            const { posts, comments } = await this.fetchPostsWithPagination(limit);
             console.log(`✅ Fetched ${posts.length} posts and ${comments.length} comments from Reddit`);
 
             // Filter out duplicates
@@ -631,6 +631,79 @@ class RedditScraperService {
         } finally {
             this.isRunning = false;
         }
+    }
+
+    /**
+     * Fetch posts with pagination for mega scrapes
+     * Uses Reddit's free JSON API with pagination to get as many posts as possible
+     */
+    async fetchPostsWithPagination(limit = 5000) {
+        console.log(`📡 Fetching up to ${limit} posts using Reddit JSON API with pagination...`);
+
+        let allPosts = [];
+        const sortMethods = ['top', 'hot', 'new'];
+        const postsPerPage = 100; // Reddit's max per request
+        const pagesNeeded = Math.ceil(limit / sortMethods.length / postsPerPage);
+
+        for (const sort of sortMethods) {
+            console.log(`📦 Fetching ${sort} posts...`);
+            let after = null;
+            let pagesForThisSort = 0;
+
+            while (pagesForThisSort < pagesNeeded && allPosts.length < limit) {
+                const { posts, nextAfter } = await this.fetchPostsDirectly(100, sort, after);
+
+                if (posts.length === 0) {
+                    console.log(`   ⚠️ No more ${sort} posts available`);
+                    break;
+                }
+
+                allPosts.push(...posts);
+                pagesForThisSort++;
+                console.log(`   ✅ Page ${pagesForThisSort}: Got ${posts.length} posts (total: ${allPosts.length})`);
+
+                after = nextAfter;
+                if (!after) {
+                    console.log(`   ⚠️ Reached end of ${sort} listing`);
+                    break;
+                }
+
+                // Small delay to respect Reddit's rate limits (~60 req/min)
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+
+            console.log(`✅ ${sort}: ${pagesForThisSort} pages, total collected: ${allPosts.length}`);
+        }
+
+        // For mega scrapes, also fetch comments for high-quality posts
+        console.log(`💬 Fetching comments for high-quality posts...`);
+        const importantPosts = allPosts
+            .filter(post => {
+                const isMeme = post.flair && post.flair.toLowerCase().includes('meme');
+                const hasComments = post.numberOfComments > 0;
+                const isHighEngagement = post.upVotes > 5 || post.numberOfComments > 3;
+                return !isMeme && hasComments && isHighEngagement;
+            })
+            .slice(0, 100); // Limit to top 100 posts for comments
+
+        let allComments = [];
+        for (let i = 0; i < importantPosts.length; i++) {
+            const post = importantPosts[i];
+            const comments = await this.fetchCommentsForPost(post.parsedId, 150);
+
+            if (comments.length > 0) {
+                allComments.push(...comments);
+                if ((i + 1) % 10 === 0) {
+                    console.log(`   💬 Fetched comments for ${i + 1}/${importantPosts.length} posts (${allComments.length} total)`);
+                }
+            }
+
+            // Rate limit: 2 seconds between comment requests
+            await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+
+        console.log(`✅ Total: ${allPosts.length} posts, ${allComments.length} comments`);
+        return { posts: allPosts, comments: allComments };
     }
 
     /**
