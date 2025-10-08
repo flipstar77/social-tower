@@ -330,7 +330,20 @@ class RedditScraperService {
             return;
         }
 
-        const formattedPosts = posts.map(post => ({
+        // Deduplicate posts by reddit_id (same post can appear in top/hot/new)
+        const uniquePosts = [];
+        const seenIds = new Set();
+
+        for (const post of posts) {
+            if (!seenIds.has(post.parsedId)) {
+                seenIds.add(post.parsedId);
+                uniquePosts.push(post);
+            }
+        }
+
+        console.log(`📦 Deduplicating posts: ${posts.length} → ${uniquePosts.length} unique`);
+
+        const formattedPosts = uniquePosts.map(post => ({
             reddit_id: post.parsedId,
             title: post.title,
             author: post.username,
