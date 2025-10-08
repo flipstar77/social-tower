@@ -136,8 +136,8 @@ class SupabaseManager {
             // Check if user exists
             const { data: existingUser, error: checkError } = await this.supabase
                 .from('users')
-                .select('discord_user_id')
-                .eq('discord_user_id', discordUserId)
+                .select('discord_id')
+                .eq('discord_id', discordUserId)
                 .single();
 
             if (existingUser) {
@@ -150,7 +150,7 @@ class SupabaseManager {
             const { data, error } = await this.supabase
                 .from('users')
                 .insert([{
-                    discord_user_id: discordUserId,
+                    discord_id: discordUserId,
                     username: username || `User_${discordUserId}`,
                     created_at: new Date().toISOString()
                 }])
