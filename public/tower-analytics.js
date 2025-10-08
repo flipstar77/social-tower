@@ -614,11 +614,25 @@ class TowerAnalytics {
         ] : [];
 
         // Enemy types defeated breakdown
+        const basicEnemies = this.calculateBotTotal('basic_enemies');
+        const fastEnemies = this.calculateBotTotal('fast_enemies');
+        const tankEnemies = this.calculateBotTotal('tank_enemies');
+        const rangedEnemies = this.calculateBotTotal('ranged_enemies');
+
+        console.log('🎯 ENEMY CARD VALUES:', {
+            basic: basicEnemies,
+            fast: fastEnemies,
+            tank: tankEnemies,
+            ranged: rangedEnemies,
+            formatted_basic: FormattingUtils.formatNumber(basicEnemies),
+            formatted_fast: FormattingUtils.formatNumber(fastEnemies)
+        });
+
         const enemyTypesCards = totals ? [
-            { value: FormattingUtils.formatNumber(this.calculateBotTotal('basic_enemies')), label: 'Basic Enemies', icon: '👤' },
-            { value: FormattingUtils.formatNumber(this.calculateBotTotal('fast_enemies')), label: 'Fast Enemies', icon: '💨' },
-            { value: FormattingUtils.formatNumber(this.calculateBotTotal('tank_enemies')), label: 'Tank Enemies', icon: '🛡️' },
-            { value: FormattingUtils.formatNumber(this.calculateBotTotal('ranged_enemies')), label: 'Ranged Enemies', icon: '🏹' },
+            { value: FormattingUtils.formatNumber(basicEnemies), label: 'Basic Enemies', icon: '👤' },
+            { value: FormattingUtils.formatNumber(fastEnemies), label: 'Fast Enemies', icon: '💨' },
+            { value: FormattingUtils.formatNumber(tankEnemies), label: 'Tank Enemies', icon: '🛡️' },
+            { value: FormattingUtils.formatNumber(rangedEnemies), label: 'Ranged Enemies', icon: '🏹' },
             { value: FormattingUtils.formatNumber(this.calculateBotTotal('boss_enemies')), label: 'Boss Enemies', icon: '👑' },
             { value: FormattingUtils.formatNumber(this.calculateBotTotal('protector_enemies')), label: 'Protector Enemies', icon: '🛡️' },
             { value: FormattingUtils.formatNumber(this.calculateBotTotal('total_elites')), label: 'Total Elites', icon: '⭐' },
