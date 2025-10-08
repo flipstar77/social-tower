@@ -292,6 +292,14 @@ class TowerAnalytics {
                     console.log(`🎯 Applying latest run filter - before: ${this.filteredRuns.length} runs`);
                     this.filteredRuns = [this.filteredRuns[0]]; // Show only the latest run
                     console.log(`🎯 Applied latest run filter - after: ${this.filteredRuns.length} runs`);
+                    console.log(`🎯 Enemy fields in filtered run:`, {
+                        basic_enemies: this.filteredRuns[0].basic_enemies,
+                        fast_enemies: this.filteredRuns[0].fast_enemies,
+                        tank_enemies: this.filteredRuns[0].tank_enemies,
+                        ranged_enemies: this.filteredRuns[0].ranged_enemies,
+                        vampires: this.filteredRuns[0].vampires,
+                        total_enemies: this.filteredRuns[0].total_enemies
+                    });
                 }
 
                 console.log(`✅ Loaded ${this.runs.length} tower runs from Supabase API`);
