@@ -510,6 +510,12 @@ class TowerStatsManager {
                 window.towerAnalytics.refreshData();
             }
 
+            // Trigger achievement checks
+            if (window.towerAchievements && typeof window.towerAchievements.onRunUploaded === 'function') {
+                console.log('🏆 Checking achievements for uploaded run...');
+                window.towerAchievements.onRunUploaded(parsedData);
+            }
+
             console.log('Import completed successfully');
         } catch (error) {
             console.error('Error parsing game data:', error);
