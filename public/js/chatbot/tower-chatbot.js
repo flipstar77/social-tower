@@ -222,6 +222,7 @@ class TowerChatbot {
 
             if (data.success && data.answer) {
                 // Add AI-generated answer with sources
+                console.log('📚 Chatbot sources:', data.sources);
                 this.addAIAnswer(data.answer, data.sources, question);
             } else {
                 this.addMessage(data.answer || "I couldn't find any relevant information about that. Try asking in a different way!", 'bot');
@@ -306,13 +307,13 @@ class TowerChatbot {
             .replace(/\n/g, '<br>');
 
         // Build sources HTML with footnote-style numbering
-        const sourcesHTML = sources && sources.length > 0 ? sources
-            .filter(s => s.url)
-            .map((s, i) => `
+        const filteredSources = sources && sources.length > 0 ? sources.filter(s => s.url) : [];
+        console.log('📋 Filtered sources for display:', filteredSources);
+        const sourcesHTML = filteredSources.map((s, i) => `
                 <a href="${s.url}" target="_blank" class="source-link" data-index="${i + 1}">
                     ${s.title}${s.score ? ` (${s.score} upvotes)` : ''}
                 </a>
-            `).join('') : '';
+            `).join('');
 
         // Build related questions HTML
         const relatedQuestionsHTML = relatedQuestions.length > 0 ? `
