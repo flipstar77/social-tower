@@ -2,7 +2,7 @@
 class GameDataParser {
     // Parse raw game statistics text
     static parseGameStats(content) {
-        console.log('🔧 Parser version: 2.0 (numeric parsing enabled)');
+        console.log('🔧 Parser version: 3.0 (string formatting preserved for large numbers)');
         const lines = content.split('\n').filter(line => line.trim());
         const data = {};
         const fieldMappings = FieldMappings.getFieldMappings();
@@ -69,19 +69,15 @@ class GameDataParser {
             return parseInt(value.replace('+', ''));
         }
 
-        // Handle currency (parse to number, removing $ symbol)
+        // Handle currency - keep as string to preserve formatting
         if (value.startsWith('$')) {
-            const withoutDollar = value.substring(1);
-            // Check if it has units like $1.5B
-            if (withoutDollar.match(/[\d,\.]+[KMBTQSOND]/i)) {
-                return this.parseNumberWithUnits(withoutDollar);
-            }
-            return FormattingUtils.parseEuropeanNumber(withoutDollar);
+            return value; // Keep currency values as formatted strings
         }
 
-        // Handle numbers with units (K, M, B, T, q, Q, s, S, O, N, D) but NOT time units - parse to actual number
+        // Handle numbers with units (K, M, B, T, q, Q, s, S, O, N, D) but NOT time units - keep as string
+        // These are kept as strings because they can be too large for SQL numeric types
         if (value.match(/[\d,\.]+[KMBTQSOND]/i) && !value.match(/[dhm]/i)) {
-            return this.parseNumberWithUnits(value);
+            return value; // Keep as formatted string
         }
 
         // Handle regular numbers (including European format)
