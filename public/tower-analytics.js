@@ -150,6 +150,15 @@ class TowerAnalytics {
             }, { once: true });
         }
 
+        // Listen for runs updates from script.js
+        window.addEventListener('runsUpdated', async () => {
+            console.log('🔄 Runs updated event detected, refreshing Tower Analytics...');
+            // Small delay to ensure data is fully loaded
+            setTimeout(async () => {
+                await this.loadDashboard();
+            }, 500);
+        });
+
         this.setupEventListeners();
 
         // Set up global reference for refreshing
@@ -174,9 +183,13 @@ class TowerAnalytics {
         if (section) {
             section.style.display = 'block';
 
-            // Force reload data when section becomes visible
-            console.log('🔄 Force reloading dashboard data when section shown...');
-            this.loadDashboard();
+            // Force reload data when section becomes visible - ONLY if auth is ready
+            if (window.discordAuth?.authenticatedFetch) {
+                console.log('🔄 Force reloading dashboard data when section shown (auth ready)...');
+                this.loadDashboard();
+            } else {
+                console.log('⏭️ Skipping dashboard reload - waiting for auth to be ready first');
+            }
 
             // Re-render charts when section becomes visible
             setTimeout(() => this.renderCharts(), 100);
