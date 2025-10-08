@@ -2,6 +2,7 @@
 class GameDataParser {
     // Parse raw game statistics text
     static parseGameStats(content) {
+        console.log('🔧 Parser version: 2.0 (numeric parsing enabled)');
         const lines = content.split('\n').filter(line => line.trim());
         const data = {};
         const fieldMappings = FieldMappings.getFieldMappings();
