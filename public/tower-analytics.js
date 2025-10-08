@@ -614,6 +614,9 @@ class TowerAnalytics {
         ] : [];
 
         // Enemy types defeated breakdown
+        console.log('🎯 DEBUG - this.runs length:', this.runs?.length);
+        console.log('🎯 DEBUG - Sample run data:', this.runs?.[0]);
+
         const basicEnemies = this.calculateBotTotal('basic_enemies');
         const fastEnemies = this.calculateBotTotal('fast_enemies');
         const tankEnemies = this.calculateBotTotal('tank_enemies');
@@ -624,6 +627,7 @@ class TowerAnalytics {
             fast: fastEnemies,
             tank: tankEnemies,
             ranged: rangedEnemies,
+            runsLength: this.runs?.length,
             formatted_basic: FormattingUtils.formatNumber(basicEnemies),
             formatted_fast: FormattingUtils.formatNumber(fastEnemies)
         });
@@ -808,9 +812,15 @@ class TowerAnalytics {
         });
 
         // Force clear before updating to ensure DOM refresh
+        console.log('🎯 About to clear targetGrid innerHTML, current children:', targetGrid.children.length);
         targetGrid.innerHTML = '';
+        console.log('🎯 After clear, targetGrid children:', targetGrid.children.length);
+
         // Small delay to force re-render
         setTimeout(() => {
+            console.log('🎯 About to set new innerHTML with', visibleCards.length, 'cards');
+            console.log('🎯 First 3 card values:', visibleCards.slice(0, 3).map(c => ({ label: c.label, value: c.value })));
+
             targetGrid.innerHTML = visibleCards.map((card, index) => `
             <div class="analytics-stat-card"
                  draggable="true"
@@ -823,6 +833,8 @@ class TowerAnalytics {
                 </div>
             </div>
         `).join('');
+
+            console.log('🎯 After setting innerHTML, targetGrid children:', targetGrid.children.length);
 
             // Store cards data and initialize drag & drop
             this.allCards = allCards;
