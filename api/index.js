@@ -26,6 +26,11 @@ const SupabaseManager = require('../server/supabase-config');
 let supabase;
 try {
     supabase = new SupabaseManager();
+    // Make Supabase available to all routes via app.locals
+    if (supabase && supabase.supabase) {
+        app.locals.supabase = supabase.supabase;
+        app.locals.supabaseManager = supabase;
+    }
 } catch (error) {
     console.error('Failed to initialize Supabase:', error);
     supabase = null;
