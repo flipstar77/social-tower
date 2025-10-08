@@ -644,7 +644,7 @@ class TowerStatsManager {
         return stats;
     }
 
-    addSession(sessionData) {
+    async addSession(sessionData) {
         console.log('addSession called with data:', sessionData);
 
         // Add timestamp if missing
@@ -652,6 +652,37 @@ class TowerStatsManager {
             sessionData.timestamp = new Date().toISOString();
         }
 
+        // Save to API (database) if authenticated
+        if (window.discordAuth?.authenticatedFetch) {
+            try {
+                console.log('💾 Saving run to database...');
+                const response = await window.discordAuth.authenticatedFetch('/api/tower/runs', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(sessionData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    console.log('✅ Run saved to database successfully!', data);
+                    // Use the ID from the database
+                    if (data.run && data.run.id) {
+                        sessionData.id = data.run.id;
+                    }
+                } else {
+                    console.error('❌ Failed to save run to database:', data.error);
+                    alert('Warning: Run saved locally but failed to sync to database. It may not persist after logout.');
+                }
+            } catch (error) {
+                console.error('❌ Error saving run to database:', error);
+                alert('Warning: Run saved locally but failed to sync to database. It may not persist after logout.');
+            }
+        } else {
+            console.warn('⚠️ Not authenticated - run will only be saved locally');
+        }
+
+        // Also save to localStorage as backup
         console.log('Sessions before adding:', this.sessions.length);
         this.sessions.push(sessionData);
         console.log('Sessions after adding:', this.sessions.length);
@@ -660,7 +691,7 @@ class TowerStatsManager {
         console.log('Current session set');
 
         this.saveToStorage();
-        console.log('Data saved to storage');
+        console.log('Data saved to local storage');
     }
 
     async deleteSession(session) {
