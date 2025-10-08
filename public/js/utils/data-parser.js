@@ -73,14 +73,14 @@ class GameDataParser {
         if (value.startsWith('$')) {
             const withoutDollar = value.substring(1);
             // Check if it has units like $1.5B
-            if (withoutDollar.match(/[\d,\.]+[KMBTQS]/i)) {
+            if (withoutDollar.match(/[\d,\.]+[KMBTQSOND]/i)) {
                 return this.parseNumberWithUnits(withoutDollar);
             }
             return FormattingUtils.parseEuropeanNumber(withoutDollar);
         }
 
-        // Handle numbers with units (K, M, B, T, q, Q, s, S) but NOT time units - parse to actual number
-        if (value.match(/[\d,\.]+[KMBTQS]/i) && !value.match(/[dhm]/i)) {
+        // Handle numbers with units (K, M, B, T, q, Q, s, S, O, N, D) but NOT time units - parse to actual number
+        if (value.match(/[\d,\.]+[KMBTQSOND]/i) && !value.match(/[dhm]/i)) {
             return this.parseNumberWithUnits(value);
         }
 
@@ -93,21 +93,24 @@ class GameDataParser {
         return value;
     }
 
-    // Parse numbers with unit suffixes (K, M, B, T, q, Q, s, S)
+    // Parse numbers with unit suffixes (K, M, B, T, q, Q, s, S, O, N, D)
     static parseNumberWithUnits(value) {
-        const numPart = value.replace(/[KMBTQS]/i, '');
-        const unit = value.match(/[KMBTQS]/i)?.[0]?.toLowerCase();
+        const numPart = value.replace(/[KMBTQSOND]/i, '');
+        const unit = value.match(/[KMBTQSOND]/i)?.[0]?.toLowerCase();
         const baseNumber = FormattingUtils.parseEuropeanNumber(numPart);
 
         if (isNaN(baseNumber)) return 0;
 
         const multipliers = {
-            'k': 1e3,
-            'm': 1e6,
-            'b': 1e9,
-            't': 1e12,
+            'k': 1e3,    // thousand
+            'm': 1e6,    // million
+            'b': 1e9,    // billion
+            't': 1e12,   // trillion
             'q': 1e15,   // quadrillion
-            's': 1e18    // sextillion
+            's': 1e18,   // sextillion (lowercase s)
+            'o': 1e27,   // octillion
+            'n': 1e30,   // nonillion
+            'd': 1e33    // decillion
         };
 
         return baseNumber * (multipliers[unit] || 1);
