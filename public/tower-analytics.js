@@ -129,11 +129,21 @@ class TowerAnalytics {
 
         // Load saved preset preference
         const savedPreset = localStorage.getItem('towerAnalyticsPreset');
-        if (savedPreset && this.presets[savedPreset]) {
+        // Ignore saved 'essential' preset as it hides most tiles - default to 'all' instead
+        if (savedPreset && this.presets[savedPreset] && savedPreset !== 'essential') {
             this.currentPreset = savedPreset;
             const presetSelect = document.getElementById('analyticsPresetSelect');
             if (presetSelect) {
                 presetSelect.value = savedPreset;
+            }
+        } else if (savedPreset === 'essential') {
+            // Migrate old 'essential' preset to 'all'
+            console.log('🔄 Migrating from essential preset to all preset');
+            this.currentPreset = 'all';
+            localStorage.setItem('towerAnalyticsPreset', 'all');
+            const presetSelect = document.getElementById('analyticsPresetSelect');
+            if (presetSelect) {
+                presetSelect.value = 'all';
             }
         }
 
