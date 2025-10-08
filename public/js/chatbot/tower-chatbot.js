@@ -238,7 +238,7 @@ class TowerChatbot {
     /**
      * Add message to chat
      */
-    addMessage(content, type = 'bot') {
+    addMessage(content, type = 'bot', autoScroll = true) {
         const messagesContainer = document.getElementById('chatbot-messages');
 
         // Get user avatar from Discord auth
@@ -259,7 +259,10 @@ class TowerChatbot {
         `;
 
         messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
-        this.scrollToBottom();
+        // Only auto-scroll for user messages, not bot responses
+        if (autoScroll && type === 'user') {
+            this.scrollToBottom();
+        }
     }
 
     /**
@@ -365,7 +368,7 @@ class TowerChatbot {
         `;
 
         messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
-        this.scrollToBottom();
+        // Don't auto-scroll for bot responses - let user stay at their current position
     }
 
     /**
@@ -417,7 +420,7 @@ class TowerChatbot {
         `;
 
         messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
-        this.scrollToBottom();
+        // Don't auto-scroll for bot responses - let user stay at their current position
     }
 
     /**
