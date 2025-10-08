@@ -807,7 +807,11 @@ class TowerAnalytics {
             return !this.hiddenCards || !this.hiddenCards.has(originalIndex);
         });
 
-        targetGrid.innerHTML = visibleCards.map((card, index) => `
+        // Force clear before updating to ensure DOM refresh
+        targetGrid.innerHTML = '';
+        // Small delay to force re-render
+        setTimeout(() => {
+            targetGrid.innerHTML = visibleCards.map((card, index) => `
             <div class="analytics-stat-card"
                  draggable="true"
                  data-card-id="${index}"
@@ -820,10 +824,11 @@ class TowerAnalytics {
             </div>
         `).join('');
 
-        // Store cards data and initialize drag & drop
-        this.allCards = allCards;
-        this.initializeDragAndDrop();
-        this.updateRestoreButton();
+            // Store cards data and initialize drag & drop
+            this.allCards = allCards;
+            this.initializeDragAndDrop();
+            this.updateRestoreButton();
+        }, 10); // Small delay to force DOM refresh
     }
 
     renderCharts() {
