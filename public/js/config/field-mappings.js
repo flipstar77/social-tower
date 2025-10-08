@@ -73,7 +73,7 @@ class FieldMappings {
             'Flame bot damage': 'flameBotDamage',
             'Thunder bot stuns': 'thunderBotStuns',
             'Golden bot coins earned': 'goldenBotCoinsEarned',
-            'Damage': 'damage',
+            'Damage': 'damageMisc',
             'Coins Stolen': 'coinsStolen',
             'Guardian catches': 'guardianCatches',
             'Coins Fetched': 'coinsFetched',
