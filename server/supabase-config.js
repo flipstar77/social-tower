@@ -130,6 +130,49 @@ class SupabaseManager {
         }
     }
 
+    // Ensure user exists in database (for web uploads)
+    async ensureUserExists(discordUserId, username = null) {
+        try {
+            // Check if user exists
+            const { data: existingUser, error: checkError } = await this.supabase
+                .from('users')
+                .select('discord_user_id')
+                .eq('discord_user_id', discordUserId)
+                .single();
+
+            if (existingUser) {
+                console.log('✅ User already exists in database');
+                return { success: true };
+            }
+
+            // User doesn't exist, create them
+            console.log('📝 Creating new user in database:', discordUserId);
+            const { data, error } = await this.supabase
+                .from('users')
+                .insert([{
+                    discord_user_id: discordUserId,
+                    username: username || `User_${discordUserId}`,
+                    created_at: new Date().toISOString()
+                }])
+                .select();
+
+            if (error) {
+                // If error is duplicate key (user was created by another request), that's OK
+                if (error.code === '23505') {
+                    console.log('✅ User was created by concurrent request');
+                    return { success: true };
+                }
+                throw error;
+            }
+
+            console.log('✅ User created successfully');
+            return { success: true, data: data[0] };
+        } catch (error) {
+            console.error('❌ Error ensuring user exists:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
     // Run Data Management
     async saveRun(runData) {
         try {
@@ -146,6 +189,11 @@ class SupabaseManager {
                 chainLightningDamage: runData.chainLightningDamage,
                 deathRayDamage: runData.deathRayDamage
             });
+
+            // Ensure user exists in database first
+            if (runData.discordUserId) {
+                await this.ensureUserExists(runData.discordUserId, runData.username);
+            }
 
             const { data, error } = await this.supabase
                 .from('tower_runs')

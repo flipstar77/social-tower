@@ -198,11 +198,13 @@ function createTowerRouter(supabaseManager) {
                 hasDiscordId: !!req.discordUserId
             });
 
-            // Add authenticated user's Discord ID if available
+            // Add authenticated user's Discord ID and username if available
             if (req.discordUserId && !runData.discordUserId) {
                 runData.discordUserId = req.discordUserId;
+                runData.username = req.user?.user_metadata?.full_name || req.user?.user_metadata?.name || `User_${req.discordUserId}`;
                 runData.source = 'web';
                 console.log(`📝 Adding user ID to run: ${req.discordUserId}`);
+                console.log(`📝 Username: ${runData.username}`);
             }
 
             console.log('🔄 Calling saveRun() with discordUserId:', runData.discordUserId);
