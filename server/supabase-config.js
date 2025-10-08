@@ -151,8 +151,10 @@ class SupabaseManager {
                 .from('users')
                 .insert([{
                     discord_id: discordUserId,
-                    username: username || `User_${discordUserId}`,
-                    created_at: new Date().toISOString()
+                    discord_username: username || `User_${discordUserId}`,
+                    discord_discriminator: '0',
+                    created_at: new Date().toISOString(),
+                    is_linked: false
                 }])
                 .select();
 
