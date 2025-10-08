@@ -18,46 +18,60 @@ class RedditScraperService {
     }
 
     /**
-     * Start scheduled scraping (twice daily at 8 AM and 8 PM)
+     * Start scheduled scraping (twice daily + nightly mega-scrape)
      */
     start() {
-        // Run at 8:00 AM and 8:00 PM every day
-        this.cronJob = cron.schedule('0 8,20 * * *', async () => {
-            console.log('⏰ Scheduled Reddit scrape triggered');
-            await this.scrapeAndStore();
+        // Light scrapes: Run at 8:00 AM and 6:00 PM every day (100 posts)
+        this.lightScrapeJob = cron.schedule('0 8,18 * * *', async () => {
+            console.log('⏰ Scheduled light Reddit scrape triggered (100 posts)');
+            await this.scrapeAndStore(100);
         });
 
-        console.log('✅ Reddit scraper scheduled (runs at 8 AM and 8 PM daily)');
+        // Mega scrape: Run at 2:00 AM every day (1000 posts)
+        this.megaScrapeJob = cron.schedule('0 2 * * *', async () => {
+            console.log('🌙 Scheduled MEGA Reddit scrape triggered (1000 posts)');
+            await this.scrapeAndStore(1000, true);
+        });
 
-        // Run initial scrape on startup
-        setTimeout(() => this.scrapeAndStore(), 5000);
+        console.log('✅ Reddit scraper scheduled:');
+        console.log('   📅 Light scrapes: 8 AM & 6 PM (100 posts)');
+        console.log('   🌙 Mega scrape: 2 AM (1000 posts)');
+
+        // Run initial light scrape on startup
+        setTimeout(() => this.scrapeAndStore(100), 5000);
     }
 
     /**
      * Stop scheduled scraping
      */
     stop() {
-        if (this.cronJob) {
-            this.cronJob.stop();
-            console.log('🛑 Reddit scraper stopped');
+        if (this.lightScrapeJob) {
+            this.lightScrapeJob.stop();
         }
+        if (this.megaScrapeJob) {
+            this.megaScrapeJob.stop();
+        }
+        console.log('🛑 Reddit scraper stopped');
     }
 
     /**
      * Scrape Reddit and store posts in Supabase
+     * @param {number} limit - Number of posts to fetch (default 100)
+     * @param {boolean} isMegaScrape - Whether this is a mega scrape (logs differently)
      */
-    async scrapeAndStore() {
+    async scrapeAndStore(limit = 100, isMegaScrape = false) {
         if (this.isRunning) {
             console.log('⚠️ Scrape already in progress, skipping...');
             return;
         }
 
         this.isRunning = true;
-        console.log(`📡 Starting Reddit scrape for r/${this.subreddit}...`);
+        const scrapeType = isMegaScrape ? '🌙 MEGA SCRAPE' : '📡 Light scrape';
+        console.log(`${scrapeType} starting for r/${this.subreddit} (${limit} posts)...`);
 
         try {
             // Fetch posts and comments from Apify
-            const { posts, comments } = await this.fetchPosts(100); // Get 100 posts
+            const { posts, comments } = await this.fetchPosts(limit);
             console.log(`✅ Fetched ${posts.length} posts and ${comments.length} comments from Reddit`);
 
             // Filter out duplicates
