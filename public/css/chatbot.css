@@ -38,6 +38,8 @@
     right: 30px;
     width: 420px;
     height: 600px;
+    max-width: calc(100vw - 60px);
+    max-height: calc(100vh - 60px);
     background: #0A0D10;
     border-radius: 20px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
@@ -57,6 +59,18 @@
     pointer-events: all;
 }
 
+.chatbot-window.large {
+    width: 640px;
+    height: 800px;
+}
+
+.chatbot-window.fullscreen {
+    width: calc(100vw - 60px);
+    height: calc(100vh - 60px);
+    bottom: 30px;
+    right: 30px;
+}
+
 /* Header */
 .chatbot-header {
     display: flex;
@@ -74,6 +88,27 @@
     gap: 10px;
     font-weight: 600;
     font-size: 16px;
+}
+
+.chatbot-resize-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+}
+
+.chatbot-resize-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
 }
 
 .chatbot-close-btn {
@@ -169,6 +204,10 @@
     color: #CED8E1;
     line-height: 1.5;
     font-size: 14px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+    overflow-x: hidden;
 }
 
 .user-message .message-content {
@@ -298,36 +337,53 @@
     line-height: 1.5;
 }
 
-/* Sources */
+/* Sources - Footnote Style */
 .message-sources {
-    margin-top: 12px;
+    margin-top: 16px;
     padding-top: 12px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
 }
 
 .message-sources strong {
-    font-size: 12px;
+    font-size: 11px;
     color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     margin-bottom: 4px;
 }
 
 .source-link {
-    display: inline-block;
-    color: #F72585;
+    display: block;
+    color: #CED8E1;
     text-decoration: none;
-    font-size: 12px;
-    padding: 4px 8px;
-    background: rgba(247, 37, 133, 0.1);
-    border-radius: 6px;
+    font-size: 11px;
+    padding: 6px 0;
     transition: all 0.2s ease;
+    position: relative;
+    padding-left: 16px;
+    line-height: 1.4;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.source-link:before {
+    content: '[' attr(data-index) ']';
+    position: absolute;
+    left: 0;
+    color: #F72585;
+    font-weight: 600;
 }
 
 .source-link:hover {
-    background: rgba(247, 37, 133, 0.2);
-    transform: translateX(2px);
+    color: #F72585;
+    padding-left: 18px;
+}
+
+.source-link:hover:before {
+    color: #FF3DA1;
 }
 
 /* Typing Indicator */

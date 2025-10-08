@@ -8,6 +8,7 @@ class TowerChatbot {
         this.container = null;
         this.isOpen = false;
         this.apiBase = window.location.hostname === 'localhost' ? 'http://localhost:6078' : '';
+        this.size = 'normal'; // 'normal', 'large', 'fullscreen'
     }
 
     /**
@@ -41,7 +42,10 @@ class TowerChatbot {
                         </svg>
                         <span>Tower Assistant</span>
                     </div>
-                    <button id="chatbot-close" class="chatbot-close-btn">✕</button>
+                    <div style="display: flex; gap: 0;">
+                        <button id="chatbot-resize" class="chatbot-resize-btn" title="Resize window">⇱</button>
+                        <button id="chatbot-close" class="chatbot-close-btn">✕</button>
+                    </div>
                 </div>
 
                 <div class="chatbot-messages" id="chatbot-messages">
@@ -92,6 +96,11 @@ class TowerChatbot {
         // Toggle button
         document.getElementById('chatbot-toggle').addEventListener('click', () => {
             this.toggle();
+        });
+
+        // Resize button
+        document.getElementById('chatbot-resize').addEventListener('click', () => {
+            this.cycleSize();
         });
 
         // Close button
@@ -152,6 +161,25 @@ class TowerChatbot {
         this.container.classList.remove('open');
         document.getElementById('chatbot-toggle').classList.remove('hidden');
         this.isOpen = false;
+    }
+
+    /**
+     * Cycle through chatbot sizes
+     */
+    cycleSize() {
+        // Remove current size classes
+        this.container.classList.remove('large', 'fullscreen');
+
+        // Cycle: normal -> large -> fullscreen -> normal
+        if (this.size === 'normal') {
+            this.size = 'large';
+            this.container.classList.add('large');
+        } else if (this.size === 'large') {
+            this.size = 'fullscreen';
+            this.container.classList.add('fullscreen');
+        } else {
+            this.size = 'normal';
+        }
     }
 
     /**
@@ -277,12 +305,12 @@ class TowerChatbot {
             .replace(/\n\n/g, '</p><p>')
             .replace(/\n/g, '<br>');
 
-        // Build sources HTML
+        // Build sources HTML with footnote-style numbering
         const sourcesHTML = sources && sources.length > 0 ? sources
             .filter(s => s.url && !s.url.includes('reddit.com/r/TheTowerGame/'))
-            .map(s => `
-                <a href="${s.url}" target="_blank" class="source-link">
-                    📄 ${s.title} ${s.score ? `(${s.score} upvotes)` : ''}
+            .map((s, i) => `
+                <a href="${s.url}" target="_blank" class="source-link" data-index="${i + 1}">
+                    ${s.title}${s.score ? ` (${s.score} upvotes)` : ''}
                 </a>
             `).join('') : '';
 
@@ -349,12 +377,12 @@ class TowerChatbot {
         const topResult = results[0];
         const formattedContent = this.formatContent(topResult.content, question);
 
-        // Add sources (only if URL exists and is not placeholder)
+        // Add sources with footnote-style numbering (only if URL exists and is not placeholder)
         const sourcesHTML = results
             .filter(result => result.url && !result.url.includes('reddit.com/r/TheTowerGame/'))
             .map((result, index) => `
-                <a href="${result.url}" target="_blank" class="source-link">
-                    📄 ${result.title} ${result.score ? `(${result.score} upvotes)` : ''}
+                <a href="${result.url}" target="_blank" class="source-link" data-index="${index + 1}">
+                    ${result.title}${result.score ? ` (${result.score} upvotes)` : ''}
                 </a>
             `).join('');
 
