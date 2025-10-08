@@ -141,6 +141,11 @@ class SupabaseManager {
                 discordUserId: !!runData.discordUserId,
                 serverId: !!runData.serverId
             });
+            console.log('🔢 Large number fields:', {
+                damage: runData.damage,
+                chainLightningDamage: runData.chainLightningDamage,
+                deathRayDamage: runData.deathRayDamage
+            });
 
             const { data, error } = await this.supabase
                 .from('tower_runs')
@@ -267,6 +272,12 @@ class SupabaseManager {
             console.log('📊 Database query executed, checking results...');
             if (error) {
                 console.error('❌ Database error occurred:', error);
+                console.error('❌ Error details:', {
+                    message: error.message,
+                    code: error.code,
+                    details: error.details,
+                    hint: error.hint
+                });
                 throw error;
             } else {
                 console.log('✅ Database insertion successful:', !!data);
@@ -274,6 +285,8 @@ class SupabaseManager {
             return { success: true, data: data[0] };
         } catch (error) {
             console.error('❌ Error saving run:', error);
+            console.error('❌ Error message:', error.message);
+            console.error('❌ Error stack:', error.stack);
             return { success: false, error: error.message };
         }
     }
