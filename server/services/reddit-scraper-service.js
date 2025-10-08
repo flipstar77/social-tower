@@ -33,9 +33,9 @@ class RedditScraperService {
             await this.scrapeAndStore(5000, true);
         });
 
-        console.log('✅ Reddit scraper scheduled:');
-        console.log('   📅 Light scrapes: 8 AM & 6 PM (100 posts via Apify)');
-        console.log('   🌙 Mega scrape: 2 AM (5000 posts via free Reddit JSON API)');
+        console.log('✅ Reddit scraper scheduled (using free Reddit JSON API):');
+        console.log('   📅 Light scrapes: 8 AM & 6 PM (100 posts)');
+        console.log('   🌙 Mega scrape: 2 AM (5000 posts + comments)');
 
         // Run initial light scrape on startup
         setTimeout(() => this.scrapeAndStore(100), 5000);
