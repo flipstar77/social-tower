@@ -175,6 +175,9 @@ class TowerStatsManager {
                     // Update all displays with the new data
                     this.updateDisplay();
 
+                    // Notify other components (like Tower Analytics) that runs were loaded
+                    window.dispatchEvent(new CustomEvent('runsUpdated'));
+
                     console.log('✅ Updated Recent Sessions with API runs');
                 }
             }
