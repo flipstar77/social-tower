@@ -137,7 +137,19 @@ class TowerAnalytics {
             }
         }
 
-        await this.loadDashboard();
+        // Wait for Discord auth before loading data
+        if (window.discordAuth?.authenticatedFetch) {
+            console.log('✅ Discord auth available, loading dashboard with auth');
+            await this.loadDashboard();
+        } else {
+            console.log('⏳ Waiting for Discord auth before loading dashboard...');
+            // Wait for auth ready event
+            window.addEventListener('discordAuthReady', async () => {
+                console.log('✅ Discord auth ready, loading dashboard');
+                await this.loadDashboard();
+            }, { once: true });
+        }
+
         this.setupEventListeners();
 
         // Set up global reference for refreshing
@@ -215,6 +227,12 @@ class TowerAnalytics {
                 : await fetch(`${this.apiBase}/runs?limit=100`);
             const data = await response.json();
             console.log('🔥 API response:', data);
+            console.log('🔥 API response check:', {
+                success: data.success,
+                hasRuns: !!data.runs,
+                runsLength: data.runs?.length,
+                runsIsArray: Array.isArray(data.runs)
+            });
 
             if (data.success && data.runs && data.runs.length > 0) {
                 const farmData = data.runs;
