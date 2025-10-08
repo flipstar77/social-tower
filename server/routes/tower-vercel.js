@@ -187,6 +187,16 @@ function createTowerRouter(supabaseManager) {
             }
 
             const runData = req.body;
+            console.log('📦 Received run data with fields:', {
+                tier: runData.tier,
+                wave: runData.wave,
+                damage: runData.damage,
+                coins: runData.coins,
+                basicEnemies: runData.basicEnemies,
+                fastEnemies: runData.fastEnemies,
+                totalFields: Object.keys(runData).length,
+                hasDiscordId: !!req.discordUserId
+            });
 
             // Add authenticated user's Discord ID if available
             if (req.discordUserId && !runData.discordUserId) {
@@ -195,10 +205,14 @@ function createTowerRouter(supabaseManager) {
                 console.log(`📝 Adding user ID to run: ${req.discordUserId}`);
             }
 
+            console.log('🔄 Calling saveRun() with discordUserId:', runData.discordUserId);
             // Use saveRun() method which handles field mapping correctly
             const result = await supabaseManager.saveRun(runData);
 
+            console.log('📊 saveRun() result:', { success: result.success, hasData: !!result.data, error: result.error });
+
             if (!result.success) {
+                console.error('❌ saveRun() failed:', result.error);
                 throw new Error(result.error);
             }
 
@@ -209,7 +223,8 @@ function createTowerRouter(supabaseManager) {
                 run: result.data
             });
         } catch (error) {
-            console.error('Error creating run:', error);
+            console.error('❌ Error creating run:', error);
+            console.error('❌ Error stack:', error.stack);
             res.status(500).json({ error: 'Failed to create run', message: error.message });
         }
     });

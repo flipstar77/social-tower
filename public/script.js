@@ -656,6 +656,16 @@ class TowerStatsManager {
         if (window.discordAuth?.authenticatedFetch) {
             try {
                 console.log('💾 Saving run to database...');
+                console.log('📦 Session data being sent:', {
+                    tier: sessionData.tier,
+                    wave: sessionData.wave,
+                    damage: sessionData.damage,
+                    coins: sessionData.coins,
+                    basicEnemies: sessionData.basicEnemies,
+                    fastEnemies: sessionData.fastEnemies,
+                    tankEnemies: sessionData.tankEnemies,
+                    totalFields: Object.keys(sessionData).length
+                });
                 const response = await window.discordAuth.authenticatedFetch('/api/tower/runs', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -663,6 +673,7 @@ class TowerStatsManager {
                 });
 
                 const data = await response.json();
+                console.log('📥 API response:', data);
 
                 if (data.success) {
                     console.log('✅ Run saved to database successfully!', data);
@@ -672,10 +683,12 @@ class TowerStatsManager {
                     }
                 } else {
                     console.error('❌ Failed to save run to database:', data.error);
+                    console.error('❌ Full error response:', data);
                     alert('Warning: Run saved locally but failed to sync to database. It may not persist after logout.');
                 }
             } catch (error) {
                 console.error('❌ Error saving run to database:', error);
+                console.error('❌ Error details:', error.message, error.stack);
                 alert('Warning: Run saved locally but failed to sync to database. It may not persist after logout.');
             }
         } else {
