@@ -71,7 +71,10 @@
       "Bash(npm run lint:*)",
       "Bash(npm test)",
       "Bash(npm run test:coverage:*)",
-      "Bash(vercel:*)"
+      "Bash(vercel:*)",
+      "Bash(ls -la \"c:\\Users\\Администратор\\Downloads\"\" | grep -i \"tower)",
+      "Bash(lab)",
+      "Bash(csv \")"
     ],
     "deny": [],
     "ask": []

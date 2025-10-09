@@ -27,6 +27,7 @@
     <!-- Chatbot Styles -->
     <link rel="stylesheet" href="css/chatbot.css?v=1">
     <link rel="stylesheet" href="css/bracket-difficulty.css?v=1">
+    <link rel="stylesheet" href="css/labs.css?v=1">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Helvetica+Neue:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -48,6 +49,10 @@
                 <div class="menu-item active" data-section="dashboard">
                     <div class="menu-icon dashboard-icon">📊</div>
                     <span>Dashboard</span>
+                </div>
+                <div class="menu-item" data-section="myLabs">
+                    <div class="menu-icon labs-icon">🧪</div>
+                    <span>My Labs</span>
                 </div>
                 <div class="menu-item" data-section="contentHub">
                     <div class="menu-icon content-icon">🎮</div>
@@ -361,6 +366,144 @@ Wave    8541
                         <div class="value-display">4.2 hrs</div>
                         <div id="chart-area" class="chart-graphic area" style="min-height: 210px !important; height: 210px !important;"></div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- My Labs Section (Hidden by default) -->
+        <div id="myLabs" class="my-labs-section" style="display: none;">
+            <button class="logout-btn" onclick="window.discordAuth?.logout()" style="position: absolute; right: 20px; top: 20px; z-index: 100; background: linear-gradient(135deg, #ff4757, #ff3742); color: white; border: none; padding: 8px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.3s ease;">🚪 Logout</button>
+
+            <div class="labs-header">
+                <h1 class="labs-title">🧪 My Lab Levels</h1>
+                <p class="labs-subtitle">Track your research lab progress and get personalized recommendations</p>
+            </div>
+
+            <div class="labs-content">
+                <div class="labs-intro-card">
+                    <h3>📊 Why Track Lab Levels?</h3>
+                    <p>Enter your current lab levels to receive personalized upgrade recommendations based on efficiency calculations and your current tier progression.</p>
+                    <ul>
+                        <li>🎯 Get optimal upgrade priority recommendations</li>
+                        <li>📈 See efficiency % per day for each lab</li>
+                        <li>💡 AI chatbot uses your lab data for personalized advice</li>
+                    </ul>
+                </div>
+
+                <div class="labs-form-container">
+                    <div class="labs-category-grid">
+                        <!-- Damage Labs -->
+                        <div class="lab-category">
+                            <h3 class="category-title">⚔️ Damage Labs</h3>
+                            <div class="lab-inputs-grid">
+                                <div class="lab-input-group">
+                                    <label for="lab-damage">Damage</label>
+                                    <input type="number" id="lab-damage" class="lab-input" min="0" max="999" placeholder="0">
+                                </div>
+                                <div class="lab-input-group">
+                                    <label for="lab-crit-factor">Crit Factor</label>
+                                    <input type="number" id="lab-crit-factor" class="lab-input" min="0" max="999" placeholder="0">
+                                </div>
+                                <div class="lab-input-group">
+                                    <label for="lab-crit-chance">Crit Chance</label>
+                                    <input type="number" id="lab-crit-chance" class="lab-input" min="0" max="999" placeholder="0">
+                                </div>
+                                <div class="lab-input-group">
+                                    <label for="lab-attack-speed">Attack Speed</label>
+                                    <input type="number" id="lab-attack-speed" class="lab-input" min="0" max="999" placeholder="0">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Defense Labs -->
+                        <div class="lab-category">
+                            <h3 class="category-title">🛡️ Defense Labs</h3>
+                            <div class="lab-inputs-grid">
+                                <div class="lab-input-group">
+                                    <label for="lab-health">Health</label>
+                                    <input type="number" id="lab-health" class="lab-input" min="0" max="999" placeholder="0">
+                                </div>
+                                <div class="lab-input-group">
+                                    <label for="lab-defense">Defense</label>
+                                    <input type="number" id="lab-defense" class="lab-input" min="0" max="999" placeholder="0">
+                                </div>
+                                <div class="lab-input-group">
+                                    <label for="lab-regen">Regen</label>
+                                    <input type="number" id="lab-regen" class="lab-input" min="0" max="999" placeholder="0">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Utility Labs -->
+                        <div class="lab-category">
+                            <h3 class="category-title">⚡ Utility Labs</h3>
+                            <div class="lab-inputs-grid">
+                                <div class="lab-input-group">
+                                    <label for="lab-range">Range</label>
+                                    <input type="number" id="lab-range" class="lab-input" min="0" max="999" placeholder="0">
+                                </div>
+                                <div class="lab-input-group">
+                                    <label for="lab-knockback">Knockback</label>
+                                    <input type="number" id="lab-knockback" class="lab-input" min="0" max="999" placeholder="0">
+                                </div>
+                                <div class="lab-input-group">
+                                    <label for="lab-speed">Speed</label>
+                                    <input type="number" id="lab-speed" class="lab-input" min="0" max="999" placeholder="0">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Economy Labs -->
+                        <div class="lab-category">
+                            <h3 class="category-title">💰 Economy Labs</h3>
+                            <div class="lab-inputs-grid">
+                                <div class="lab-input-group">
+                                    <label for="lab-coins">Coins</label>
+                                    <input type="number" id="lab-coins" class="lab-input" min="0" max="999" placeholder="0">
+                                </div>
+                                <div class="lab-input-group">
+                                    <label for="lab-interest">Interest</label>
+                                    <input type="number" id="lab-interest" class="lab-input" min="0" max="999" placeholder="0">
+                                </div>
+                                <div class="lab-input-group">
+                                    <label for="lab-cash">Cash</label>
+                                    <input type="number" id="lab-cash" class="lab-input" min="0" max="999" placeholder="0">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Special Labs -->
+                        <div class="lab-category">
+                            <h3 class="category-title">✨ Special Labs</h3>
+                            <div class="lab-inputs-grid">
+                                <div class="lab-input-group">
+                                    <label for="lab-super-tower">Super Tower</label>
+                                    <input type="number" id="lab-super-tower" class="lab-input" min="0" max="999" placeholder="0">
+                                </div>
+                                <div class="lab-input-group">
+                                    <label for="lab-super-crit">Super Crit</label>
+                                    <input type="number" id="lab-super-crit" class="lab-input" min="0" max="999" placeholder="0">
+                                </div>
+                                <div class="lab-input-group">
+                                    <label for="lab-lifesteal">Lifesteal</label>
+                                    <input type="number" id="lab-lifesteal" class="lab-input" min="0" max="999" placeholder="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="labs-actions">
+                        <button id="save-labs-btn" class="save-labs-btn">💾 Save Lab Levels</button>
+                        <button id="clear-labs-btn" class="clear-labs-btn">🗑️ Clear All</button>
+                    </div>
+
+                    <div class="labs-status" id="labs-status"></div>
+                </div>
+
+                <!-- Lab Recommendations (shown after saving) -->
+                <div class="labs-recommendations" id="labs-recommendations" style="display: none;">
+                    <h3>📈 Upgrade Recommendations</h3>
+                    <div id="recommendations-content"></div>
                 </div>
             </div>
         </div>
@@ -915,6 +1058,7 @@ Or paste raw tournament data from game stats."></textarea>
     <!-- Main Application Scripts -->
     <script src="script.js?v=15"></script>
     <script src="content-hub.js?v=21"></script>
+    <script src="js/labs-manager.js?v=1"></script>
     <!-- Performance Charts -->
     <script src="js/charts/PerformanceCharts.js?v=3"></script>
     <script src="js/charts/ChartDataAdapter.js?v=1"></script>
@@ -1056,5 +1200,15 @@ Or paste raw tournament data from game stats."></textarea>
 
     <!-- Bracket Difficulty -->
     <script src="js/bracket-difficulty.js?v=1"></script>
+
+    <!-- Initialize Labs Manager after authentication -->
+    <script>
+        // Initialize labs manager when user is authenticated
+        window.addEventListener('authStateChanged', async (event) => {
+            if (event.detail.isAuthenticated && window.labsManager) {
+                await window.labsManager.init();
+            }
+        });
+    </script>
 </body>
 </html>

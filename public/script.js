@@ -1319,30 +1319,56 @@ class TowerStatsManager {
         const timeAgo = this.getTimeAgo(session.timestamp);
         const changeValue = this.calculateSessionChange(session);
         const tournamentBadge = session.isTournament ? '<span class="tournament-badge" title="Tournament Run">🏆</span>' : '';
+        const sessionId = session.id || session.sessionId || session.timestamp;
 
         item.innerHTML = `
+            <input type="checkbox" class="run-compare-checkbox" data-session-id="${sessionId}" title="Select for comparison">
             <div class="history-icon tower-icon"></div>
             <div class="history-text">
-                <span class="history-title">${tournamentBadge}Session completed - Wave ${FormattingUtils.formatNumber(session.wave || 0)}</span>
+                <span class="history-title">${tournamentBadge}T${session.tier || '?'} W${FormattingUtils.formatNumber(session.wave || 0)}</span>
                 <div class="history-meta">
                     <span class="history-date">${timeAgo}</span>
                     <span class="history-change ${changeValue >= 0 ? 'positive' : 'negative'}">
                         ${changeValue >= 0 ? '+' : ''}${FormattingUtils.formatNumber(changeValue)}
                     </span>
+                    <button class="load-run-btn" data-session-id="${sessionId}" title="Load stats into tiles">
+                        📊
+                    </button>
                     <button class="share-run-btn" data-run='${JSON.stringify(session)}' title="Share this run">
                         📤
                     </button>
-                    <button class="delete-run-btn" data-session-id="${session.sessionId || session.timestamp}" title="Delete this run">
+                    <button class="delete-run-btn" data-session-id="${sessionId}" title="Delete this run">
                         🗑️
                     </button>
                 </div>
             </div>
         `;
 
+        // Add event listener for load stats button
+        const loadBtn = item.querySelector('.load-run-btn');
+        if (loadBtn) {
+            loadBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.loadRunIntoTiles(session);
+            });
+        }
+
+        // Add event listener for checkbox (prevent click event propagation)
+        const checkbox = item.querySelector('.run-compare-checkbox');
+        if (checkbox) {
+            checkbox.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.toggleRunComparison(session, e.target.checked);
+            });
+        }
+
         // Add event listener for clicking the session to select it
         item.addEventListener('click', (e) => {
-            // Don't select if clicking on delete or share buttons
-            if (e.target.closest('.delete-run-btn') || e.target.closest('.share-run-btn')) {
+            // Don't select if clicking on buttons or checkbox
+            if (e.target.closest('.delete-run-btn') ||
+                e.target.closest('.share-run-btn') ||
+                e.target.closest('.load-run-btn') ||
+                e.target.closest('.run-compare-checkbox')) {
                 return;
             }
             this.selectSession(session);
@@ -1366,6 +1392,72 @@ class TowerStatsManager {
         this.updateComprehensiveStats();
         this.updateTrendCards(); // Also update hourly rates
         console.log('✅ Selected session:', session);
+    }
+
+    loadRunIntoTiles(session) {
+        // Load this run's stats into the Tower Analytics tiles
+        console.log('📊 Loading run into tiles:', session);
+
+        // Notify Tower Analytics to display this specific run
+        if (window.towerMigration?.analyticsManager) {
+            window.towerMigration.analyticsManager.displayRunStats(session);
+        } else if (window.TowerAnalytics) {
+            // Fallback to old Tower Analytics
+            window.TowerAnalytics.currentSession = session;
+            window.TowerAnalytics.loadDashboard();
+        }
+
+        // Also update the current view
+        this.currentSession = session;
+        this.updateComprehensiveStats();
+        this.updateTrendCards();
+    }
+
+    toggleRunComparison(session, isSelected) {
+        // Initialize comparison array if it doesn't exist
+        if (!this.comparisonRuns) {
+            this.comparisonRuns = [];
+        }
+
+        if (isSelected) {
+            // Add to comparison (max 5 runs)
+            if (this.comparisonRuns.length >= 5) {
+                alert('Maximum 5 runs can be selected for comparison');
+                // Uncheck the checkbox
+                const checkbox = document.querySelector(`.run-compare-checkbox[data-session-id="${session.id || session.sessionId || session.timestamp}"]`);
+                if (checkbox) checkbox.checked = false;
+                return;
+            }
+            this.comparisonRuns.push(session);
+            console.log(`✅ Added run to comparison (${this.comparisonRuns.length}/5)`);
+        } else {
+            // Remove from comparison
+            this.comparisonRuns = this.comparisonRuns.filter(r =>
+                (r.id || r.sessionId || r.timestamp) !== (session.id || session.sessionId || session.timestamp)
+            );
+            console.log(`➖ Removed run from comparison (${this.comparisonRuns.length}/5)`);
+        }
+
+        // Update comparison UI
+        this.updateComparisonUI();
+    }
+
+    updateComparisonUI() {
+        // Show/hide comparison section based on selected runs
+        const comparisonSection = document.getElementById('run-comparison-container');
+        if (!comparisonSection) return;
+
+        if (this.comparisonRuns && this.comparisonRuns.length > 0) {
+            comparisonSection.style.display = 'block';
+
+            // Update RunComparison with selected runs
+            if (window.runComparison) {
+                window.runComparison.selectedRuns = this.comparisonRuns;
+                window.runComparison.visualizeSelectedRuns();
+            }
+        } else {
+            comparisonSection.style.display = 'none';
+        }
     }
 
     parseTimeToHours(timeString) {

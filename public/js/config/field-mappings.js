@@ -139,11 +139,7 @@ class FieldMappings {
             },
             {
                 category: '⚔️ Damage Output',
-                fields: ['damage', 'projectilesDamage', 'rendArmorDamage', 'projectilesCount', 'lifesteal']
-            },
-            {
-                category: '🔮 Tower Abilities',
-                fields: ['thornDamage', 'orbDamage', 'orbHits', 'landMineDamage', 'landMinesSpawned', 'deathRayDamage', 'smartMissileDamage', 'innerLandMineDamage', 'chainLightningDamage', 'deathWaveDamage', 'swampDamage', 'blackHoleDamage']
+                fields: ['damage', 'projectilesDamage', 'rendArmorDamage', 'thornDamage', 'orbDamage', 'landMineDamage', 'deathRayDamage', 'smartMissileDamage', 'innerLandMineDamage', 'chainLightningDamage', 'deathWaveDamage', 'swampDamage', 'blackHoleDamage', 'flameBotDamage', 'projectilesCount', 'orbHits', 'landMinesSpawned', 'lifesteal']
             },
             {
                 category: '👹 Enemies',

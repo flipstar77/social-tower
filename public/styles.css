@@ -752,8 +752,19 @@ body.authenticated .main-content {
     color: #E3507A;
 }
 
-/* Share and Delete Buttons */
+/* Run Comparison Checkbox */
+.run-compare-checkbox {
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+    cursor: pointer;
+    flex-shrink: 0;
+    accent-color: #F72585;
+}
+
+/* Share, Load, and Delete Buttons */
 .share-run-btn,
+.load-run-btn,
 .delete-run-btn {
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -763,6 +774,12 @@ body.authenticated .main-content {
     cursor: pointer;
     font-size: 14px;
     transition: all 0.3s ease;
+}
+
+.load-run-btn:hover {
+    background: rgba(247, 37, 133, 0.2);
+    border-color: #F72585;
+    transform: translateY(-1px);
 }
 
 .share-run-btn:hover {
