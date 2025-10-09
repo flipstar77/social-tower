@@ -20,6 +20,7 @@ const { router: videosRouter } = require('../server/routes/videos-vercel');
 const createTowerRouter = require('../server/routes/tower-vercel');
 const createRedditRAGRouter = require('../server/routes/reddit-rag');
 const createGuidesRouter = require('../server/routes/guides');
+const createUserLabsRouter = require('../server/routes/user-labs');
 
 // Initialize Supabase for database routes
 const SupabaseManager = require('../server/supabase-config');
@@ -45,6 +46,7 @@ if (supabase && supabase.supabase) {
     app.use('/api/tower', createTowerRouter(supabase));
     app.use('/api/reddit-rag', createRedditRAGRouter(supabase));
     app.use('/api/guides', createGuidesRouter(supabase));
+    app.use('/api/user-labs', createUserLabsRouter(supabase));
 } else {
     console.warn('⚠️ Supabase not configured - database routes disabled');
     app.use('/api/tower', (req, res) => {
