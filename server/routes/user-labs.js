@@ -12,7 +12,7 @@ function createUserLabsRouter(supabase) {
         try {
             const { discordUserId } = req.params;
 
-            const { data, error } = await supabase.client
+            const { data, error } = await supabase.supabase
                 .from('user_labs')
                 .select('labs')
                 .eq('discord_user_id', discordUserId)
@@ -46,7 +46,7 @@ function createUserLabsRouter(supabase) {
             }
 
             // Upsert (insert or update)
-            const { data, error } = await supabase.client
+            const { data, error } = await supabase.supabase
                 .from('user_labs')
                 .upsert({
                     discord_user_id: discordUserId,
