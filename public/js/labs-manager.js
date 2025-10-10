@@ -56,10 +56,11 @@ class LabsManager {
 
             categoryLabs.forEach(lab => {
                 const labId = window.labNameToId(lab.name);
+                const maxLevel = lab.maxLevel || 999;
                 html += `
                     <div class="lab-input-group">
-                        <label for="lab-${labId}">${lab.name}</label>
-                        <input type="number" id="lab-${labId}" class="lab-input" min="0" max="999" placeholder="0" data-lab-key="${labId}">
+                        <label for="lab-${labId}">${lab.name} <span class="max-level">(Max: ${maxLevel})</span></label>
+                        <input type="number" id="lab-${labId}" class="lab-input" min="0" max="${maxLevel}" placeholder="0" data-lab-key="${labId}">
                     </div>
                 `;
             });
