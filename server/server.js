@@ -30,6 +30,7 @@ const createWikiRouter = require('./routes/wiki');
 const createDiscordAuthRouter = require('./routes/discord-auth');
 const createDiscordApiRouter = require('./routes/discord-api');
 const tournamentBracketsRouter = require('./routes/tournament-brackets');
+const createUserLabsRouter = require('./routes/user-labs');
 
 const app = express();
 const PORT = process.env.PORT || 6078;
@@ -212,6 +213,10 @@ const wikiRouter = createWikiRouter(wikiScraper, () => wikiInitialized);
 // Allow the wiki router to update the wikiInitialized state
 app.set('setWikiInitialized', (value) => { wikiInitialized = value; });
 app.use('/api/wiki', wikiRouter);
+
+// Mount user labs router
+const userLabsRouter = createUserLabsRouter(supabase);
+app.use('/api/user-labs', userLabsRouter);
 
 
 // Routes
