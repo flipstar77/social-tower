@@ -219,3 +219,11 @@ function labNameToId(name) {
 function labIdToKey(id) {
     return id.replace(/-([a-z])/g, (match, letter) => letter.toUpperCase());
 }
+
+// Export to window for use by labs-manager.js
+window.ALL_LABS = ALL_LABS;
+window.CATEGORY_LABELS = CATEGORY_LABELS;
+window.labNameToId = labNameToId;
+window.labIdToKey = labIdToKey;
+
+console.log('✅ Lab data loaded:', ALL_LABS.length, 'labs in', Object.keys(CATEGORY_LABELS).length, 'categories');
