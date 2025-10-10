@@ -15,8 +15,63 @@ class LabsManager {
             this.discordId = window.discordAuth.user.user_metadata.provider_id;
         }
 
+        this.renderLabInputs();
         this.setupEventListeners();
         await this.loadUserLabs();
+    }
+
+    renderLabInputs() {
+        console.log('🎨 Rendering lab inputs...');
+
+        if (!window.ALL_LABS || !window.CATEGORY_LABELS) {
+            console.error('❌ Lab data not loaded! Make sure lab-data.js is loaded first.');
+            return;
+        }
+
+        const grid = document.getElementById('labs-category-grid');
+        if (!grid) {
+            console.error('❌ labs-category-grid container not found');
+            return;
+        }
+
+        // Group labs by category
+        const labsByCategory = {};
+        window.ALL_LABS.forEach(lab => {
+            if (!labsByCategory[lab.category]) {
+                labsByCategory[lab.category] = [];
+            }
+            labsByCategory[lab.category].push(lab);
+        });
+
+        // Render each category
+        let html = '';
+        for (const [categoryKey, categoryLabs] of Object.entries(labsByCategory)) {
+            const categoryLabel = window.CATEGORY_LABELS[categoryKey] || categoryKey;
+
+            html += `
+                <div class="lab-category">
+                    <h3 class="category-title">${categoryLabel}</h3>
+                    <div class="lab-inputs-grid">
+            `;
+
+            categoryLabs.forEach(lab => {
+                const labId = window.labNameToId(lab.name);
+                html += `
+                    <div class="lab-input-group">
+                        <label for="lab-${labId}">${lab.name}</label>
+                        <input type="number" id="lab-${labId}" class="lab-input" min="0" max="999" placeholder="0" data-lab-key="${labId}">
+                    </div>
+                `;
+            });
+
+            html += `
+                    </div>
+                </div>
+            `;
+        }
+
+        grid.innerHTML = html;
+        console.log(`✅ Rendered ${window.ALL_LABS.length} labs in ${Object.keys(labsByCategory).length} categories`);
     }
 
     setupEventListeners() {
@@ -54,53 +109,26 @@ class LabsManager {
     }
 
     populateForm(labs) {
-        // Populate all lab input fields
-        const labMapping = {
-            'damage': 'lab-damage',
-            'critFactor': 'lab-crit-factor',
-            'critChance': 'lab-crit-chance',
-            'attackSpeed': 'lab-attack-speed',
-            'health': 'lab-health',
-            'defense': 'lab-defense',
-            'regen': 'lab-regen',
-            'range': 'lab-range',
-            'knockback': 'lab-knockback',
-            'speed': 'lab-speed',
-            'coins': 'lab-coins',
-            'interest': 'lab-interest',
-            'cash': 'lab-cash',
-            'superTower': 'lab-super-tower',
-            'superCrit': 'lab-super-crit',
-            'lifesteal': 'lab-lifesteal'
-        };
-
-        for (const [labKey, inputId] of Object.entries(labMapping)) {
-            const input = document.getElementById(inputId);
-            if (input && labs[labKey] !== undefined) {
-                input.value = labs[labKey];
+        // Populate all lab input fields dynamically
+        for (const [labKey, level] of Object.entries(labs)) {
+            const input = document.getElementById(`lab-${labKey}`);
+            if (input && level !== undefined) {
+                input.value = level;
             }
         }
     }
 
     collectFormData() {
-        const labs = {
-            damage: parseInt(document.getElementById('lab-damage')?.value) || 0,
-            critFactor: parseInt(document.getElementById('lab-crit-factor')?.value) || 0,
-            critChance: parseInt(document.getElementById('lab-crit-chance')?.value) || 0,
-            attackSpeed: parseInt(document.getElementById('lab-attack-speed')?.value) || 0,
-            health: parseInt(document.getElementById('lab-health')?.value) || 0,
-            defense: parseInt(document.getElementById('lab-defense')?.value) || 0,
-            regen: parseInt(document.getElementById('lab-regen')?.value) || 0,
-            range: parseInt(document.getElementById('lab-range')?.value) || 0,
-            knockback: parseInt(document.getElementById('lab-knockback')?.value) || 0,
-            speed: parseInt(document.getElementById('lab-speed')?.value) || 0,
-            coins: parseInt(document.getElementById('lab-coins')?.value) || 0,
-            interest: parseInt(document.getElementById('lab-interest')?.value) || 0,
-            cash: parseInt(document.getElementById('lab-cash')?.value) || 0,
-            superTower: parseInt(document.getElementById('lab-super-tower')?.value) || 0,
-            superCrit: parseInt(document.getElementById('lab-super-crit')?.value) || 0,
-            lifesteal: parseInt(document.getElementById('lab-lifesteal')?.value) || 0
-        };
+        const labs = {};
+
+        // Collect all lab inputs dynamically
+        document.querySelectorAll('.lab-input').forEach(input => {
+            const labKey = input.dataset.labKey;
+            const value = parseInt(input.value) || 0;
+            if (labKey) {
+                labs[labKey] = value;
+            }
+        });
 
         return labs;
     }
@@ -199,14 +227,14 @@ class LabsManager {
     }
 
     calculateRecommendations() {
-        // Lab efficiency data (% per day)
+        // Lab efficiency data (% per day) - simplified for now
         const efficiencies = {
-            superTower: { efficiency: 13.38, name: 'Super Tower' },
-            critFactor: { efficiency: 1.24, name: 'Crit Factor' },
-            superCrit: { efficiency: 1.24, name: 'Super Crit' },
-            attackSpeed: { efficiency: 1.24, name: 'Attack Speed' },
-            damage: { efficiency: 1.24, name: 'Damage' },
-            critChance: { efficiency: 0.86, name: 'Crit Chance' }
+            'super-tower-bonus': { efficiency: 13.38, name: 'Super Tower Bonus' },
+            'critical-factor': { efficiency: 1.24, name: 'Critical Factor' },
+            'super-crit-multi': { efficiency: 1.24, name: 'Super Crit Multi' },
+            'attack-speed': { efficiency: 1.24, name: 'Attack Speed' },
+            'damage': { efficiency: 1.24, name: 'Damage' },
+            'super-crit-chance': { efficiency: 0.86, name: 'Super Crit Chance' }
         };
 
         const recommendations = [];

@@ -391,104 +391,10 @@ Wave    8541
                 </div>
 
                 <div class="labs-form-container">
-                    <div class="labs-category-grid">
-                        <!-- Damage Labs -->
-                        <div class="lab-category">
-                            <h3 class="category-title">⚔️ Damage Labs</h3>
-                            <div class="lab-inputs-grid">
-                                <div class="lab-input-group">
-                                    <label for="lab-damage">Damage</label>
-                                    <input type="number" id="lab-damage" class="lab-input" min="0" max="999" placeholder="0">
-                                </div>
-                                <div class="lab-input-group">
-                                    <label for="lab-crit-factor">Crit Factor</label>
-                                    <input type="number" id="lab-crit-factor" class="lab-input" min="0" max="999" placeholder="0">
-                                </div>
-                                <div class="lab-input-group">
-                                    <label for="lab-crit-chance">Crit Chance</label>
-                                    <input type="number" id="lab-crit-chance" class="lab-input" min="0" max="999" placeholder="0">
-                                </div>
-                                <div class="lab-input-group">
-                                    <label for="lab-attack-speed">Attack Speed</label>
-                                    <input type="number" id="lab-attack-speed" class="lab-input" min="0" max="999" placeholder="0">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Defense Labs -->
-                        <div class="lab-category">
-                            <h3 class="category-title">🛡️ Defense Labs</h3>
-                            <div class="lab-inputs-grid">
-                                <div class="lab-input-group">
-                                    <label for="lab-health">Health</label>
-                                    <input type="number" id="lab-health" class="lab-input" min="0" max="999" placeholder="0">
-                                </div>
-                                <div class="lab-input-group">
-                                    <label for="lab-defense">Defense</label>
-                                    <input type="number" id="lab-defense" class="lab-input" min="0" max="999" placeholder="0">
-                                </div>
-                                <div class="lab-input-group">
-                                    <label for="lab-regen">Regen</label>
-                                    <input type="number" id="lab-regen" class="lab-input" min="0" max="999" placeholder="0">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Utility Labs -->
-                        <div class="lab-category">
-                            <h3 class="category-title">⚡ Utility Labs</h3>
-                            <div class="lab-inputs-grid">
-                                <div class="lab-input-group">
-                                    <label for="lab-range">Range</label>
-                                    <input type="number" id="lab-range" class="lab-input" min="0" max="999" placeholder="0">
-                                </div>
-                                <div class="lab-input-group">
-                                    <label for="lab-knockback">Knockback</label>
-                                    <input type="number" id="lab-knockback" class="lab-input" min="0" max="999" placeholder="0">
-                                </div>
-                                <div class="lab-input-group">
-                                    <label for="lab-speed">Speed</label>
-                                    <input type="number" id="lab-speed" class="lab-input" min="0" max="999" placeholder="0">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Economy Labs -->
-                        <div class="lab-category">
-                            <h3 class="category-title">💰 Economy Labs</h3>
-                            <div class="lab-inputs-grid">
-                                <div class="lab-input-group">
-                                    <label for="lab-coins">Coins</label>
-                                    <input type="number" id="lab-coins" class="lab-input" min="0" max="999" placeholder="0">
-                                </div>
-                                <div class="lab-input-group">
-                                    <label for="lab-interest">Interest</label>
-                                    <input type="number" id="lab-interest" class="lab-input" min="0" max="999" placeholder="0">
-                                </div>
-                                <div class="lab-input-group">
-                                    <label for="lab-cash">Cash</label>
-                                    <input type="number" id="lab-cash" class="lab-input" min="0" max="999" placeholder="0">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Special Labs -->
-                        <div class="lab-category">
-                            <h3 class="category-title">✨ Special Labs</h3>
-                            <div class="lab-inputs-grid">
-                                <div class="lab-input-group">
-                                    <label for="lab-super-tower">Super Tower</label>
-                                    <input type="number" id="lab-super-tower" class="lab-input" min="0" max="999" placeholder="0">
-                                </div>
-                                <div class="lab-input-group">
-                                    <label for="lab-super-crit">Super Crit</label>
-                                    <input type="number" id="lab-super-crit" class="lab-input" min="0" max="999" placeholder="0">
-                                </div>
-                                <div class="lab-input-group">
-                                    <label for="lab-lifesteal">Lifesteal</label>
-                                    <input type="number" id="lab-lifesteal" class="lab-input" min="0" max="999" placeholder="0">
-                                </div>
-                            </div>
+                    <!-- Labs will be dynamically populated here by lab-data.js -->
+                    <div id="labs-category-grid" class="labs-category-grid">
+                        <div style="text-align: center; padding: 40px; color: #888;">
+                            Loading labs...
                         </div>
                     </div>
 
@@ -1058,7 +964,9 @@ Or paste raw tournament data from game stats."></textarea>
     <!-- Main Application Scripts -->
     <script src="script.js?v=15"></script>
     <script src="content-hub.js?v=21"></script>
-    <script src="js/labs-manager.js?v=1"></script>
+    <!-- Lab Data (must load before labs-manager) -->
+    <script src="js/lab-data.js?v=100"></script>
+    <script src="js/labs-manager.js?v=100"></script>
     <!-- Performance Charts -->
     <script src="js/charts/PerformanceCharts.js?v=3"></script>
     <script src="js/charts/ChartDataAdapter.js?v=1"></script>
