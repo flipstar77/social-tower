@@ -1001,6 +1001,7 @@ Or paste raw tournament data from game stats."></textarea>
         // Reload labs data when user authenticates
         window.addEventListener('authStateChanged', async (event) => {
             if (event.detail.isAuthenticated && window.labsManager) {
+                window.labsManager.updateDiscordId();
                 await window.labsManager.loadUserLabs();
             }
         });

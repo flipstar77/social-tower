@@ -88,7 +88,22 @@ class LabsManager {
         }
     }
 
+    updateDiscordId() {
+        // Update Discord ID from auth
+        if (window.discordAuth?.user?.user_metadata?.provider_id) {
+            this.discordId = window.discordAuth.user.user_metadata.provider_id;
+            console.log('✅ Discord ID updated:', this.discordId);
+            return true;
+        }
+        return false;
+    }
+
     async loadUserLabs() {
+        // Try to update Discord ID if not set
+        if (!this.discordId) {
+            this.updateDiscordId();
+        }
+
         if (!this.discordId) {
             console.log('⚠️ No Discord ID, skipping lab load');
             return;
@@ -134,6 +149,11 @@ class LabsManager {
     }
 
     async saveLabs() {
+        // Try to update Discord ID if not set
+        if (!this.discordId) {
+            this.updateDiscordId();
+        }
+
         if (!this.discordId) {
             this.showStatus('❌ Please log in with Discord first', 'error');
             return;
