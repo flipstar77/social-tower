@@ -87,6 +87,20 @@ class LabsManager {
         if (clearBtn) {
             clearBtn.addEventListener('click', () => this.clearLabs());
         }
+
+        // Add input validation to all lab inputs
+        document.querySelectorAll('.lab-input').forEach(input => {
+            input.addEventListener('input', (e) => {
+                const max = parseInt(e.target.max);
+                const value = parseInt(e.target.value);
+
+                if (value > max) {
+                    e.target.value = max;
+                } else if (value < 0) {
+                    e.target.value = 0;
+                }
+            });
+        });
     }
 
     updateDiscordId() {
