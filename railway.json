@@ -5,7 +5,7 @@
     "buildCommand": "cd server && npm install"
   },
   "deploy": {
-    "startCommand": "cd server && node bot-launcher.js",
+    "startCommand": "cd server && node server.js",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
   }
