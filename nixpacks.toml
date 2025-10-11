@@ -1,0 +1,6 @@
+# Railway deployment configuration
+[phases.setup]
+nixPkgs = ["nodejs"]
+
+[start]
+cmd = "bash railway-start.sh"
