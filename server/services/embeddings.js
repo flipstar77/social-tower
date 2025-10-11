@@ -2,7 +2,7 @@
  * Embeddings Service - Generate vector embeddings using OpenAI
  */
 
-const OPENAI_API_KEY = 'sk-WwfdWptruLu50CvBiKSY6QqUT3LQCDrtr0TKkKkm3nT3BlbkFJymAhkGei8OSHKJ-HkSF2Mkp7RqDK5AyTsCZXDkHcUA';
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const OPENAI_EMBEDDINGS_URL = 'https://api.openai.com/v1/embeddings';
 const EMBEDDING_MODEL = 'text-embedding-3-small'; // 1536 dimensions
 

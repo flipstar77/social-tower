@@ -3,6 +3,9 @@
  */
 class LabsManager {
     constructor() {
+        this.apiBaseUrl = window.location.hostname === 'localhost'
+            ? 'http://localhost:6078'
+            : 'https://tower-stats-backend-production.up.railway.app';
         this.labs = {};
         this.discordId = null;
     }
@@ -125,7 +128,7 @@ class LabsManager {
         }
 
         try {
-            const response = await fetch(`/api/user-labs/${this.discordId}`);
+            const response = await fetch(`${this.apiBaseUrl}/api/user-labs/${this.discordId}`);
             const data = await response.json();
 
             if (data.success && data.labs) {
@@ -179,7 +182,7 @@ class LabsManager {
         const labs = this.collectFormData();
 
         try {
-            const response = await fetch(`/api/user-labs/${this.discordId}`, {
+            const response = await fetch(`${this.apiBaseUrl}/api/user-labs/${this.discordId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
