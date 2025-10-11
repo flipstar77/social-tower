@@ -3,15 +3,18 @@
  */
 class LabsManager {
     constructor() {
-        this.apiBaseUrl = window.location.hostname === 'localhost'
-            ? 'http://localhost:6078'
-            : 'https://tower-stats-backend-production.up.railway.app';
         this.labs = {};
         this.discordId = null;
+        this.supabase = null;
     }
 
     async init() {
         console.log('🧪 Initializing Labs Manager...');
+
+        // Get Supabase client from discordAuth
+        if (window.discordAuth?.supabase) {
+            this.supabase = window.discordAuth.supabase;
+        }
 
         // Get Discord ID from auth
         if (window.discordAuth?.user?.user_metadata?.provider_id) {
@@ -122,16 +125,24 @@ class LabsManager {
             this.updateDiscordId();
         }
 
-        if (!this.discordId) {
-            console.log('⚠️ No Discord ID, skipping lab load');
+        if (!this.discordId || !this.supabase) {
+            console.log('⚠️ No Discord ID or Supabase client, skipping lab load');
             return;
         }
 
         try {
-            const response = await fetch(`${this.apiBaseUrl}/api/user-labs/${this.discordId}`);
-            const data = await response.json();
+            const { data, error } = await this.supabase
+                .from('user_labs')
+                .select('labs')
+                .eq('discord_user_id', this.discordId)
+                .single();
 
-            if (data.success && data.labs) {
+            if (error && error.code !== 'PGRST116') { // PGRST116 = no rows found
+                console.error('❌ Error loading labs:', error);
+                return;
+            }
+
+            if (data && data.labs) {
                 this.labs = data.labs;
                 this.populateForm(this.labs);
                 console.log('✅ Loaded user labs:', this.labs);
@@ -172,7 +183,7 @@ class LabsManager {
             this.updateDiscordId();
         }
 
-        if (!this.discordId) {
+        if (!this.discordId || !this.supabase) {
             this.showStatus('❌ Please log in with Discord first', 'error');
             return;
         }
@@ -182,24 +193,27 @@ class LabsManager {
         const labs = this.collectFormData();
 
         try {
-            const response = await fetch(`${this.apiBaseUrl}/api/user-labs/${this.discordId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ labs })
-            });
+            const { data, error } = await this.supabase
+                .from('user_labs')
+                .upsert({
+                    discord_user_id: this.discordId,
+                    labs: labs,
+                    updated_at: new Date().toISOString()
+                }, {
+                    onConflict: 'discord_user_id'
+                })
+                .select();
 
-            const data = await response.json();
-
-            if (data.success) {
-                this.labs = labs;
-                this.showStatus('✅ Lab levels saved successfully!', 'success');
-                this.showRecommendations();
-                console.log('✅ Saved labs:', labs);
-            } else {
-                this.showStatus('❌ Failed to save: ' + data.error, 'error');
+            if (error) {
+                console.error('❌ Error saving labs:', error);
+                this.showStatus('❌ Failed to save: ' + error.message, 'error');
+                return;
             }
+
+            this.labs = labs;
+            this.showStatus('✅ Lab levels saved successfully!', 'success');
+            this.showRecommendations();
+            console.log('✅ Saved labs:', labs);
         } catch (error) {
             console.error('❌ Save error:', error);
             this.showStatus('❌ Failed to save lab levels', 'error');
