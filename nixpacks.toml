@@ -1,3 +1,4 @@
+# Railway deployment configuration for Tower Stats
 [phases.setup]
 nixPkgs = ["nodejs"]
 
