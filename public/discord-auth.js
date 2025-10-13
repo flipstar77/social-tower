@@ -57,10 +57,20 @@ class DiscordAuth {
                 this.showSuccess('Successfully logged in with Discord!');
                 this.hasShownLoginMessage = true;
             }
+
+            // Dispatch auth state changed event for other modules
+            window.dispatchEvent(new CustomEvent('authStateChanged', {
+                detail: { isAuthenticated: true, user: this.user }
+            }));
         } else if (event === 'SIGNED_OUT') {
             this.isAuthenticated = false;
             this.user = null;
             this.hasShownLoginMessage = false;
+
+            // Dispatch auth state changed event for other modules
+            window.dispatchEvent(new CustomEvent('authStateChanged', {
+                detail: { isAuthenticated: false, user: null }
+            }));
         }
 
         this.setupUI();
