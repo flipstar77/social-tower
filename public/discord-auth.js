@@ -48,17 +48,17 @@ class DiscordAuth {
     async handleAuthStateChange(event, session) {
         const wasAuthenticated = this.isAuthenticated;
 
-        if (event === 'SIGNED_IN' && session) {
+        if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session) {
             this.isAuthenticated = true;
             this.user = session.user;
 
             // Only show success message if this is a new login (not on page load)
-            if (!wasAuthenticated && !this.hasShownLoginMessage) {
+            if (!wasAuthenticated && !this.hasShownLoginMessage && event === 'SIGNED_IN') {
                 this.showSuccess('Successfully logged in with Discord!');
                 this.hasShownLoginMessage = true;
             }
 
-            // Dispatch auth state changed event for other modules
+            // Dispatch auth state changed event for other modules (including on initial page load)
             window.dispatchEvent(new CustomEvent('authStateChanged', {
                 detail: { isAuthenticated: true, user: this.user }
             }));
