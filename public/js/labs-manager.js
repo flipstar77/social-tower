@@ -125,6 +125,12 @@ class LabsManager {
             this.updateDiscordId();
         }
 
+        // Try to get Supabase client if not set
+        if (!this.supabase && window.discordAuth?.supabase) {
+            this.supabase = window.discordAuth.supabase;
+            console.log('✅ Supabase client retrieved');
+        }
+
         if (!this.discordId || !this.supabase) {
             console.log('⚠️ No Discord ID or Supabase client, skipping lab load');
             return;
@@ -181,6 +187,11 @@ class LabsManager {
         // Try to update Discord ID if not set
         if (!this.discordId) {
             this.updateDiscordId();
+        }
+
+        // Try to get Supabase client if not set
+        if (!this.supabase && window.discordAuth?.supabase) {
+            this.supabase = window.discordAuth.supabase;
         }
 
         if (!this.discordId || !this.supabase) {
