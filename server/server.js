@@ -105,7 +105,11 @@ app.use(cors({
         'http://localhost:6079',
         'https://trackyourstats.vercel.app'
     ],
-    credentials: true
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    preflightContinue: false,
+    optionsSuccessStatus: 204
 }));
 app.use(cookieParser());
 app.use(express.json({ limit: '10mb' }));
