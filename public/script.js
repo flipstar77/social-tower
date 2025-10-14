@@ -273,6 +273,12 @@ class TowerStatsManager {
         const menuText = e.currentTarget.querySelector('span').textContent;
         console.log('Menu clicked:', menuText);
 
+        // Handle My Labs section
+        if (menuText === 'My Labs') {
+            this.showMyLabs();
+            return;
+        }
+
         // Handle navigation items using NavigationManager
         if (['Dashboard', 'Tower Analytics', 'Achievements', 'Tournaments', 'Content Hub'].includes(menuText)) {
             window.navigationManager.showSectionByMenuText(menuText);
@@ -290,6 +296,28 @@ class TowerStatsManager {
             case 'Settings':
                 this.showSettings();
                 break;
+        }
+    }
+
+    showMyLabs() {
+        // Hide all sections
+        this.hideAllSections();
+
+        // Show My Labs section
+        const myLabs = document.getElementById('myLabs');
+        if (myLabs) {
+            myLabs.style.display = 'block';
+        }
+
+        // Update menu active state
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        const myLabsMenuItem = Array.from(document.querySelectorAll('.menu-item')).find(
+            item => item.querySelector('span')?.textContent === 'My Labs'
+        );
+        if (myLabsMenuItem) {
+            myLabsMenuItem.classList.add('active');
         }
     }
 
@@ -391,11 +419,13 @@ class TowerStatsManager {
         const contentHub = document.getElementById('contentHub');
         const towerAnalytics = document.getElementById('towerAnalytics');
         const tournaments = document.getElementById('tournaments');
+        const myLabs = document.getElementById('myLabs');
 
         if (dashboard) dashboard.style.display = 'none';
         if (contentHub) contentHub.style.display = 'none';
         if (towerAnalytics) towerAnalytics.style.display = 'none';
         if (tournaments) tournaments.style.display = 'none';
+        if (myLabs) myLabs.style.display = 'none';
 
         // Hide Tower Analytics if it exists
         if (window.towerAnalytics) {
