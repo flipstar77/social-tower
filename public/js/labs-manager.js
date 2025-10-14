@@ -162,6 +162,9 @@ class LabsManager {
                 this.labs = data.labs;
                 this.populateForm(this.labs);
                 console.log('✅ Loaded user labs:', this.labs);
+
+                // Automatically show recommendations after loading labs
+                await this.showRecommendations();
             }
         } catch (error) {
             console.error('❌ Failed to load labs:', error);
@@ -300,11 +303,15 @@ class LabsManager {
             });
 
             const result = await response.json();
+            console.log('📊 API Response:', result);
 
             if (!result.success) {
                 recContent.innerHTML = `<div style="color: #F72585; padding: 20px;">${result.message || 'Failed to load recommendations'}</div>`;
                 return;
             }
+
+            console.log('✅ Priorities received:', result.data.priorities);
+            console.log('✅ Stats received:', result.data.currentStats);
 
             // Render stats and recommendations
             this.renderStats(result.data.currentStats);
@@ -365,15 +372,15 @@ class LabsManager {
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <div style="flex: 1;">
                         <div style="font-size: 18px; font-weight: 600; color: white; margin-bottom: 5px;">
-                            ${index + 1}. ${priority.displayName}
+                            ${index + 1}. ${priority.displayName || priority.name || 'Unknown Lab'}
                         </div>
                         <div style="color: rgba(255, 255, 255, 0.6); font-size: 14px;">
-                            Level ${priority.currentLevel} → ${priority.newLevel}
+                            Level ${priority.currentLevel || 0} → ${priority.newLevel || 0}
                         </div>
                     </div>
                     <div style="text-align: right;">
                         <div style="font-size: 20px; font-weight: 700; color: #F72585; margin-bottom: 3px;">
-                            +${priority.improvementPercent.toFixed(2)}%
+                            +${(priority.improvementPercent || 0).toFixed(2)}%
                         </div>
                         <div style="font-size: 12px; color: rgba(255, 255, 255, 0.5);">
                             ${focusLabel}
@@ -381,8 +388,8 @@ class LabsManager {
                     </div>
                 </div>
                 <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.1); display: flex; gap: 20px; font-size: 13px; color: rgba(255, 255, 255, 0.6);">
-                    <div>⏱️ ROI: ${priority.roi.toFixed(2)}/hour</div>
-                    <div>💎 Cost: ${this.formatNumber(priority.upgradeCost)} coins</div>
+                    <div>⏱️ ROI: ${(priority.roi || 0).toFixed(2)}/hour</div>
+                    <div>💎 Cost: ${this.formatNumber(priority.upgradeCost || 0)} coins</div>
                 </div>
             </div>
         `).join('');
