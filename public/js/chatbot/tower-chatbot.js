@@ -9,7 +9,7 @@ class TowerChatbot {
         this.isOpen = false;
         this.apiBase = window.location.hostname === 'localhost'
             ? 'http://localhost:6078'
-            : 'https://tower-stats-backend-production.up.railway.app';
+            : 'https://social-tower-production.up.railway.app';
         this.size = 'normal'; // 'normal', 'large', 'fullscreen'
     }
 
