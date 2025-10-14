@@ -21,9 +21,10 @@ class ChartDataAdapter {
             }
 
             // Fallback to API with authentication
+            const apiUrl = window.API_CONFIG ? window.API_CONFIG.getApiUrl('api/tower/runs?limit=50') : '/api/tower/runs?limit=50';
             const response = window.discordAuth?.authenticatedFetch
-                ? await window.discordAuth.authenticatedFetch('/api/tower/runs?limit=50')
-                : await fetch('/api/tower/runs?limit=50');
+                ? await window.discordAuth.authenticatedFetch(apiUrl)
+                : await fetch(apiUrl);
             const data = await response.json();
             this.towerData = data.runs || [];
             console.log('📊 Loaded tower data from API:', this.towerData.length, 'runs');

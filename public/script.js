@@ -87,9 +87,10 @@ class TowerStatsManager {
             });
 
             // Use authenticated fetch if available
+            const apiUrl = window.API_CONFIG ? window.API_CONFIG.getApiUrl('api/tower/runs?limit=10') : '/api/tower/runs?limit=10';
             const response = window.discordAuth?.authenticatedFetch
-                ? await window.discordAuth.authenticatedFetch('/api/tower/runs?limit=10')
-                : await fetch('/api/tower/runs?limit=10');
+                ? await window.discordAuth.authenticatedFetch(apiUrl)
+                : await fetch(apiUrl);
             if (response.ok) {
                 const data = await response.json();
                 if (data.success && data.runs && data.runs.length > 0) {

@@ -54,7 +54,7 @@ class ContentHub {
     // Load real YouTube data from server API
     async loadRealYouTubeData() {
         console.log('📺 Fetching YouTube data from API...');
-        const apiBase = window.APP_CONFIG?.api?.baseUrl || '';
+        const apiBase = window.API_CONFIG ? window.API_CONFIG.getBaseUrl() : (window.APP_CONFIG?.api?.baseUrl || '');
         const response = await fetch(`${apiBase}/api/videos`);
 
         if (!response.ok) {
