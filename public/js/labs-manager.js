@@ -94,6 +94,14 @@ class LabsManager {
             clearBtn.addEventListener('click', () => this.clearLabs());
         }
 
+        // Recommendation tab buttons
+        document.querySelectorAll('.rec-tab').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                const focus = e.target.dataset.focus;
+                this.switchRecommendationTab(focus);
+            });
+        });
+
         // Add input validation to all lab inputs
         document.querySelectorAll('.lab-input').forEach(input => {
             input.addEventListener('input', (e) => {
@@ -253,89 +261,148 @@ class LabsManager {
         }, 5000);
     }
 
-    showRecommendations() {
+    async showRecommendations() {
         const recSection = document.getElementById('labs-recommendations');
-        const recContent = document.getElementById('recommendations-content');
-
-        if (!recSection || !recContent) return;
-
-        // Calculate efficiency recommendations based on lab efficiency data
-        const recommendations = this.calculateRecommendations();
-
-        recContent.innerHTML = `
-            <div class="recommendations-grid">
-                ${recommendations.map(rec => `
-                    <div class="recommendation-card ${rec.priority}">
-                        <div class="rec-header">
-                            <span class="rec-lab">${rec.name}</span>
-                            <span class="rec-priority">${rec.priorityLabel}</span>
-                        </div>
-                        <div class="rec-stats">
-                            <div class="rec-stat">
-                                <span class="rec-label">Current Level:</span>
-                                <span class="rec-value">${rec.current}</span>
-                            </div>
-                            <div class="rec-stat">
-                                <span class="rec-label">Efficiency:</span>
-                                <span class="rec-value">${rec.efficiency}% /day</span>
-                            </div>
-                        </div>
-                        <div class="rec-advice">${rec.advice}</div>
-                    </div>
-                `).join('')}
-            </div>
-        `;
+        if (!recSection) return;
 
         recSection.style.display = 'block';
+
+        // Load recommendations for the default tab (damage)
+        await this.loadRecommendations('damage');
     }
 
-    calculateRecommendations() {
-        // Lab efficiency data (% per day) - simplified for now
-        const efficiencies = {
-            'super-tower-bonus': { efficiency: 13.38, name: 'Super Tower Bonus' },
-            'critical-factor': { efficiency: 1.24, name: 'Critical Factor' },
-            'super-crit-multi': { efficiency: 1.24, name: 'Super Crit Multi' },
-            'attack-speed': { efficiency: 1.24, name: 'Attack Speed' },
-            'damage': { efficiency: 1.24, name: 'Damage' },
-            'super-crit-chance': { efficiency: 0.86, name: 'Super Crit Chance' }
-        };
-
-        const recommendations = [];
-
-        for (const [key, data] of Object.entries(efficiencies)) {
-            const current = this.labs[key] || 0;
-            let priority = 'medium';
-            let priorityLabel = 'Medium Priority';
-            let advice = 'Consider upgrading when you have resources.';
-
-            if (data.efficiency > 5) {
-                priority = 'high';
-                priorityLabel = 'HIGH PRIORITY';
-                advice = 'Highest efficiency! Upgrade this first.';
-            } else if (data.efficiency > 1.2) {
-                priority = 'medium';
-                priorityLabel = 'Medium Priority';
-                advice = 'Good efficiency. Upgrade after high priority labs.';
-            } else {
-                priority = 'low';
-                priorityLabel = 'Low Priority';
-                advice = 'Lower efficiency. Upgrade later.';
-            }
-
-            recommendations.push({
-                name: data.name,
-                current,
-                efficiency: data.efficiency,
-                priority,
-                priorityLabel,
-                advice
-            });
+    async loadRecommendations(focus = 'damage') {
+        if (!this.discordId) {
+            console.log('⚠️ No Discord ID, cannot load recommendations');
+            return;
         }
 
-        // Sort by efficiency (descending)
-        recommendations.sort((a, b) => b.efficiency - a.efficiency);
+        const recContent = document.getElementById('recommendations-content');
+        if (!recContent) return;
 
-        return recommendations.slice(0, 6); // Top 6 recommendations
+        recContent.innerHTML = '<div style="text-align: center; padding: 20px;">Loading recommendations...</div>';
+
+        try {
+            const apiUrl = window.API_CONFIG.getApiUrl('api/calculator/priorities');
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    discord_user_id: this.discordId,
+                    focus,
+                    limit: 5
+                })
+            });
+
+            const result = await response.json();
+
+            if (!result.success) {
+                recContent.innerHTML = `<div style="color: #F72585; padding: 20px;">${result.message || 'Failed to load recommendations'}</div>`;
+                return;
+            }
+
+            // Render stats and recommendations
+            this.renderStats(result.data.currentStats);
+            this.renderRecommendations(result.data.priorities, focus);
+
+        } catch (error) {
+            console.error('❌ Error loading recommendations:', error);
+            recContent.innerHTML = `<div style="color: #F72585; padding: 20px;">Error: ${error.message}</div>`;
+        }
+    }
+
+    renderStats(stats) {
+        const summaryEl = document.getElementById('stats-summary');
+        if (!summaryEl || !stats) return;
+
+        const focusEmojis = {
+            damage: '🗡️',
+            health: '❤️',
+            economy: '💰'
+        };
+
+        summaryEl.innerHTML = `
+            <div class="stat-card">
+                <div class="stat-icon">🗡️</div>
+                <div class="stat-label">eDamage</div>
+                <div class="stat-value">${this.formatNumber(stats.eDamage)}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">❤️</div>
+                <div class="stat-label">eHP</div>
+                <div class="stat-value">${this.formatNumber(stats.eHP)}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-label">eEcon</div>
+                <div class="stat-value">${this.formatNumber(stats.eEcon)}</div>
+            </div>
+        `;
+    }
+
+    renderRecommendations(priorities, focus) {
+        const recContent = document.getElementById('recommendations-content');
+        if (!recContent || !priorities || priorities.length === 0) {
+            recContent.innerHTML = '<div style="text-align: center; padding: 20px; color: rgba(255,255,255,0.5);">No recommendations available</div>';
+            return;
+        }
+
+        const focusLabels = {
+            damage: 'eDamage',
+            health: 'eHP',
+            economy: 'eEcon'
+        };
+
+        const focusLabel = focusLabels[focus] || focus;
+
+        recContent.innerHTML = priorities.map((priority, index) => `
+            <div class="recommendation-item" style="background: rgba(255, 255, 255, ${0.05 - index * 0.005});">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="flex: 1;">
+                        <div style="font-size: 18px; font-weight: 600; color: white; margin-bottom: 5px;">
+                            ${index + 1}. ${priority.displayName}
+                        </div>
+                        <div style="color: rgba(255, 255, 255, 0.6); font-size: 14px;">
+                            Level ${priority.currentLevel} → ${priority.newLevel}
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 20px; font-weight: 700; color: #F72585; margin-bottom: 3px;">
+                            +${priority.improvementPercent.toFixed(2)}%
+                        </div>
+                        <div style="font-size: 12px; color: rgba(255, 255, 255, 0.5);">
+                            ${focusLabel}
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.1); display: flex; gap: 20px; font-size: 13px; color: rgba(255, 255, 255, 0.6);">
+                    <div>⏱️ ROI: ${priority.roi.toFixed(2)}/hour</div>
+                    <div>💎 Cost: ${this.formatNumber(priority.upgradeCost)} coins</div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    switchRecommendationTab(focus) {
+        // Update tab active states
+        document.querySelectorAll('.rec-tab').forEach(tab => {
+            if (tab.dataset.focus === focus) {
+                tab.classList.add('active');
+            } else {
+                tab.classList.remove('active');
+            }
+        });
+
+        // Load recommendations for the selected focus
+        this.loadRecommendations(focus);
+    }
+
+    formatNumber(num) {
+        if (num >= 1e12) return (num / 1e12).toFixed(2) + 'T';
+        if (num >= 1e9) return (num / 1e9).toFixed(2) + 'B';
+        if (num >= 1e6) return (num / 1e6).toFixed(2) + 'M';
+        if (num >= 1e3) return (num / 1e3).toFixed(2) + 'K';
+        return num.toFixed(2);
     }
 }
 

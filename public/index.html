@@ -291,6 +291,20 @@ Wave    8541
                 <!-- Lab Recommendations (shown after saving) -->
                 <div class="labs-recommendations" id="labs-recommendations" style="display: none;">
                     <h3>📈 Upgrade Recommendations</h3>
+
+                    <!-- Stats Summary -->
+                    <div class="stats-summary" id="stats-summary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                        <!-- Stats cards will be inserted here -->
+                    </div>
+
+                    <!-- Recommendation Tabs -->
+                    <div class="recommendation-tabs">
+                        <button class="rec-tab active" data-focus="damage">🗡️ Damage (eDamage)</button>
+                        <button class="rec-tab" data-focus="health">❤️ Health (eHP)</button>
+                        <button class="rec-tab" data-focus="economy">💰 Economy (eEcon)</button>
+                    </div>
+
+                    <!-- Tab Content -->
                     <div id="recommendations-content"></div>
                 </div>
             </div>
