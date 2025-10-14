@@ -94,14 +94,6 @@ class LabsManager {
             clearBtn.addEventListener('click', () => this.clearLabs());
         }
 
-        // Recommendation tab buttons
-        document.querySelectorAll('.rec-tab').forEach(tab => {
-            tab.addEventListener('click', (e) => {
-                const focus = e.target.dataset.focus;
-                this.switchRecommendationTab(focus);
-            });
-        });
-
         // Add input validation to all lab inputs
         document.querySelectorAll('.lab-input').forEach(input => {
             input.addEventListener('input', (e) => {
@@ -113,6 +105,16 @@ class LabsManager {
                 } else if (value < 0) {
                     e.target.value = 0;
                 }
+            });
+        });
+    }
+
+    setupTabListeners() {
+        // Recommendation tab buttons
+        document.querySelectorAll('.rec-tab').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                const focus = e.target.dataset.focus;
+                this.switchRecommendationTab(focus);
             });
         });
     }
@@ -266,6 +268,9 @@ class LabsManager {
         if (!recSection) return;
 
         recSection.style.display = 'block';
+
+        // Setup tab listeners now that the section is visible
+        this.setupTabListeners();
 
         // Load recommendations for the default tab (damage)
         await this.loadRecommendations('damage');
