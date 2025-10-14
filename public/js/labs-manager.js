@@ -209,12 +209,18 @@ class LabsManager {
 
         if (!this.discordId || !this.supabase) {
             this.showStatus('❌ Please log in with Discord first', 'error');
+            console.error('❌ Missing Discord ID or Supabase client', {
+                hasDiscordId: !!this.discordId,
+                hasSupabase: !!this.supabase
+            });
             return;
         }
 
         this.showStatus('💾 Saving lab levels...', 'loading');
 
         const labs = this.collectFormData();
+        console.log('📝 Collected lab data:', labs);
+        console.log('👤 Discord ID:', this.discordId);
 
         try {
             const { data, error } = await this.supabase
@@ -230,14 +236,16 @@ class LabsManager {
 
             if (error) {
                 console.error('❌ Error saving labs:', error);
+                console.error('❌ Error details:', JSON.stringify(error, null, 2));
                 this.showStatus('❌ Failed to save: ' + error.message, 'error');
                 return;
             }
 
             this.labs = labs;
+            console.log('✅ Saved labs successfully:', labs);
+            console.log('✅ Supabase response:', data);
             this.showStatus('✅ Lab levels saved successfully!', 'success');
             this.showRecommendations();
-            console.log('✅ Saved labs:', labs);
         } catch (error) {
             console.error('❌ Save error:', error);
             this.showStatus('❌ Failed to save lab levels', 'error');
