@@ -1,6 +1,6 @@
 // Tower Analytics Configuration
 export const ANALYTICS_CONFIG = {
-    API_BASE: '/api/tower',
+    API_BASE: window.API_CONFIG ? window.API_CONFIG.getBaseUrl() + '/api/tower' : '/api/tower',
 
     CHART_TYPES: {
         POLAR_AREA: 'polarArea',

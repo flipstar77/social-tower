@@ -43,7 +43,7 @@ class TowerAnalytics {
             };
         }
 
-        this.apiBase = '/api/tower';
+        this.apiBase = window.API_CONFIG ? window.API_CONFIG.getBaseUrl() + '/api/tower' : '/api/tower';
         this.runs = [];
         this.filteredRuns = [];
         this.charts = {};

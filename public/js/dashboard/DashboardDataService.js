@@ -3,7 +3,7 @@
 
 class DashboardDataService {
     constructor() {
-        this.apiBase = '/api/tower';
+        this.apiBase = window.API_CONFIG ? window.API_CONFIG.getBaseUrl() + '/api/tower' : '/api/tower';
     }
 
     /**

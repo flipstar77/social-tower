@@ -42,7 +42,8 @@ class TowerStatsManager {
     async loadLatestDataFromAPI() {
         try {
             // Fetch latest stats from the API
-            const response = await fetch('/api/tower/stats');
+            const apiUrl = window.API_CONFIG ? window.API_CONFIG.getApiUrl('api/tower/stats') : '/api/tower/stats';
+            const response = await fetch(apiUrl);
             if (response.ok) {
                 const data = await response.json();
 
