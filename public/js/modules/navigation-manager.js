@@ -145,16 +145,8 @@ class NavigationManager {
             return;
         }
 
-        // Hide current section
-        if (this.activeSection && this.sections.has(this.activeSection)) {
-            const currentSection = this.sections.get(this.activeSection);
-            const currentElement = document.querySelector(currentSection.elementSelector);
-            if (currentElement) {
-                currentElement.style.display = 'none';
-                currentSection.onHide();
-            }
-            this.removeActiveMenuClass(this.activeSection);
-        }
+        // Hide ALL sections first to ensure clean state
+        this.hideAllSections();
 
         // Show new section
         const newSection = this.sections.get(sectionName);
