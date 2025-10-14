@@ -273,14 +273,8 @@ class TowerStatsManager {
         const menuText = e.currentTarget.querySelector('span').textContent;
         console.log('Menu clicked:', menuText);
 
-        // Handle My Labs section
-        if (menuText === 'My Labs') {
-            this.showMyLabs();
-            return;
-        }
-
         // Handle navigation items using NavigationManager
-        if (['Dashboard', 'Tower Analytics', 'Achievements', 'Tournaments', 'Content Hub'].includes(menuText)) {
+        if (['Dashboard', 'Tower Analytics', 'Achievements', 'Tournaments', 'Content Hub', 'My Labs'].includes(menuText)) {
             window.navigationManager.showSectionByMenuText(menuText);
             return;
         }
@@ -296,28 +290,6 @@ class TowerStatsManager {
             case 'Settings':
                 this.showSettings();
                 break;
-        }
-    }
-
-    showMyLabs() {
-        // Hide all sections
-        this.hideAllSections();
-
-        // Show My Labs section
-        const myLabs = document.getElementById('myLabs');
-        if (myLabs) {
-            myLabs.style.display = 'block';
-        }
-
-        // Update menu active state
-        document.querySelectorAll('.menu-item').forEach(item => {
-            item.classList.remove('active');
-        });
-        const myLabsMenuItem = Array.from(document.querySelectorAll('.menu-item')).find(
-            item => item.querySelector('span')?.textContent === 'My Labs'
-        );
-        if (myLabsMenuItem) {
-            myLabsMenuItem.classList.add('active');
         }
     }
 

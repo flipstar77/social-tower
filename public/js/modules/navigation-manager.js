@@ -102,6 +102,16 @@ class NavigationManager {
             }
         });
 
+        this.registerSection('myLabs', {
+            elementSelector: '#myLabs',
+            menuText: 'My Labs',
+            onShow: () => {
+                if (window.labsManager) {
+                    window.labsManager.loadUserLabs();
+                }
+            }
+        });
+
         this.registerSection('unique-modules', {
             elementSelector: '#uniqueModules',
             menuText: 'Unique Modules',
