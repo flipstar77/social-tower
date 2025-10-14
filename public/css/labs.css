@@ -484,3 +484,9 @@
     font-size: 14px;
     color: rgba(255, 255, 255, 0.6);
 }
+
+/* Force hide My Labs section when not active */
+.dashboard-content:not([style*="display: none"]) ~ #myLabs,
+.dashboard-content[style*="display: block"] ~ #myLabs {
+    display: none !important;
+}
