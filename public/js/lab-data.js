@@ -209,10 +209,11 @@ const CATEGORY_LABELS = {
 function labNameToId(name) {
     return name
         .toLowerCase()
-        .replace(/[\/\s]+/g, '-')
-        .replace(/[%()]/g, '')
-        .replace(/--+/g, '-')
-        .replace(/^-|-$/g, '');
+        .replace(/\s*\/\s*/g, '-per-')  // Convert " / " to "-per-"
+        .replace(/\s+/g, '-')           // Convert remaining spaces to dashes
+        .replace(/[%()]/g, '')          // Remove special characters
+        .replace(/--+/g, '-')           // Replace multiple dashes with single dash
+        .replace(/^-|-$/g, '');         // Remove leading/trailing dashes
 }
 
 // Convert lab ID to camelCase key (e.g., "damage-meter" -> "damageMeter")
