@@ -46,7 +46,7 @@ class NavigationManager {
                 }
             },
             onHide: () => {
-                if (window.towerAnalytics) {
+                if (window.towerAnalytics && typeof window.towerAnalytics.hideSection === 'function') {
                     window.towerAnalytics.hideSection();
                 }
             }
@@ -121,7 +121,7 @@ class NavigationManager {
                 }
             },
             onHide: () => {
-                if (window.uniqueModulesManager) {
+                if (window.uniqueModulesManager && typeof window.uniqueModulesManager.hideSection === 'function') {
                     window.uniqueModulesManager.hideSection();
                 }
             }
