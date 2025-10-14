@@ -194,7 +194,7 @@ function createRedditRAGRouter(supabase) {
 
             console.log(`🤖 AI question: "${question}"`, discord_user_id ? `(user: ${discord_user_id})` : '');
 
-            // 1. Fetch user's lab data if asking about labs and user is authenticated
+            // 1. Fetch user's lab data AND calculate stats if asking about labs
             let userLabsContext = '';
             if (discord_user_id && question.toLowerCase().includes('lab')) {
                 const { data: userLabs, error } = await supabase.supabase
@@ -203,14 +203,52 @@ function createRedditRAGRouter(supabase) {
                     .eq('discord_user_id', discord_user_id)
                     .single();
 
-                if (userLabs && !error) {
-                    // Format lab levels into readable context
-                    const labLevels = Object.entries(userLabs)
-                        .filter(([key]) => !['id', 'discord_user_id', 'created_at', 'updated_at'].includes(key))
-                        .map(([lab, level]) => `${lab}: ${level}`)
-                        .join(', ');
-                    userLabsContext = `\n\n[USER'S CURRENT LAB LEVELS]:\n${labLevels}\n\nUse this information to provide personalized recommendations for what they should upgrade next.\n`;
-                    console.log(`📊 Including user lab data: ${labLevels.substring(0, 100)}...`);
+                if (userLabs && !error && userLabs.labs) {
+                    try {
+                        // Import calculator modules
+                        const { calculateAllStats, calculateLabPriorities } = require('../services/tower-calculator/roi-calculator');
+                        const { CARD_MASTERY } = require('../services/tower-calculator/constants');
+
+                        // Extract labs and card mastery
+                        const labs = userLabs.labs || {};
+                        const cardMastery = {
+                            [CARD_MASTERY.DAMAGE]: userLabs.damage_mastery || 0,
+                            [CARD_MASTERY.ATTACK_SPEED]: userLabs.attack_speed_mastery || 0,
+                            [CARD_MASTERY.CRITICAL_CHANCE]: userLabs.critical_chance_mastery || 0,
+                            [CARD_MASTERY.RANGE]: userLabs.range_mastery || 0,
+                            [CARD_MASTERY.SUPER_TOWER]: userLabs.super_tower_mastery || 0,
+                            [CARD_MASTERY.ULTIMATE_CRIT]: userLabs.ultimate_crit_mastery || 0,
+                            [CARD_MASTERY.DEMON_MODE]: userLabs.demon_mode_mastery || 0
+                        };
+
+                        // Calculate current stats
+                        const stats = calculateAllStats(labs, cardMastery);
+
+                        // Calculate lab priorities
+                        const priorities = calculateLabPriorities(labs, cardMastery, 'damage');
+
+                        // Format context for AI
+                        userLabsContext = `\n\n[USER'S CALCULATED STATS]:\n`;
+                        userLabsContext += `eDamage (Effective Damage): ${stats.eDamage.toFixed(2)}\n`;
+                        userLabsContext += `eHP (Effective Health): ${stats.eHP.toFixed(2)}\n`;
+                        userLabsContext += `eEcon (Effective Economy): ${stats.eEcon.toFixed(2)}\n\n`;
+
+                        userLabsContext += `[TOP 5 RECOMMENDED LAB UPGRADES]:\n`;
+                        priorities.slice(0, 5).forEach((priority, index) => {
+                            userLabsContext += `${index + 1}. ${priority.displayName} (Level ${priority.currentLevel} → ${priority.newLevel}): +${priority.improvementPercent.toFixed(2)}% improvement, ROI: ${priority.roi.toFixed(2)} per hour\n`;
+                        });
+
+                        userLabsContext += `\nUse these calculated values to provide accurate, personalized upgrade recommendations.\n`;
+
+                        console.log(`📊 Including calculated stats: eDMG=${stats.eDamage.toFixed(2)}, eHP=${stats.eHP.toFixed(2)}, eEcon=${stats.eEcon.toFixed(2)}`);
+                    } catch (calcError) {
+                        console.error('Error calculating stats:', calcError);
+                        // Fall back to basic lab levels
+                        const labLevels = Object.entries(userLabs.labs)
+                            .map(([lab, level]) => `${lab}: ${level}`)
+                            .join(', ');
+                        userLabsContext = `\n\n[USER'S CURRENT LAB LEVELS]:\n${labLevels}\n\n`;
+                    }
                 }
             }
 

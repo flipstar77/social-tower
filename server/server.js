@@ -225,6 +225,11 @@ app.use('/api/wiki', wikiRouter);
 const userLabsRouter = createUserLabsRouter(supabase);
 app.use('/api/user-labs', userLabsRouter);
 
+// Mount calculator router
+const createCalculatorRouter = require('./routes/calculator');
+const calculatorRouter = createCalculatorRouter(supabase);
+app.use('/api/calculator', calculatorRouter);
+
 
 // Routes
 app.get('/', (req, res) => {

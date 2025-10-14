@@ -1,0 +1,48 @@
+,,,,,,,,,,,,,,,,,,,,,,,,
+,,U,Value,Bonus Type,,U,Value,Bonus Type,,U,Value,Bonus Type,,,,U,Value,Bonus Type,,,Total Bonuses,Active,,TOTAL
+,Initial Upgrades,,,,,,,,,,,,,,,,,,,,Misc.,,,
+,,,,,,,,,,,,,,,,,,5 keys,,,Bot Range,m,,6m
+,,,,,,,,15 keys,,,,,,,,FALSE,2.5%,Discount Enhancements,,,Discount Enhancements,0.0%,,15.0%
+,,,,,,FALSE,5%,Ultimate Weapon Damage,,,,,,,,,,,,,Discount Rerolls,0.0%,,12.5%
+,,,,,,,,,,,,,,,,,⬇,5 keys,,,Attack,,,
+,,,,,,,⬇,20 keys,,,,,,,,FALSE,2.5%,Discount Rerolls,,,Damage,0.0%,,5.0%
+,,,,,⬅,FALSE,2m,Bot Range,➡,,,,,,,,,,,,Ultimate Weapon Damage,0.0%,,15.0%
+,,,,,,,,,,,,,,,,,⬇,5 keys,,,Attack Speed,0.0%,,5.0%
+,,,⬇,5 keys,,,⬇,10 keys,,,,5 keys,,,,FALSE,2.5%,Discount Enhancements,,,Critical Chance,0.0%,,1.0%
+,,FALSE,5%,Defense Absolute,,FALSE,5%,Damage / Meter,,FALSE,5%,Cash,,,,,,,,,Critical Factor,0.0%,,5.0%
+,,,,,,,,,,,,,,,,,⬇,5 keys,,,Damage / Meter,0.0%,,5.0%
+,,,⬇,10 keys,,,,15 keys,,,⬇,15 keys,,,,FALSE,2.5%,Discount Rerolls,,,Super Crit Chance,0.0%,,2.0%
+,,FALSE,5%,Regen,,FALSE,1%,Critical Chance,,FALSE,5%,Coins / Kill,,,,,,,,,Super Crit Mult,0.0%,,5.0%
+,,,,,,,,,,,,,,,,,⬇,5 keys,,,Rend Armor Mult,0.0%,,5.0%
+,,,⬇,15 keys,,,⬇,15 keys,,,⬇,25 keys,,,,FALSE,2.5%,Discount Enhancements,,,Defense,,,
+,,FALSE,5%,Health,,FALSE,5%,Damage,,FALSE,0.5%,Enemy Attack Skip,,,,,,,,,Health,0.0%,,5.0%
+,,,,,,,,,,,,,,,,,⬇,5 keys,,,Health Regen,0.0%,,0.0%
+,,,⬇,25 keys,,,⬇,25 keys,,,⬇,25 keys,,,,FALSE,2.5%,Discount Rerolls,,,Defense %,0.0%,,0.5%
+,,FALSE,0.5%,Defense %,➡,FALSE,2%,Super Crit Chance,⬅,FALSE,0.5%,Enemy Health Skip,,,,,,,,,Defense Absolute,0.0%,,5.0%
+,,,,,,,,,,,,,,,,,⬇,5 keys,,,Thorn Damage,0.0%,,5.0%
+,,,,,,,⬇,15 keys,,,,,,,,FALSE,2.5%,Discount Enhancements,,,Knockback Force,0.0%,,5.0%
+,,,,,,FALSE,5%,Ultimate Weapon Damage,,,,,,,,,,,,,Orb Speed,0.0%,,5.0%
+,,,,,,,,,,,,,,,,,⬇,5 keys,,,Wall Rebuild,0s,,-20s
+,,,,,,,⬇,20 keys,,,,,,,,FALSE,2.5%,Discount Rerolls,,,Utility,,,
+,,,,,⬅,FALSE,2m,Bot Range,➡,,,,,,,,,,,,Cash,0.0%,,5.0%
+,,,,,,,,,,,,,,,,,⬇,5 keys,,,Coins / Kill,0.0%,,5.0%
+,,,,20 keys,,,⬇,20 keys,,,,15 keys,,,,FALSE,2.5%,Discount Enhancements,,,Free Attack Upgrade,0.0%,,5.0%
+,,FALSE,5%,Thorn Damage,,FALSE,5%,Rend Armor Mult,,FALSE,5%,Recovery Amount,,,,,,,,,Free Defense Upgrade,0.0%,,5.0%
+,,,,,,,,,,,,,,,,,⬇,5 keys,,,Free Utility Upgrade,0.0%,,5.0%
+,,,⬇,25 keys,,,⬇,25 keys,,,⬇,25 keys,,,,FALSE,2.5%,Discount Rerolls,,,Recovery Amount,0.0%,,5.0%
+,,FALSE,5%,Knockback Force,,FALSE,5%,Critical Factor,,FALSE,5%,Free Attack Upgrade,,,,,,,,,Enemy Attack Skip,0.0%,,0.5%
+,,,,,,,,,,,,,,,,,⬇,5 keys,,,Enemy Health Skip,0.0%,,0.5%
+,,,⬇,25 keys,,,⬇,25 keys,,,⬇,25 keys,,,,FALSE,2.5%,Discount Enhancements,,,,,,
+,,FALSE,5%,Orb Speed,,FALSE,5%,Attack Speed,,FALSE,5%,Free Defense Upgrade,,,,,,,,,Keys spent,0 keys,,630 keys
+,,,,,,,,,,,,,,,,,,,,,,,,
+,,,⬇,25 keys,,,⬇,25 keys,,,⬇,25 keys,,,,,,,,,,,,
+,,FALSE,-20s,Wall Rebuild,➡,FALSE,5%,Super Crit Mult,⬅,FALSE,5%,Free Utility Upgrade,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,⬇,15 keys,,,,,,,,,,,,,,,,
+,,,,,,FALSE,5%,Ultimate Weapon Damage,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,⬇,20 keys,,,,,,,,,,,,,,,,
+,,,,,,FALSE,2m,Bot Range,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,
+,Final Upgrades,,,,,,,,,,,,,,,,,,,,,,,

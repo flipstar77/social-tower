@@ -1,0 +1,42 @@
+,"Lab level taken from ""Lab Calculator""-sheet. Manual override will work but break the reference.",,,,,,,,,,173.0233322,,0,5,5,7.85,5,15,32,10,300,5,30,375,1
+,,Lab Level,Workshop,,,-,Current Cash Bonus,Current Coin / Kill Bonus,,,,,1,13,5.8,8.65,14,16,33,28,290,16,31,850,2
+,Lab Speed,56,2.78,,,Current,23.33,144.53,,,lab +1,,2,22,6.6,9.45,23,17,34,46,280,27,32,MAX,3
+,Cash Bonus,35,4.23,,,Cash Bonus - Coin / Kill Lab +1,23.60,145.99,,,4.28,,3,32,7.4,10.25,32,18,35,64,270,38,33,,
+,Coin / Kill,49,6.31,,,GT Bonus Lab +1,23.50,145.59,,,6.37,,4,43,8.2,11.05,41,19,36,82,260,49,34,,
+,,,,,,GT Duration Lab +1,23.77,147.28,,,,,5,55,9,11.85,50,20,37,100,250,60,35,,
+,ULTIMATE WEAPON,Lab Level,Stone Cost For Next Upg,Total,,Standard Perk Bonus Lab +1,—,145.75,,,,,6,68,9.8,12.65,59,21,38,118,240,71,36,,
+,,,,,,Improved Trade-Off Perks Lab +1,—,145.86,,lab+1,stone+1,,7,82,10.6,13.45,68,22,39,136,230,82,37,,
+,GT Bonus   ,19,250,17.45,,SL Coin Bonus Lab +1,—,146.98,,17.6,18.25,,8,98,11.4,14.25,77,23,40,154,220,93,38,,
+,GT Duration,17,110,43,,GT Bonus Stone +1,24.24,150.17,,,44,,9,116,12.2,15.05,87,24,41,172,210,104,39,,
+,GT Cooldown,150—,118,240,,GT Duration Stone +1,23.77,147.28,,,230,,10,138,13,15.85,98,25,42,190,200,115,40,,
+,SL Angle,—,16,31,,GT Cooldown +1,24.16,149.68,,,32,,11,162,13.8,16.65,110,26,43,208,190,126,41,,
+,SL Quantity,—,850,2,,SL Angle +1,-,144.61,,,3,,12,250,14.6,17.45,123,27,44,226,180,137,42,,
+,SL Coin Bonus,1,—,1.1,,SL Quantity +1,-,145.76,,1.2,,,13,350,15.4,18.25,137,28,45,244,170,148,43,,
+,PERKS,Lab Level,Bonus,,,,,,,,,,14,500,16.2,19.05,152,29,46,262,160,159,44,,
+,Standard Perk Bonus,19,19.00%,,,Next Best Time Investment,,,,,lab+1,,15,MAX,17,19.85,168,30,47,300,150,170,45,,
+,Improved Trade-off Perk,9,9.00%,,,-,Cash Bonus,Coin / Kill Bonus,,,20.00%,,16,,,,185,31,48,368,140,181,46,,
+,,,,,,Cash Bonus - Coin / Kill Lab +1,0.771%,0.299% /Day,,,10.00%,,17,,,,203,32,49,476,130,192,47,,
+,PERKS IN RUN,—,Bonus,,,GT Bonus Lab +1,0.063%,0.063% /Day,,,,,18,,,,222,33,50,644,120,203,48,,
+,Golden Tower Bonus ×1.5,TRUE,26.175,,,GT Duration Lab +1,0.220%,0.220% /Day,,26.40,27.38,,19,,,,242,34,51,872,110,214,49,,
+,× Coin Bonus,5,2.08,,,Standard Perk Bonus Lab +1,—,0.085% /Day,,,2.10,,20,,,,263,35,52,Max,100,225,50,,
+,× Coin Trade-off,TRUE,1.96,,,Improved Trade-Off Perks Lab +1,—,0.301% /Day,,,1.98,,21,,,,285,36,53,,,236,51,,
+,,,,,,SL Coin Lab +1,—,2.334% /Day,,,,,22,,,,308,37,54,,,247,52,,
+,"Edit the green cells with your stats.
+Blue cells will show your bonuses as they'll appear in the game.
+
+In the right you'll see 3 tables.
+Top One shows your current bonuses and the bonuses after one upgrade in many different things.
+The Bottom two help you decide with one to invest first, considering fastest Lab or Stone Cost.
+
+Bigger Value = Better",,,,,Next Best Stone Investment,,,,,,,23,,,,332,38,55,,,258,53,,
+,,,,,,-,Cash Bonus,Coin / Kill Bonus,,,,,24,,,,356,39,56,,,269,54,,
+,,,,,,GT Bonus Stone +1,0.016%,0.016% /Day,,,,,25,,,,380,40,57,,,280,55,,
+,,,,,,GT Duration Stone +1,0.017%,0.017% /Day,,,,,,,,,404,41,58,,,291,56,,
+,,,,,,GT Cooldown +1,0.030%,0.030% /Day,,,,,,,,,428,42,59,,,302,57,,
+,,,,,,SL Angle +1,—,0.003% /Day,,,,,,,,,452,43,60,,,313,58,,
+,,,,,,SL Quantity +1,—,0.001% /Day,,,,,,,,,476,44,61,,,324,59,,
+,,,,,,,,,,,,,,,,,MAX,45,62,,,MAX,60,,
+,,,,,,"What about Black Hole and Coin Bot?
+Well, Coin Bot has it's own separate cost (Medals), but I advise going for more Size than Bonus, try to keep it at 3 extra size levels than bonus.
+Black Hole is a bit harder, actually, extremely harder to calculate. I'd say to go for a BH coin bonus lab whenever it's quicker than GT Duration or Standard Perk Bonus labs.
+It's not a exact measure, but usually, the lab that is quicker will provide the best bonuses, so, it should work.",,,,,,,,,,,,,,,,,,,

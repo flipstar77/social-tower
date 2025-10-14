@@ -1,0 +1,835 @@
+{
+  "calculator_name": "TheTowerofTobi Lab Optimizer",
+  "version": "3.16.04.03",
+  "latest_version": "4.11.00",
+  "description": "Comprehensive optimization calculator for The Tower game that determines optimal lab upgrades, ultimate weapons, and resource allocations using Return on Investment (RoI) analysis",
+
+  "input_parameters": {
+    "master_sheet": {
+      "labs": {
+        "description": "All laboratory upgrade levels",
+        "parameters": [
+          {"name": "game_speed", "type": "integer", "min": 0, "max": 7, "unit": "level"},
+          {"name": "starting_cash", "type": "integer", "min": 0, "max": 99, "unit": "level"},
+          {"name": "workshop_attack_discount", "type": "integer", "min": 0, "max": 99, "unit": "level"},
+          {"name": "workshop_defense_discount", "type": "integer", "min": 0, "max": 99, "unit": "level"},
+          {"name": "workshop_utility_discount", "type": "integer", "min": 0, "max": 99, "unit": "level"},
+          {"name": "labs_coin_discount", "type": "integer", "min": 0, "max": 99, "unit": "level"},
+          {"name": "labs_speed", "type": "integer", "min": 0, "max": 99, "unit": "level"},
+          {"name": "damage", "type": "integer", "min": 0, "max": 100, "unit": "level"},
+          {"name": "attack_speed", "type": "integer", "min": 0, "max": 99, "unit": "level"},
+          {"name": "critical_factor", "type": "integer", "min": 0, "max": 99, "unit": "level"},
+          {"name": "range", "type": "integer", "min": 0, "max": 80, "unit": "level"},
+          {"name": "damage_per_meter", "type": "integer", "min": 0, "max": 99, "unit": "level"},
+          {"name": "super_crit_chance", "type": "integer", "min": 0, "max": 50, "unit": "level"},
+          {"name": "super_crit_multi", "type": "integer", "min": 0, "max": 40, "unit": "level"},
+          {"name": "max_rend_armor_multiplier", "type": "integer", "min": 0, "max": 30, "unit": "level"},
+          {"name": "health", "type": "integer", "min": 0, "max": 100, "unit": "level"},
+          {"name": "health_regen", "type": "integer", "min": 0, "max": 100, "unit": "level"},
+          {"name": "defense_absolute", "type": "integer", "min": 0, "max": 100, "unit": "level"},
+          {"name": "defense_percent", "type": "integer", "min": 0, "max": 50, "unit": "level"},
+          {"name": "wall_health", "type": "integer", "min": 0, "max": 50, "unit": "level"},
+          {"name": "wall_fortification", "type": "integer", "min": 0, "max": 60, "unit": "level"},
+          {"name": "wall_regen", "type": "integer", "min": 0, "max": 30, "unit": "level"},
+          {"name": "coins_per_kill_bonus", "type": "integer", "min": 0, "max": 99, "unit": "level"},
+          {"name": "golden_tower_bonus", "type": "integer", "min": 0, "max": 25, "unit": "level"},
+          {"name": "golden_tower_duration", "type": "integer", "min": 0, "max": 20, "unit": "level"},
+          {"name": "death_wave_coin_bonus", "type": "integer", "min": 0, "max": 20, "unit": "level"},
+          {"name": "black_hole_coin_bonus", "type": "integer", "min": 0, "max": 20, "unit": "level"},
+          {"name": "spotlight_coin_bonus", "type": "integer", "min": 0, "max": 20, "unit": "level"},
+          {"name": "recovery_package_chance", "type": "integer", "min": 0, "max": 20, "unit": "level"},
+          {"name": "recovery_package_max", "type": "integer", "min": 0, "max": 18, "unit": "level"},
+          {"name": "shock_multiplier", "type": "integer", "min": 0, "max": 14, "unit": "level"},
+          {"name": "missile_amplifier", "type": "integer", "min": 0, "max": 25, "unit": "level"},
+          {"name": "spotlight_missiles", "type": "integer", "min": 0, "max": 18, "unit": "level"},
+          {"name": "death_wave_damage_amplifier", "type": "integer", "min": 0, "max": 30, "unit": "level"},
+          {"name": "super_tower_bonus", "type": "integer", "min": 0, "max": 30, "unit": "level"},
+          {"name": "chain_thunder", "type": "integer", "min": 0, "max": 30, "unit": "level"},
+          {"name": "chrono_field_reduction_percent", "type": "integer", "min": 0, "max": 30, "unit": "level"},
+          {"name": "death_wave_health", "type": "integer", "min": 0, "max": 30, "unit": "level"}
+        ]
+      },
+      "workshop": {
+        "description": "Workshop upgrade levels",
+        "parameters": [
+          {"name": "damage_level_coins", "type": "integer", "min": 0, "max": 2000, "unit": "level"},
+          {"name": "damage_level_stones", "type": "integer", "min": 0, "max": 6000, "unit": "level"},
+          {"name": "attack_speed_level_coins", "type": "integer", "min": 0, "max": 99, "unit": "level"},
+          {"name": "attack_speed_level_stones", "type": "integer", "min": 0, "max": 99, "unit": "level"},
+          {"name": "critical_chance_level_coins", "type": "integer", "min": 0, "max": 79, "unit": "level"},
+          {"name": "critical_factor_level_coins", "type": "integer", "min": 0, "max": 100, "unit": "level"},
+          {"name": "health_level_coins", "type": "integer", "min": 0, "max": 2000, "unit": "level"}
+        ]
+      },
+      "workshop_enhancements": {
+        "description": "Workshop enhancement (WS+) unlock status and levels",
+        "parameters": [
+          {"name": "damage_plus", "type": "integer", "min": 0, "max": 300, "unit": "level"},
+          {"name": "attack_speed_plus", "type": "integer", "min": 0, "max": 300, "unit": "level"},
+          {"name": "rend_armor_plus", "type": "integer", "min": 0, "max": 300, "unit": "level"},
+          {"name": "critical_factor_plus", "type": "integer", "min": 0, "max": 300, "unit": "level"},
+          {"name": "damage_per_meter_plus", "type": "integer", "min": 0, "max": 300, "unit": "level"},
+          {"name": "super_crit_mult_plus", "type": "integer", "min": 0, "max": 300, "unit": "level"},
+          {"name": "health_plus", "type": "integer", "min": 0, "max": 300, "unit": "level"},
+          {"name": "defense_absolute_plus", "type": "integer", "min": 0, "max": 300, "unit": "level"},
+          {"name": "wall_health_plus", "type": "integer", "min": 0, "max": 300, "unit": "level"},
+          {"name": "recovery_package_plus", "type": "integer", "min": 0, "max": 100, "unit": "level"},
+          {"name": "coin_bonus_plus", "type": "integer", "min": 0, "max": 100, "unit": "level"},
+          {"name": "free_upgrades_plus", "type": "integer", "min": 0, "max": 50, "unit": "level"}
+        ]
+      },
+      "ultimate_weapons": {
+        "description": "Ultimate weapon levels and unlock status",
+        "parameters": [
+          {"name": "chain_lightning_unlocked", "type": "boolean"},
+          {"name": "chain_lightning_damage", "type": "integer", "min": 0, "max": 50, "unit": "level"},
+          {"name": "chain_lightning_quantity", "type": "integer", "min": 0, "max": 50, "unit": "level"},
+          {"name": "chain_lightning_cooldown", "type": "integer", "min": 0, "max": 50, "unit": "level"},
+          {"name": "smart_missiles_unlocked", "type": "boolean"},
+          {"name": "smart_missiles_damage", "type": "integer", "min": 0, "max": 50, "unit": "level"},
+          {"name": "death_wave_unlocked", "type": "boolean"},
+          {"name": "death_wave_damage", "type": "integer", "min": 0, "max": 50, "unit": "level"},
+          {"name": "death_wave_quantity", "type": "integer", "min": 0, "max": 50, "unit": "level"},
+          {"name": "death_wave_cooldown", "type": "integer", "min": 0, "max": 50, "unit": "level"},
+          {"name": "chrono_field_unlocked", "type": "boolean"},
+          {"name": "chrono_field_duration", "type": "integer", "min": 0, "max": 50, "unit": "level"},
+          {"name": "chrono_field_speed", "type": "integer", "min": 0, "max": 50, "unit": "level"},
+          {"name": "golden_tower_unlocked", "type": "boolean"},
+          {"name": "golden_tower_multiplier", "type": "integer", "min": 0, "max": 50, "unit": "level"},
+          {"name": "golden_tower_duration", "type": "integer", "min": 0, "max": 50, "unit": "level"},
+          {"name": "golden_tower_cooldown", "type": "integer", "min": 0, "max": 50, "unit": "level"},
+          {"name": "black_hole_unlocked", "type": "boolean"},
+          {"name": "black_hole_size", "type": "integer", "min": 0, "max": 50, "unit": "level"},
+          {"name": "black_hole_duration", "type": "integer", "min": 0, "max": 50, "unit": "level"},
+          {"name": "black_hole_cooldown", "type": "integer", "min": 0, "max": 50, "unit": "level"},
+          {"name": "spotlight_unlocked", "type": "boolean"},
+          {"name": "spotlight_multiplier", "type": "integer", "min": 0, "max": 50, "unit": "level"},
+          {"name": "spotlight_angle", "type": "integer", "min": 0, "max": 50, "unit": "level"}
+        ]
+      },
+      "cards": {
+        "description": "Card levels and stars",
+        "parameters": [
+          {"name": "damage_card_level", "type": "integer", "min": 1, "max": 50, "unit": "level"},
+          {"name": "damage_card_stars", "type": "integer", "min": 0, "max": 5, "unit": "stars"},
+          {"name": "attack_speed_card_level", "type": "integer", "min": 1, "max": 50, "unit": "level"},
+          {"name": "health_card_level", "type": "integer", "min": 1, "max": 50, "unit": "level"},
+          {"name": "critical_chance_card_level", "type": "integer", "min": 1, "max": 50, "unit": "level"},
+          {"name": "coins_card_level", "type": "integer", "min": 1, "max": 50, "unit": "level"}
+        ]
+      },
+      "bots": {
+        "description": "Bot unlock status and levels",
+        "parameters": [
+          {"name": "flame_bot_unlocked", "type": "boolean"},
+          {"name": "flame_bot_damage", "type": "integer", "min": 0, "max": 100, "unit": "level"},
+          {"name": "flame_bot_cooldown", "type": "integer", "min": 0, "max": 100, "unit": "level"},
+          {"name": "thunder_bot_unlocked", "type": "boolean"},
+          {"name": "thunder_bot_damage", "type": "integer", "min": 0, "max": 100, "unit": "level"},
+          {"name": "thunder_bot_cooldown", "type": "integer", "min": 0, "max": 100, "unit": "level"},
+          {"name": "golden_bot_unlocked", "type": "boolean"},
+          {"name": "golden_bot_bonus", "type": "integer", "min": 0, "max": 100, "unit": "level"},
+          {"name": "golden_bot_cooldown", "type": "integer", "min": 0, "max": 25, "unit": "level"},
+          {"name": "golden_bot_duration", "type": "integer", "min": 0, "max": 20, "unit": "level"},
+          {"name": "amplify_bot_unlocked", "type": "boolean"},
+          {"name": "amplify_bot_bonus", "type": "integer", "min": 0, "max": 100, "unit": "level"}
+        ]
+      },
+      "modules": {
+        "description": "Module configurations and substats",
+        "parameters": [
+          {"name": "cannon_preset", "type": "string", "enum": ["Farming", "Pushing", "Custom"]},
+          {"name": "cannon_multishot_chance", "type": "percentage", "min": 0, "max": 100},
+          {"name": "cannon_attack_range", "type": "float", "unit": "meters"},
+          {"name": "armor_preset", "type": "string", "enum": ["Farming", "Pushing", "Custom"]},
+          {"name": "armor_defense_absolute", "type": "percentage"},
+          {"name": "armor_defense_percent", "type": "percentage"},
+          {"name": "generator_preset", "type": "string", "enum": ["Farming", "Pushing", "Custom"]},
+          {"name": "generator_coins_per_wave", "type": "integer"},
+          {"name": "generator_free_utility_upgrade", "type": "percentage"},
+          {"name": "core_preset", "type": "string", "enum": ["Farming", "Pushing", "Custom"]},
+          {"name": "core_black_hole_size", "type": "float", "unit": "meters"},
+          {"name": "core_smart_missiles_damage", "type": "float", "unit": "multiplier"}
+        ]
+      },
+      "relics": {
+        "description": "Relic ownership status",
+        "parameters": [
+          {"name": "relics_owned", "type": "array", "items": "string", "description": "List of owned relic names"}
+        ]
+      },
+      "vault": {
+        "description": "Vault upgrade unlock status",
+        "parameters": [
+          {"name": "vault_upgrades_unlocked", "type": "array", "items": "string", "description": "List of unlocked vault upgrade names"}
+        ]
+      },
+      "perks": {
+        "description": "Perk configurations",
+        "parameters": [
+          {"name": "standard_perks_bonus", "type": "integer", "min": 0, "max": 25, "unit": "level"},
+          {"name": "improve_tradeoff_perks", "type": "integer", "min": 0, "max": 10, "unit": "level"}
+        ]
+      },
+      "masteries": {
+        "description": "Mastery lab levels",
+        "parameters": [
+          {"name": "damage_mastery", "type": "integer", "min": 0, "max": 9, "unit": "level"},
+          {"name": "attack_speed_mastery", "type": "integer", "min": 0, "max": 9, "unit": "level"},
+          {"name": "health_mastery", "type": "integer", "min": 0, "max": 9, "unit": "level"},
+          {"name": "coins_mastery", "type": "integer", "min": 0, "max": 9, "unit": "level"},
+          {"name": "critical_chance_mastery", "type": "integer", "min": 0, "max": 9, "unit": "level"}
+        ]
+      },
+      "user_guesses": {
+        "description": "User-estimated values for hard-to-calculate mechanics",
+        "parameters": [
+          {"name": "attack_speed_bullets_per_second", "type": "float", "description": "Estimated bullets per second based on attack speed"},
+          {"name": "max_rend_multiplier", "type": "float", "description": "Realistic maximum rend armor multiplier achieved"},
+          {"name": "shock_multiplier_average", "type": "float", "description": "Average shock multiplier from Chain Lightning"},
+          {"name": "smart_missile_damage_contribution", "type": "percentage", "description": "Estimated percentage of damage from Smart Missiles area"},
+          {"name": "black_hole_dig_percentage", "type": "percentage", "description": "Estimated percentage of coins collected by Black Hole"},
+          {"name": "chain_thunder_max_damage", "type": "percentage", "description": "Maximum Chain Lightning Thunder damage estimate"},
+          {"name": "death_wave_duration_per_wave", "type": "float", "unit": "seconds", "default": 4.0}
+        ]
+      }
+    }
+  },
+
+  "calculation_formulas": {
+    "roi": {
+      "time_based_roi": {
+        "formula": "((new_value - current_value) / current_value) / time_days * 100",
+        "description": "Return on Investment as percentage per day",
+        "unit": "percent per day"
+      },
+      "stone_based_roi": {
+        "formula": "((new_value - current_value) / current_value) / stone_cost * 100",
+        "description": "Return on Investment as percentage per stone spent",
+        "unit": "percent per stone"
+      },
+      "coin_based_roi": {
+        "formula": "((new_value - current_value) / current_value) / (coins / 100000000000) * 100",
+        "description": "Return on Investment as percentage per 100 billion coins spent",
+        "unit": "percent per 100B coins"
+      }
+    },
+
+    "effective_damage": {
+      "total_damage": {
+        "formula": "base_damage * (1 + damage_labs) * (1 + damage_cards) * (1 + damage_modules) * (1 + damage_relics) * (1 + damage_vault) * (1 + damage_perks)",
+        "description": "Total base damage with all multiplicative bonuses",
+        "components": [
+          "base_damage",
+          "damage_labs",
+          "damage_cards",
+          "damage_modules",
+          "damage_relics",
+          "damage_vault",
+          "damage_perks"
+        ]
+      },
+      "bullets_per_second": {
+        "formula": "CUSTOM_FUNCTION(attack_speed_total)",
+        "description": "Non-precise custom formula to convert attack speed to bullets per second",
+        "note": "This is an approximation and may not match in-game exactly"
+      },
+      "critical_multiplier": {
+        "formula": "(1 - crit_chance - super_crit_chance) + (crit_chance * crit_factor) + (super_crit_chance * super_crit_multiplier)",
+        "description": "Average damage multiplier from critical hits",
+        "components": [
+          "crit_chance (capped at 100%)",
+          "crit_factor",
+          "super_crit_chance",
+          "super_crit_multiplier"
+        ]
+      },
+      "effective_damage": {
+        "formula": "total_damage * bullets_per_second * critical_multiplier * rend_multiplier * shock_multiplier * damage_per_meter_bonus * rapid_fire_multiplier * bounce_shot_multiplier * ultimate_weapon_damage",
+        "description": "Final effective damage per second",
+        "components": [
+          "total_damage",
+          "bullets_per_second",
+          "critical_multiplier",
+          "rend_multiplier",
+          "shock_multiplier",
+          "damage_per_meter_bonus",
+          "rapid_fire_multiplier",
+          "bounce_shot_multiplier",
+          "ultimate_weapon_damage"
+        ]
+      },
+      "damage_per_meter_bonus": {
+        "formula": "1 + (damage_per_meter_stat * tower_range)",
+        "description": "Damage bonus based on tower range"
+      },
+      "rapid_fire_multiplier": {
+        "formula": "1 + (rapid_fire_chance * rapid_fire_duration_bonus)",
+        "description": "Average damage increase from rapid fire"
+      },
+      "bounce_shot_multiplier": {
+        "formula": "1 + (bounce_shot_chance * (bounce_shot_targets - 1))",
+        "description": "Effective damage multiplier from hitting multiple targets"
+      }
+    },
+
+    "effective_economy": {
+      "base_cpk": {
+        "formula": "base_coins * (1 + cpk_labs) * (1 + cpk_cards) * (1 + cpk_modules) * (1 + cpk_relics) * (1 + cpk_vault) * (1 + cpk_perks)",
+        "description": "Base coins per kill with all bonuses",
+        "components": [
+          "base_coins",
+          "cpk_labs",
+          "cpk_cards",
+          "cpk_modules",
+          "cpk_relics",
+          "cpk_vault",
+          "cpk_perks"
+        ]
+      },
+      "global_cooldown": {
+        "formula": "base_cooldown / (1 + SUM(all_cooldown_reductions))",
+        "description": "Actual cooldown after reductions from labs, cards, and modules",
+        "components": [
+          "base_cooldown",
+          "cooldown_reduction_labs",
+          "cooldown_reduction_cards",
+          "cooldown_reduction_modules"
+        ]
+      },
+      "uptime_percentage": {
+        "formula": "duration / (duration + global_cooldown)",
+        "description": "Percentage of time ultimate weapon is active",
+        "components": [
+          "duration",
+          "global_cooldown"
+        ]
+      },
+      "golden_tower_bonus": {
+        "formula": "1 + (gt_bonus_multiplier * gt_uptime)",
+        "description": "Average coin multiplier from Golden Tower",
+        "components": [
+          "gt_bonus_multiplier",
+          "gt_uptime"
+        ]
+      },
+      "black_hole_bonus": {
+        "formula": "1 + (bh_coin_bonus * bh_uptime * bh_dig_percentage)",
+        "description": "Average coin bonus from Black Hole",
+        "components": [
+          "bh_coin_bonus",
+          "bh_uptime",
+          "bh_dig_percentage (user guess)"
+        ]
+      },
+      "death_wave_bonus": {
+        "formula": "1 + (dw_coin_bonus * (dw_waves * wave_duration / total_wave_time))",
+        "description": "Average coin bonus from Death Wave",
+        "components": [
+          "dw_coin_bonus",
+          "dw_waves",
+          "wave_duration (default 4 seconds)",
+          "total_wave_time"
+        ],
+        "note": "Assumes each wave lasts 4 seconds"
+      },
+      "spotlight_bonus": {
+        "formula": "1 + (sl_coin_bonus * sl_uptime * sl_coverage)",
+        "description": "Average coin bonus from Spotlight",
+        "components": [
+          "sl_coin_bonus",
+          "sl_uptime",
+          "sl_coverage (angle-based)"
+        ]
+      },
+      "golden_bot_bonus": {
+        "formula": "1 + (gb_multiplier * gb_uptime)",
+        "description": "Average coin bonus from Golden Bot",
+        "components": [
+          "gb_multiplier",
+          "gb_uptime"
+        ],
+        "note": "Does not account for sync with other UWs"
+      },
+      "effective_cpk": {
+        "formula": "base_cpk * gt_bonus * bh_bonus * dw_bonus * sl_bonus * gb_bonus",
+        "description": "Average coins per kill accounting for all bonuses",
+        "components": [
+          "base_cpk",
+          "gt_bonus",
+          "bh_bonus",
+          "dw_bonus",
+          "sl_bonus",
+          "gb_bonus"
+        ]
+      }
+    },
+
+    "effective_health": {
+      "base_hp": {
+        "formula": "base_health * (1 + health_labs) * (1 + health_cards) * (1 + health_modules) * (1 + health_relics) * (1 + health_vault) * (1 + health_perks)",
+        "description": "Total base health with all bonuses",
+        "components": [
+          "base_health",
+          "health_labs",
+          "health_cards",
+          "health_modules",
+          "health_relics",
+          "health_vault",
+          "health_perks"
+        ]
+      },
+      "defense_multiplier": {
+        "formula": "1 / (1 - defense_percent)",
+        "description": "Effective HP multiplier from percentage defense",
+        "components": [
+          "defense_percent (capped at < 100%)"
+        ]
+      },
+      "defense_absolute_multiplier": {
+        "formula": "1 + defense_absolute",
+        "description": "Additional HP from absolute defense",
+        "components": [
+          "defense_absolute"
+        ]
+      },
+      "tower_ehp": {
+        "formula": "base_hp * defense_multiplier * defense_absolute_multiplier",
+        "description": "Effective health points of tower",
+        "components": [
+          "base_hp",
+          "defense_multiplier",
+          "defense_absolute_multiplier"
+        ]
+      },
+      "wall_hp": {
+        "formula": "base_wall_hp * (1 + wall_health_labs) * (1 + wall_fortification)",
+        "description": "Total wall health",
+        "components": [
+          "base_wall_hp",
+          "wall_health_labs",
+          "wall_fortification"
+        ]
+      },
+      "wall_regen_total": {
+        "formula": "wall_regen_rate * combat_duration",
+        "description": "Total HP regenerated by wall during combat",
+        "components": [
+          "wall_regen_rate",
+          "combat_duration (estimated)"
+        ]
+      },
+      "chrono_field_multiplier": {
+        "formula": "1 / (1 - chrono_field_reduction_percent * chrono_field_uptime)",
+        "description": "Effective HP increase from Chrono Field damage reduction",
+        "components": [
+          "chrono_field_reduction_percent",
+          "chrono_field_uptime"
+        ],
+        "note": "Assumes full uptime in calculations"
+      },
+      "total_ehp": {
+        "formula": "(tower_ehp + wall_hp + wall_regen_total) * chrono_field_multiplier",
+        "description": "Total effective health including tower, wall, regen, and damage reduction",
+        "components": [
+          "tower_ehp",
+          "wall_hp",
+          "wall_regen_total",
+          "chrono_field_multiplier"
+        ]
+      },
+      "recovery_packages": {
+        "formula": "recovery_amount * recovery_chance * expected_triggers",
+        "description": "Expected healing from recovery packages",
+        "components": [
+          "recovery_amount",
+          "recovery_chance",
+          "expected_triggers (varies by wave)"
+        ]
+      }
+    },
+
+    "special_mechanics": {
+      "ultimate_weapon_sync": {
+        "description": "Keeping UW cooldowns synchronized for combo effects",
+        "formula": "Match global_cooldown values for Golden Tower + Black Hole",
+        "benefit": "Both UWs active simultaneously, multiplying bonuses together instead of averaging"
+      },
+      "diminishing_returns": {
+        "formula": "marginal_benefit = (new_total - current_total) / current_total",
+        "description": "Each upgrade provides smaller percentage gains as stats increase",
+        "effect": "Automatically lowers RoI of high-level upgrades, pushing them down priority list"
+      },
+      "multiplicative_stacking": {
+        "formula": "(1 + bonus_1) * (1 + bonus_2) * (1 + bonus_3) * ...",
+        "description": "Most bonuses multiply together rather than add",
+        "example": "100% damage + 50% damage = 2.0 * 1.5 = 3.0x total (not 2.5x)"
+      }
+    }
+  },
+
+  "optimization_paths": {
+    "damage_path": {
+      "name": "eDamage Lab PATH",
+      "focus": "Time-efficient damage improvements",
+      "metric": "EDMG progress / day",
+      "sorting": "Descending by RoI %",
+      "output_columns": [
+        "lab_name",
+        "current_level",
+        "next_level",
+        "duration",
+        "roi_percent",
+        "edmg_after_upgrade",
+        "running_time_cumulative"
+      ]
+    },
+    "damage_uw_path": {
+      "name": "eDamage UW PATH",
+      "focus": "Stone-efficient damage UW upgrades",
+      "metric": "EDMG progress / stone",
+      "sorting": "Descending by RoI per stone",
+      "output_columns": [
+        "uw_name",
+        "current_level",
+        "next_level",
+        "stone_cost",
+        "roi_percent",
+        "edmg_after_upgrade",
+        "total_stones_spent"
+      ]
+    },
+    "damage_coin_path": {
+      "name": "eDamage Coin PATH",
+      "focus": "Workshop+ damage upgrades",
+      "metric": "EDMG progress / 100B coins",
+      "sorting": "Descending by RoI per 100B coins",
+      "output_columns": [
+        "ws_plus_name",
+        "current_level",
+        "next_level",
+        "coin_cost",
+        "roi_percent",
+        "edmg_after_upgrade"
+      ]
+    },
+    "economy_path": {
+      "name": "eEcon Lab PATH",
+      "focus": "Time-efficient economy improvements",
+      "metric": "ROI / day",
+      "sorting": "Descending by RoI %",
+      "output_columns": [
+        "lab_name",
+        "current_level",
+        "next_level",
+        "duration",
+        "roi_percent",
+        "cpk_after_upgrade",
+        "running_time_cumulative"
+      ]
+    },
+    "economy_uw_path": {
+      "name": "eEcon UW PATH",
+      "focus": "Stone-efficient economy UW upgrades",
+      "metric": "ROI / stone",
+      "sorting": "Descending by RoI per stone",
+      "output_columns": [
+        "uw_name",
+        "current_level",
+        "next_level",
+        "stone_cost",
+        "roi_percent",
+        "cpk_after_upgrade",
+        "total_stones_spent"
+      ]
+    },
+    "economy_coin_path": {
+      "name": "eEcon Coins PATH",
+      "focus": "High-value coin-based economy upgrades",
+      "metric": "CPK progress / 100B coins",
+      "sorting": "Descending by RoI per 100B coins",
+      "output_columns": [
+        "upgrade_name",
+        "current_level",
+        "next_level",
+        "coin_cost",
+        "roi_percent",
+        "cpk_after_upgrade"
+      ]
+    },
+    "health_path": {
+      "name": "eHP Lab PATH",
+      "focus": "Time-efficient survivability improvements",
+      "metric": "EHP progress / day",
+      "sorting": "Descending by RoI %",
+      "output_columns": [
+        "lab_name",
+        "current_level",
+        "next_level",
+        "duration",
+        "roi_percent",
+        "ehp_after_upgrade",
+        "running_time_cumulative"
+      ]
+    },
+    "health_ws_plus_path": {
+      "name": "eHP WS+ PATH",
+      "focus": "Coin-efficient health WS+ upgrades",
+      "metric": "RoI / 100B coins",
+      "sorting": "Descending by RoI per 100B coins",
+      "output_columns": [
+        "ws_plus_name",
+        "current_level",
+        "next_level",
+        "coin_cost",
+        "roi_percent",
+        "ehp_after_upgrade"
+      ]
+    },
+    "regen_path": {
+      "name": "eWall Regen PATH",
+      "focus": "Wall regeneration optimization",
+      "metric": "WRegen progress / day",
+      "sorting": "Descending by RoI %",
+      "output_columns": [
+        "lab_name",
+        "current_level",
+        "next_level",
+        "duration",
+        "roi_percent",
+        "wregen_after_upgrade",
+        "running_time_cumulative"
+      ]
+    },
+    "consolidated_roi": {
+      "name": "Consolidated RoI",
+      "focus": "All-in-one view of best upgrades across all paths",
+      "metrics": [
+        "Time RoI",
+        "Stone RoI",
+        "Coin RoI"
+      ],
+      "sorting": "By category, then descending RoI",
+      "categories": [
+        "eDamage",
+        "eHP",
+        "eWall Regen",
+        "eEcon",
+        "Perks"
+      ]
+    }
+  },
+
+  "output_format": {
+    "path_recommendations": {
+      "description": "Ordered list of upgrades sorted by RoI",
+      "format": "CSV with columns specific to each path type",
+      "sorting": "Descending by RoI percentage",
+      "interpretation": "Higher RoI = higher priority"
+    },
+    "curves": {
+      "description": "Visualization of effective value increase over next 30 upgrades",
+      "purpose": "Show diminishing returns visually",
+      "format": "Data series for charting"
+    },
+    "totals": {
+      "current_edmg": {
+        "description": "Current effective damage per second",
+        "unit": "damage/second"
+      },
+      "current_cpk": {
+        "description": "Current effective coins per kill",
+        "unit": "coins"
+      },
+      "current_ehp": {
+        "description": "Current effective health points",
+        "unit": "health"
+      },
+      "total_running_time": {
+        "description": "Cumulative time to complete all recommended upgrades",
+        "unit": "days/hours/minutes"
+      }
+    },
+    "validation": {
+      "validation_check": {
+        "description": "TRUE if Master Sheet data is consistent, FALSE otherwise",
+        "checks": [
+          "Levels within max caps",
+          "No missing card levels",
+          "UW unlock status matches levels",
+          "No formula errors"
+        ]
+      }
+    }
+  },
+
+  "key_assumptions": {
+    "damage_calculations": [
+      "Attack speed conversion to BPS uses custom non-precise formula",
+      "Assumes all hits reach maximum rend armor multiplier (user guess required)",
+      "Assumes all hits at maximum shock multiplier (user guess required)",
+      "Smart Missile damage area contribution requires user estimate",
+      "Chain Thunder damage requires user to pick maximum estimate"
+    ],
+    "economy_calculations": [
+      "Death Wave assumes 4 seconds per wave duration",
+      "Black Hole dig percentage is user-estimated",
+      "Golden Bot bonus does not account for UW sync (actual may be better)",
+      "Average calculations do not include sync bonuses"
+    ],
+    "health_calculations": [
+      "Chrono Field assumes full uptime",
+      "Wall combat duration is estimated",
+      "Chain Thunder effect requires user damage estimate"
+    ],
+    "general": [
+      "All bonuses stack multiplicatively unless noted",
+      "Lab research times affected by Labs Speed stat",
+      "Discount labs/vault reduce upgrade costs",
+      "Perks affect multiple categories simultaneously"
+    ]
+  },
+
+  "priority_strategies": {
+    "early_game": {
+      "waves": "1-1000",
+      "priority_order": [
+        "Coins/Kill Bonus",
+        "Damage",
+        "Attack Speed",
+        "Health",
+        "Critical Factor"
+      ],
+      "focus": "Time-based RoI paths (Lab PATH)"
+    },
+    "mid_game": {
+      "waves": "1000-3000",
+      "priority_order": [
+        "Ultimate Weapons",
+        "Workshop Enhancements",
+        "Golden Tower + Black Hole",
+        "Critical Chance",
+        "Defense %"
+      ],
+      "focus": "Balance Lab PATH and UW PATH"
+    },
+    "late_game": {
+      "waves": "3000-4500",
+      "priority_order": [
+        "Sync UWs",
+        "Mastery Labs",
+        "Workshop+",
+        "Module Optimization",
+        "Vault Completion"
+      ],
+      "focus": "Coins PATH and UW PATH, strategic min-maxing"
+    },
+    "end_game": {
+      "waves": "4500+",
+      "priority_order": [
+        "Tournament Optimization",
+        "Relic Collection",
+        "Perfect Module Builds",
+        "Max WS+ (level 300)",
+        "Balanced Stats"
+      ],
+      "focus": "Consolidated RoI for balanced progression"
+    }
+  },
+
+  "special_features": {
+    "module_substat_planner": {
+      "description": "Compare different module substat configurations",
+      "available_in": ["eDamage", "eEcon"],
+      "output": "Percentage impact on total damage/economy, bold highlights best option"
+    },
+    "uw_sync_system": {
+      "description": "Matches UW cooldowns for simultaneous activation",
+      "example": "Golden Tower + Black Hole sync at 190s cooldown",
+      "benefit": "Multiplied bonuses instead of averaged bonuses"
+    },
+    "mastery_integration": {
+      "description": "Special labs requiring specific cards",
+      "max_level": 9,
+      "total_masteries": 32,
+      "visibility": "Hidden if required cards not owned"
+    },
+    "auto_validation": {
+      "description": "Automatic data consistency checking",
+      "checks": ["Level caps", "Card levels", "UW unlock status", "Formula errors"],
+      "indicator": "TRUE/FALSE on Home Page"
+    },
+    "version_checking": {
+      "description": "Auto-checks for calculator updates",
+      "available_since": "v3.06",
+      "location": "Home Page"
+    }
+  },
+
+  "data_flow": {
+    "input": "Master Sheet (all player stats)",
+    "processing": [
+      "Calculate total multipliers for each stat category",
+      "Compute effective values (eDMG, eCPK, eHP)",
+      "Simulate each possible next upgrade",
+      "Calculate RoI for each upgrade option",
+      "Sort by RoI percentage",
+      "Generate optimization paths"
+    ],
+    "output": [
+      "eDamage paths (Lab, UW, Coin)",
+      "eEcon paths (Lab, UW, Coin)",
+      "eHP paths (Lab, WS+, Regen)",
+      "Consolidated RoI view",
+      "Curve visualizations"
+    ],
+    "sync": [
+      "Copy Column C from Consolidated RoI to Master Sheet to update all",
+      "Copy Column C from Master Sheet to Consolidated RoI to sync current state",
+      "Copy Column U from Consolidated RoI to Master Sheet Column M for targets"
+    ]
+  },
+
+  "update_workflow": {
+    "step_1": "Enter current stats in Master Sheet",
+    "step_2": "Update Relics sheet with owned relics",
+    "step_3": "Update Vault sheet with unlocked upgrades",
+    "step_4": "Configure Module presets",
+    "step_5": "Choose optimization focus (damage/economy/health)",
+    "step_6": "Fill user-specific guess values in relevant paths",
+    "step_7": "Check Validation = TRUE on Home Page",
+    "step_8": "Review recommended path for priorities",
+    "step_9": "Execute top 3-5 upgrades",
+    "step_10": "Update Master Sheet with new levels",
+    "step_11": "Paths automatically recalculate",
+    "step_12": "Repeat"
+  },
+
+  "troubleshooting": {
+    "ref_errors": {
+      "cause": "Copied data incorrectly or deleted critical cells",
+      "fix": "Re-copy from base sheet or restore from backup"
+    },
+    "div_zero_errors": {
+      "cause": "Zero values in divisor (e.g., attack speed at 0)",
+      "fix": "Ensure all base stats have non-zero values"
+    },
+    "validation_false": {
+      "cause": "Master Sheet data inconsistent",
+      "fix": "Check levels within max caps, card levels minimum 1, UW unlock status matches levels"
+    },
+    "negative_roi": {
+      "cause": "Calculation edge case or toggle issue",
+      "fix": "Check if UW/feature actually unlocked, verify user guess inputs are reasonable"
+    },
+    "paths_not_updating": {
+      "cause": "Master Sheet not linked correctly",
+      "fix": "Verify cell references point to Master Sheet"
+    },
+    "extremely_high_roi": {
+      "cause": "First level of critical stat",
+      "not_an_error": true,
+      "explanation": "Early upgrades legitimately have massive returns"
+    }
+  }
+}

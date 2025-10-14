@@ -1,0 +1,21 @@
+{
+  "total_sheets": 4,
+  "sheets": {
+    "eDamage": {
+      "formulas": 16315,
+      "values": 4464
+    },
+    "eHP": {
+      "formulas": 7274,
+      "values": 2846
+    },
+    "eEcon": {
+      "formulas": 9077,
+      "values": 3921
+    },
+    "Lab Researches": {
+      "formulas": 15307,
+      "values": 571
+    }
+  }
+}

@@ -1,0 +1,72 @@
+,"READ NOTES AT THE BOTTOM OF THIS PAGE BEFORE TRUSTING THIS INCOME OPTIMIZER Credits: jellyfish0839
+Lab level taken from ""Lab Calculator""-sheet. Manual override will work but break the reference.",,,,,,,,,,187.2903564,,0,5,5,7.85,5,15,32,10,300,5,30,375,1,BH Dur Cost,BH Dur,BH CD Cost,BH CD,GT CD Cost,GT CD
+,,Lab Level,Workshop,,,-,Current Cash Bonus,Current Coin / Kill Bonus,,,,,1,13,5.8,8.65,14,16,33,28,290,16,31,850,2,5,15,10,200,10,300
+,Lab Speed,56,2.12,,,Current,32.14,155.68,,,lab +1,,2,22,6.6,9.45,23,17,34,46,280,27,32,MAX,3,14,16,28,190,28,290
+,Cash Bonus,35,4.23,,,Cash Bonus - Coin / Kill Lab +1,32.52,157.25,,,4.28,,3,32,7.4,10.25,32,18,35,64,270,38,33,,,23,17,46,180,46,280
+,Coin / Kill,49,4.93,,,GT Bonus Lab +1,32.40,156.94,,,4.98,,4,43,8.2,11.05,41,19,36,82,260,49,34,,,32,18,64,170,64,270
+,,,,,,GT Duration Lab +1,32.78,158.75,,,,,5,55,9,11.85,50,20,37,100,250,60,35,,,41,19,82,160,82,260
+,ULTIMATE WEAPON,Lab Level,Stone Cost For Next Upg,Total,,Standard Perk Bonus Lab +1,—,156.98,,,,,6,68,9.8,12.65,59,21,38,118,240,71,36,,,50,20,100,150,100,250
+,,,,,,Improved Trade-Off Perks Lab +1,—,157.10,,lab+1,stone+1,,7,82,10.6,13.45,68,22,39,136,230,82,37,,,59,21,118,140,118,240
+,GT Bonus   ,19,162,16.65,,SL Coin Bonus Lab +1,—,158.40,,16.8,17.45,,8,98,11.4,14.25,77,23,40,154,220,93,38,,,68,22,136,130,136,230
+,GT Duration,17,123,44,,BH Coin Bonus Lab +1,—,MAX,,,45,,9,116,12.2,15.05,87,24,41,172,210,104,39,,,77,23,154,120,154,220
+,GT Cooldown,—,262,160,,GT Bonus Stone +1,33.54,162.44,,,150,,10,138,13,15.85,98,25,42,190,200,115,40,,,86,24,172,110,172,210
+,SL Angle,—,27,32,,GT Duration Stone +1,32.78,158.75,,,33,,11,162,13.8,16.65,110,26,43,208,190,126,41,,,95,25,190,100,200,200
+,SL Quantity,—,850,2,,GT Cooldown +1,34.00,164.69,,,3,,12,250,14.6,17.45,123,27,44,226,180,137,42,,,104,26,208,90,236,190
+,SL Coin Bonus,1,—,1.1,,SL Angle +1,-,155.76,,1.2,,,13,350,15.4,18.25,137,28,45,244,170,148,43,,,113,27,226,80,272,180
+,BH Duration,—,MAX,30,,SL Quantity +1,-,157.04,,,,,14,500,16.2,19.05,152,29,46,262,160,159,44,,,122,28,244,70,308,170
+,BH + GT Duration,—,123,,,Next Best Time Investment,,,,,lab+1,,15,MAX,17,19.85,168,30,47,300,150,170,45,,,131,29,262,60,344,160
+,BH Cooldown,—,262,60,,-,Cash Bonus,Coin / Kill Bonus,,,20.00%,,16,,,,185,31,48,368,140,181,46,,,MAX,30,MAX,50,400,150
+,BH + GT Cooldown,—,524,,,Cash Bonus - Coin / Kill Lab +1,18.92%,35.48%,,,10.00%,,17,,,,203,32,49,476,130,192,47,,,No BH,0,No BH,0,486,140
+,,,,,,GT Bonus Lab +1,1.71%,8.28%,,,,,18,,,,222,33,50,644,120,203,48,,,,,,,612,130
+,,,,,,GT Duration Lab +1,5.61%,27.16%,,25.20,26.18,,19,,,,242,34,51,872,110,214,49,,,,,,,798,120
+,PERKS,Lab Level,Bonus,,,Standard Perk Bonus Lab +1,—,10.13%,,,2.10,,20,,,,263,35,52,Max,100,225,50,,,,,,,1044,110
+,Standard Perk Bonus,19,19.00%,,,Improved Trade-Off Perks Lab +1,—,35.80%,,,1.98,,21,,,,285,36,53,,,236,51,,,,,,,MAX,100
+,Improved Trade-off Perk,9,9.00%,,,SL Coin Lab +1,—,286.15%,,,,,22,,,,308,37,54,,,247,52,,,,,,,,
+,,,,,,BH Coin Lab +1,—,MAX,,,,,23,,,,332,38,55,,,258,53,,,,,,,,
+,PERKS IN RUN,—,Bonus,,,Next Best Stone Investment,,,,,,,24,,,,356,39,56,,,269,54,,,,,,,,
+,Golden Tower Bonus ×1.5,TRUE,24.975,,,-,Cash Bonus,Coin / Kill Bonus,,,,,25,,,,380,40,57,,,280,55,,,,,,,,
+,× Coin Bonus,5,2.08,,,GT Bonus Stone +1,0.86%,4.18%,,,,,,,,,404,41,58,,,291,56,,,,,,,,
+,× Coin Trade-off,TRUE,1.96,,,GT + BH Duration Stone +1,0.52%,2.50%,,,,,,,,,428,42,59,,,302,57,,,,,,,,
+,,,,,,GT + BH Cooldown +1,0.36%,1.72%,,,,,,,,,452,43,60,,,313,58,,,,,,,,
+,BLACK HOLE COIN LAB,Lab Level,Bonus,,,SL Angle +1,—,0.31%,,,,,,,,,476,44,61,,,324,59,,,,,,,,
+,BH Coin Bonus,20,11,,,SL Quantity +1,—,0.16%,,,,,,,,,MAX,45,62,,,MAX,60,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,"What about Coin Bot?
+Coin Bot has it's own separate cost (Medals), but I advise going for more Size than Bonus, try to keep it at 3 extra size levels than bonus.
+",,,,,,,,,,,,,,,,,,,,,,,,,
+,Farming game stats,Coins,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,Total coins,38.7,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,Coins from BH,25.6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,"Edit the green cells with your stats.
+Blue cells will show your bonuses as they'll appear in the game.
+
+In the right you'll see 3 tables.
+Top One shows your current bonuses and the bonuses after one upgrade in many different things.
+The Bottom two help you decide with one to invest first, considering fastest Lab or Stone Cost.
+
+Bigger Value = Better",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,Made by @jellyfish0839 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,This is an experimental sheet based on the version 2.3.0 of the TC.,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,It brings changes to the income optimizer sheet.,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,It may contain mistakes since it's not finished.,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,It is aimed for players who have their black hole and golden tower synchronized with identical cooldown between 200 and 100 seconds and a BH duration 12 seconds shorter than their GT duration.,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,It is not relevant for you if these conditions are not exactly met.,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,It aims at fixing an issue with the original sheet that didn't take into account the BH cooldown and duration upgrade cost with stones that goes along with the GT cooldown and duration upgrades. ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,It also aims at adding the BH coin bonus lab in the next best time investment comparator.,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,Do not touch the purple cells.,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,"Input the post-game stats from one (or the average of several) of your farming runs in the bright green cells (you don't need to write all the zeros, if it's 30b and 20b you just put 30 and 20, what matters is the ratio between both numbers)",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,

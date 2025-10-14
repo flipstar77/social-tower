@@ -1,0 +1,55 @@
+,,,,,,,,,,,
+,Death Wave ,,,,,,,,,# Of UWs Owned,1
+,,,Current Value,Current Stone Cost,Target level,Target Stone cost,Invested Stones,Stones required,,# Of UWs Wanted,2
+,,Damage %,x22,29,x2,0,85,0,,,
+,,Quantity,2,200,1,0,200,0,,,
+,,Cooldown,150,232,300,0,1800,0,,# Of UW+ Owned,0
+,,Kill Wall,Locked,0,Locked,0,0,0,,# Of UW+ Wanted,0
+,Black Hole,,,,,,,,,,
+,,,Current Value,Current Stone Cost,Target level,Target Stone cost,Invested Stones,Stones required,,,
+,,Size,54m,118,30m,0,642,0,,Total Stones Spend,5
+,,Duration,30,131,15,0,1020,0,,Total Stones Target,50
+,,Cooldown,50,262,200,0,2040,0,,Total Stones Required,50
+,,Consume,Locked,0,Locked,0,0,0,,,
+,Golden Tower,,,,,,,,,Total Stones For all UWs,278162
+,,,Current Value,Current Stone Cost,Target level,Target Stone cost,Invested Stones,Stones required,,,
+,,Multiplier,12.2,98,5,0,418,0,,,
+,,Duration,42,404,15,0,4424,0,,UWs,Stones required
+,,Cooldown,150,262,300,0,2040,0,,1,5
+,,Golden Combo,Locked,0,Locked,0,0,0,,2,50
+,Poison Swamp,,,,,,,,,3,150
+,,,Current Value,Current Stone Cost,Target level,Target Stone cost,Invested Stones,Stones required,,4,300
+,,Damage %,150,#N/A,15000%,0,0,0,,5,800
+,,Duration,2,0,2,0,0,0,,6,1250
+,,Chance %,0,0,0,0,0,0,,7,1750
+,,Death Creep,Locked,0,Locked,0,0,0,,8,2400
+,Inner Land Mines,,,,,,,,,9,3000
+,,,Current Value,Current Stone Cost,Target level,Target Stone cost,Invested Stones,Stones required,,,
+,,Damage %,200000%,#N/A,200000%,0,0,0,,UW+ (if all UWs unlocked),Stones required
+,,Quantity,3,0,3,0,0,0,,1,500
+,,Cooldown,200,0,200,0,0,0,,2,625
+,,Charged Mines,Locked,0,Locked,0,0,0,,3,750
+,Chrono Field,,,,,,,,,4,975
+,,,Current Value,Current Stone Cost,Target level,Target Stone cost,Invested Stones,Stones required,,5,1250
+,,Duration,5,0,5,0,0,0,,6,1650
+,,- Speed,0,0,0,0,0,0,,7,2200
+,,Cooldown,180,0,180,0,0,0,,8,2900
+,,Chrono Loop,Locked,0,Locked,0,0,0,,9,3800
+,Smart Missiles,,,,,,,,,,
+,,,Current Value,Current Stone Cost,Target level,Target Stone cost,Invested Stones,Stones required,,,
+,,Damage %,14x,#N/A,14x,0,0,0,,,
+,,Quantity,5,0,5,0,0,0,,,
+,,Cooldown,180,0,180,0,0,0,,,
+,,Cover Fire,Locked,0,Locked,0,0,0,,,
+,Chain Lightning,,,,,,,,,,
+,,,Current Value,Current Stone Cost,Target level,Target Stone cost,Invested Stones,Stones required,,,
+,,Damage %,733,252,11000%,0,1477,0,,,
+,,Quantity,5,400,1,0,655,0,,,
+,,Chance %,20%,170,0,0,890,0,,,
+,,Smite,Locked,0,Locked,0,0,0,,,
+,Spotlight,,,,,,,,,,
+,,,Current Value,Current Stone Cost,Target level,Target Stone cost,Invested Stones,Stones required,,,
+,,Multi,8x,0,8x,0,0,0,,,
+,,Angle,30,0,30,0,0,0,,,
+,,Count,1,0,1,0,0,0,,,
+,,Light Range,Locked,0,Locked,0,0,0,,,
