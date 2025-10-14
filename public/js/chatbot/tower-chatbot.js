@@ -208,13 +208,19 @@ class TowerChatbot {
         this.showTyping();
 
         try {
+            // Get Discord user ID if available for personalized answers
+            const discord_user_id = window.discordAuth?.user?.user_metadata?.provider_id || null;
+
             // Call AI-powered answer endpoint
             const response = await fetch(`${this.apiBase}/api/reddit-rag/ask`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ question })
+                body: JSON.stringify({
+                    question,
+                    discord_user_id
+                })
             });
 
             const data = await response.json();

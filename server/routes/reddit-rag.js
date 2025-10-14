@@ -182,7 +182,7 @@ function createRedditRAGRouter(supabase) {
      */
     router.post('/ask', async (req, res) => {
         try {
-            const { question } = req.body;
+            const { question, discord_user_id } = req.body;
             const limit = 3; // Top 3 results for context
 
             if (!question?.trim()) {
@@ -192,23 +192,50 @@ function createRedditRAGRouter(supabase) {
                 });
             }
 
-            console.log(`🤖 AI question: "${question}"`);
+            console.log(`🤖 AI question: "${question}"`, discord_user_id ? `(user: ${discord_user_id})` : '');
 
-            // 1. Generate embedding for the question
+            // 1. Fetch user's lab data if asking about labs and user is authenticated
+            let userLabsContext = '';
+            if (discord_user_id && question.toLowerCase().includes('lab')) {
+                const { data: userLabs, error } = await supabase.supabase
+                    .from('user_labs')
+                    .select('*')
+                    .eq('discord_user_id', discord_user_id)
+                    .single();
+
+                if (userLabs && !error) {
+                    // Format lab levels into readable context
+                    const labLevels = Object.entries(userLabs)
+                        .filter(([key]) => !['id', 'discord_user_id', 'created_at', 'updated_at'].includes(key))
+                        .map(([lab, level]) => `${lab}: ${level}`)
+                        .join(', ');
+                    userLabsContext = `\n\n[USER'S CURRENT LAB LEVELS]:\n${labLevels}\n\nUse this information to provide personalized recommendations for what they should upgrade next.\n`;
+                    console.log(`📊 Including user lab data: ${labLevels.substring(0, 100)}...`);
+                }
+            }
+
+            // 2. Generate embedding for the question
             const queryEmbedding = await generateEmbedding(question);
 
-            // 2. Search RAG for relevant content using vector semantic search
-            const { data: searchResults, error: searchError } = await supabase.supabase
-                .rpc('search_reddit_rag_semantic', {
+            // 2. Search BOTH Reddit RAG and Game Knowledge Base in parallel
+            const [redditResults, gameKnowledgeResults] = await Promise.all([
+                // Reddit community content
+                supabase.supabase.rpc('search_reddit_rag_semantic', {
                     query_embedding: queryEmbedding,
                     match_threshold: 0.2,
-                    match_count: limit
-                });
+                    match_count: 3
+                }).then(res => res.data || []).catch(() => []),
 
-            if (searchError) {
-                console.error('❌ Vector search error:', searchError.message);
-                throw new Error(`RAG search failed: ${searchError.message}`);
-            }
+                // Official game guides (sheets)
+                supabase.supabase.rpc('search_game_knowledge_semantic', {
+                    query_embedding: queryEmbedding,
+                    match_threshold: 0.2,
+                    match_count: 3
+                }).then(res => res.data || []).catch(() => [])
+            ]);
+
+            // Combine results, prioritizing game knowledge for factual questions
+            const searchResults = [...gameKnowledgeResults, ...redditResults].slice(0, limit);
 
             if (!searchResults || searchResults.length === 0) {
                 return res.json({
@@ -256,11 +283,17 @@ Rules:
 - End with exactly 3 related questions starting with "-"
 - Use bullet points and clear formatting
 - Consider upvote counts as quality indicators (higher = more trusted)
-- Be conversational and helpful`
+- Be conversational and helpful
+
+IMPORTANT - Lab Tables:
+- When you see lab tables with "Level | Duration | Cost | Gems", the Duration column shows CUMULATIVE TIME from level 1 to that level
+- Example: "Level 90 | 14d 0h 39m" means it takes 14 days total to go from level 1 to level 90, NOT 14 days per level
+- To calculate time between levels, subtract: Time(Level N) - Time(Level N-1)
+- Never assume Duration is "time per level" - it's always cumulative total time`
                         },
                         {
                             role: 'user',
-                            content: `Question: ${question}\n\nCommunity Sources:\n${context}\n\nProvide a helpful answer based ONLY on these sources.`
+                            content: `Question: ${question}${userLabsContext}\n\nCommunity Sources:\n${context}\n\nProvide a helpful answer based on these sources${userLabsContext ? ' AND the user\'s current lab levels' : ''}.`
                         }
                     ]
                 })
