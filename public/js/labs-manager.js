@@ -172,13 +172,36 @@ class LabsManager {
     }
 
     populateForm(labs) {
+        // Migrate old lab keys to new format (handle "/" -> "-per-" change)
+        const migratedLabs = this.migrateLegacyLabKeys(labs);
+
         // Populate all lab input fields dynamically
-        for (const [labKey, level] of Object.entries(labs)) {
+        for (const [labKey, level] of Object.entries(migratedLabs)) {
             const input = document.getElementById(`lab-${labKey}`);
             if (input && level !== undefined) {
                 input.value = level;
+            } else if (!input) {
+                console.warn(`⚠️ No input found for lab key: ${labKey}`);
             }
         }
+    }
+
+    migrateLegacyLabKeys(labs) {
+        // Map old keys (without "per") to new keys (with "per")
+        const keyMigrations = {
+            'coins-kill-bonus': 'coins-per-kill-bonus',
+            'coins-wave': 'coins-per-wave',
+            'cash-wave': 'cash-per-wave',
+            'damage-meter': 'damage-per-meter'
+        };
+
+        const migratedLabs = {};
+        for (const [oldKey, value] of Object.entries(labs)) {
+            const newKey = keyMigrations[oldKey] || oldKey;
+            migratedLabs[newKey] = value;
+        }
+
+        return migratedLabs;
     }
 
     collectFormData() {
