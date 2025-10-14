@@ -224,8 +224,10 @@ function createRedditRAGRouter(supabase) {
                         // Calculate current stats
                         const stats = calculateAllStats(labs, cardMastery);
 
-                        // Calculate lab priorities
-                        const priorities = calculateLabPriorities(labs, cardMastery, 'damage');
+                        // Calculate lab priorities for all three categories
+                        const damagePriorities = calculateLabPriorities(labs, cardMastery, 'damage');
+                        const healthPriorities = calculateLabPriorities(labs, cardMastery, 'health');
+                        const econPriorities = calculateLabPriorities(labs, cardMastery, 'economy');
 
                         // Format context for AI
                         userLabsContext = `\n\n[USER'S CALCULATED STATS]:\n`;
@@ -233,12 +235,33 @@ function createRedditRAGRouter(supabase) {
                         userLabsContext += `eHP (Effective Health): ${stats.eHP.toFixed(2)}\n`;
                         userLabsContext += `eEcon (Effective Economy): ${stats.eEcon.toFixed(2)}\n\n`;
 
-                        userLabsContext += `[TOP 5 RECOMMENDED LAB UPGRADES]:\n`;
-                        priorities.slice(0, 5).forEach((priority, index) => {
-                            userLabsContext += `${index + 1}. ${priority.displayName} (Level ${priority.currentLevel} → ${priority.newLevel}): +${priority.improvementPercent.toFixed(2)}% improvement, ROI: ${priority.roi.toFixed(2)} per hour\n`;
+                        // DAMAGE RECOMMENDATIONS
+                        userLabsContext += `[TOP 5 DAMAGE LAB UPGRADES (eDamage focus)]:\n`;
+                        damagePriorities.slice(0, 5).forEach((priority, index) => {
+                            userLabsContext += `${index + 1}. ${priority.displayName} (Level ${priority.currentLevel} → ${priority.newLevel}): +${priority.improvementPercent.toFixed(2)}% eDamage, ROI: ${priority.roi.toFixed(2)}/hour\n`;
                         });
 
-                        userLabsContext += `\nUse these calculated values to provide accurate, personalized upgrade recommendations.\n`;
+                        // HEALTH RECOMMENDATIONS
+                        userLabsContext += `\n[TOP 5 HEALTH LAB UPGRADES (eHP focus)]:\n`;
+                        healthPriorities.slice(0, 5).forEach((priority, index) => {
+                            userLabsContext += `${index + 1}. ${priority.displayName} (Level ${priority.currentLevel} → ${priority.newLevel}): +${priority.improvementPercent.toFixed(2)}% eHP, ROI: ${priority.roi.toFixed(2)}/hour\n`;
+                        });
+
+                        // ECONOMY RECOMMENDATIONS
+                        userLabsContext += `\n[TOP 5 ECONOMY LAB UPGRADES (eEcon focus)]:\n`;
+                        econPriorities.slice(0, 5).forEach((priority, index) => {
+                            userLabsContext += `${index + 1}. ${priority.displayName} (Level ${priority.currentLevel} → ${priority.newLevel}): +${priority.improvementPercent.toFixed(2)}% eEcon, ROI: ${priority.roi.toFixed(2)}/hour\n`;
+                        });
+
+                        // Add Super Tower context
+                        userLabsContext += `\n[IMPORTANT CONTEXT]:\n`;
+                        userLabsContext += `- Super Tower Bonus: This lab is HIGHLY efficient (33.8% per level) BUT requires card mastery to be effective.\n`;
+                        userLabsContext += `- In late game (Tier 10+), projectile damage becomes negligible. Super Tower primarily boosts Ultimate Weapon (UW) damage.\n`;
+                        userLabsContext += `- Card mastery (especially Super Tower mastery) directly affects UW damage multipliers.\n`;
+                        userLabsContext += `- Without card mastery, Super Tower has limited impact. Recommend focusing on attack speed/crit/damage labs first.\n`;
+                        userLabsContext += `- Current card mastery levels: ${JSON.stringify(cardMastery)}\n`;
+
+                        userLabsContext += `\nUse these calculated values to provide accurate, personalized upgrade recommendations based on the user's focus (damage/health/economy).\n`;
 
                         console.log(`📊 Including calculated stats: eDMG=${stats.eDamage.toFixed(2)}, eHP=${stats.eHP.toFixed(2)}, eEcon=${stats.eEcon.toFixed(2)}`);
                     } catch (calcError) {
