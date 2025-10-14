@@ -345,6 +345,23 @@ Rules:
 - Use bullet points and clear formatting
 - Consider upvote counts as quality indicators (higher = more trusted)
 - Be conversational and helpful
+- If you don't know an abbreviation, DO NOT make it up - ask for clarification instead
+
+IMPORTANT - Common Tower Game Abbreviations:
+- UW = Ultimate Weapon (NOT "Ultimate Wave" or anything else)
+- SL = Spotlight (NOT "Stone of Life" or anything else)
+- DW = Death Wave
+- GT = Golden Tower
+- BH = Black Hole
+- CF = Chrono Field
+- STB = Super Tower Bonus (lab)
+- GTB = Golden Tower Bonus (lab)
+- HW = Health Wave (workshop upgrade)
+- AS = Attack Speed
+- crit = Critical hit/chance
+- regen = Regeneration
+- AoE = Area of Effect
+- DPS = Damage Per Second
 
 IMPORTANT - Lab Tables:
 - When you see lab tables with "Level | Duration | Cost | Gems", the Duration column shows CUMULATIVE TIME from level 1 to that level
