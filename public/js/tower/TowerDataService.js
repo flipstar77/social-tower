@@ -3,7 +3,7 @@
  */
 class TowerDataService {
     constructor() {
-        this.baseUrl = '/api/tower';
+        this.baseUrl = window.API_CONFIG ? window.API_CONFIG.getBaseUrl() + '/api/tower' : '/api/tower';
     }
 
     async loadRuns() {
