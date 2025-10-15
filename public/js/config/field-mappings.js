@@ -123,7 +123,7 @@ class FieldMappings {
         return [
             {
                 category: '⏱️ Run Overview',
-                fields: ['gameTime', 'realTime', 'tier', 'wave', 'killedBy', 'coinsPerHour', 'cellsPerHour', 'rerollShardsPerHour']
+                fields: ['gameTime', 'realTime', 'tier', 'wave', 'killedBy', 'coins_per_hour', 'cells_per_hour', 'reroll_shards_per_hour']
             },
             {
                 category: '💰 Economy',

@@ -287,16 +287,16 @@ function createRedditRAGRouter(supabase) {
                     match_count: 3
                 }).then(res => res.data || []).catch(() => []),
 
-                // Official game guides (sheets)
+                // Official game guides (sheets) - fetch more to ensure complete guide coverage
                 supabase.supabase.rpc('search_game_knowledge_semantic', {
                     query_embedding: queryEmbedding,
                     match_threshold: 0.2,
-                    match_count: 3
+                    match_count: 5
                 }).then(res => res.data || []).catch(() => [])
             ]);
 
             // Combine results, prioritizing game knowledge for factual questions
-            const searchResults = [...gameKnowledgeResults, ...redditResults].slice(0, limit);
+            const searchResults = [...gameKnowledgeResults, ...redditResults].slice(0, Math.max(limit, 8));
 
             if (!searchResults || searchResults.length === 0) {
                 return res.json({
@@ -343,9 +343,12 @@ Rules:
 - Then provide Details section (comprehensive)
 - End with exactly 3 related questions starting with "-"
 - Use bullet points and clear formatting
-- Consider upvote counts as quality indicators (higher = more trusted)
+- PRIORITIZE official guides (Kairos, Tobi, Labs Guide) over Reddit posts - guides are authoritative sources
+- When a question mentions a specific guide (e.g., "According to Kairos"), answer ONLY from that guide's content
+- Consider upvote counts as quality indicators for Reddit posts (higher = more trusted)
 - Be conversational and helpful
 - If you don't know an abbreviation, DO NOT make it up - ask for clarification instead
+- When giving specific numbers (stones, levels, costs), be precise and cite the source
 
 IMPORTANT - Common Tower Game Abbreviations:
 - UW = Ultimate Weapon (NOT "Ultimate Wave" or anything else)
