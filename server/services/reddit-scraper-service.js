@@ -403,39 +403,76 @@ class RedditScraperService {
 
     /**
      * Vectorize important threads for RAG system
+     * Now vectorizes ALL high-quality posts, not just top 20
      */
     async vectorizeThreads(posts) {
         // Filter high-quality posts for RAG (exclude memes)
         const importantPosts = posts.filter(post => {
             const isMeme = post.flair && (post.flair.toLowerCase().includes('meme') || post.flair.toLowerCase().includes('humor'));
-            const isHighEngagement = post.upVotes > 10 || post.numberOfComments > 5;
-            const isGuideOrStrategy = ['Guide', 'Strategy', 'Discussion'].includes(post.flair);
+            const isHighEngagement = post.upVotes > 5 || post.numberOfComments > 3;
+            const isGuideOrStrategy = ['Guide', 'Strategy', 'Discussion', 'Help', 'Question'].includes(post.flair);
             return !isMeme && (isHighEngagement || isGuideOrStrategy);
         });
 
         console.log(`🔍 Found ${importantPosts.length} high-quality posts to vectorize`);
 
+        if (importantPosts.length === 0) {
+            console.log('⏭️ No posts to vectorize, skipping...');
+            return;
+        }
+
         // Sort by score to prioritize best content
         const sortedPosts = importantPosts.sort((a, b) => b.upVotes - a.upVotes);
 
-        // Vectorize top 20 posts per run
-        for (const post of sortedPosts.slice(0, 20)) {
-            await this.vectorizePost(post);
+        // Vectorize ALL posts in batches of 20 to respect rate limits
+        let vectorized = 0;
+        const batchSize = 20;
+
+        for (let i = 0; i < sortedPosts.length; i += batchSize) {
+            const batch = sortedPosts.slice(i, i + batchSize);
+
+            for (const post of batch) {
+                await this.vectorizePost(post);
+                vectorized++;
+
+                if (vectorized % 10 === 0) {
+                    console.log(`   📊 Vectorized ${vectorized}/${sortedPosts.length} posts...`);
+                }
+            }
+
+            // Pause between batches to respect OpenAI rate limits (3500 TPM)
+            if (i + batchSize < sortedPosts.length) {
+                console.log(`   ⏸️ Pausing 3 seconds before next batch...`);
+                await new Promise(resolve => setTimeout(resolve, 3000));
+            }
         }
 
-        console.log(`✅ Vectorized ${Math.min(sortedPosts.length, 20)} posts for RAG`);
+        console.log(`✅ Vectorized ${vectorized} posts for RAG`);
     }
 
     /**
      * Vectorize a single post with comments and store embedding
+     * Skips if already vectorized to save API calls
      */
     async vectorizePost(post, comments = []) {
         if (!this.supabase || !this.supabase.supabase) {
             console.log('⚠️ Supabase not configured, skipping vectorization');
-            return;
+            return false;
         }
 
         try {
+            // Check if already vectorized
+            const { data: existing, error: checkError } = await this.supabase.supabase
+                .from('reddit_rag_content')
+                .select('reddit_id')
+                .eq('reddit_id', post.parsedId)
+                .single();
+
+            if (existing && !checkError) {
+                // Already vectorized, skip
+                return false;
+            }
+
             const { generateEmbedding } = require('./embeddings');
 
             // Create text content for embedding including top comments
@@ -476,12 +513,16 @@ class RedditScraperService {
 
             if (error && !error.message.includes('does not exist')) {
                 console.error(`❌ Error vectorizing post ${post.parsedId}:`, error.message);
+                return false;
             }
+
+            return true; // Successfully vectorized
         } catch (error) {
             // Table might not exist yet, that's okay
             if (!error.message.includes('does not exist')) {
                 console.error('❌ Vectorization error:', error.message);
             }
+            return false;
         }
     }
 

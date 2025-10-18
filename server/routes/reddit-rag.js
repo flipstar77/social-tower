@@ -194,7 +194,13 @@ function createRedditRAGRouter(supabase) {
 
             console.log(`🤖 AI question: "${question}"`, discord_user_id ? `(user: ${discord_user_id})` : '');
 
-            // 1. Fetch user's lab data AND calculate stats if asking about labs
+            // 1. Parse time filters from question
+            const timeFilter = parseTimeFilter(question);
+            if (timeFilter) {
+                console.log(`⏰ Detected time filter: last ${timeFilter.days} days`);
+            }
+
+            // 2. Fetch user's lab data AND calculate stats if asking about labs
             let userLabsContext = '';
             if (discord_user_id && question.toLowerCase().includes('lab')) {
                 const { data: userLabs, error } = await supabase.supabase
@@ -278,13 +284,13 @@ function createRedditRAGRouter(supabase) {
             // 2. Generate embedding for the question
             const queryEmbedding = await generateEmbedding(question);
 
-            // 2. Search BOTH Reddit RAG and Game Knowledge Base in parallel
+            // 3. Search BOTH Reddit RAG and Game Knowledge Base in parallel
             const [redditResults, gameKnowledgeResults] = await Promise.all([
-                // Reddit community content
+                // Reddit community content - increased from 3 to 15 for better coverage
                 supabase.supabase.rpc('search_reddit_rag_semantic', {
                     query_embedding: queryEmbedding,
                     match_threshold: 0.2,
-                    match_count: 3
+                    match_count: 15
                 }).then(res => res.data || []).catch(() => []),
 
                 // Official game guides (sheets) - fetch more to ensure complete guide coverage
@@ -295,8 +301,40 @@ function createRedditRAGRouter(supabase) {
                 }).then(res => res.data || []).catch(() => [])
             ]);
 
-            // Combine results, prioritizing game knowledge for factual questions
-            const searchResults = [...gameKnowledgeResults, ...redditResults].slice(0, Math.max(limit, 8));
+            // 4. Apply time-based filtering if detected
+            let filteredRedditResults = redditResults;
+            if (timeFilter) {
+                const cutoffDate = new Date();
+                cutoffDate.setDate(cutoffDate.getDate() - timeFilter.days);
+
+                filteredRedditResults = redditResults.filter(post => {
+                    const postDate = new Date(post.created_at);
+                    return postDate >= cutoffDate;
+                });
+
+                console.log(`📅 Filtered ${redditResults.length} → ${filteredRedditResults.length} posts (last ${timeFilter.days} days)`);
+            }
+
+            // 5. Sort by score if asking for "most upvoted"
+            if (question.toLowerCase().includes('most upvoted') ||
+                question.toLowerCase().includes('highest rated') ||
+                question.toLowerCase().includes('top post')) {
+                filteredRedditResults.sort((a, b) => (b.score || 0) - (a.score || 0));
+                console.log(`📊 Sorted by upvotes (top: ${filteredRedditResults[0]?.score || 0})`);
+            }
+
+            // 6. Combine results intelligently based on question type
+            let searchResults;
+            if (question.toLowerCase().includes('most upvoted') ||
+                question.toLowerCase().includes('highest rated') ||
+                question.toLowerCase().includes('top post') ||
+                timeFilter) {
+                // For community/time-based questions: prioritize Reddit posts
+                searchResults = [...filteredRedditResults, ...gameKnowledgeResults].slice(0, 12);
+            } else {
+                // For factual questions: prioritize game knowledge
+                searchResults = [...gameKnowledgeResults, ...filteredRedditResults].slice(0, 12);
+            }
 
             if (!searchResults || searchResults.length === 0) {
                 return res.json({
@@ -306,10 +344,15 @@ function createRedditRAGRouter(supabase) {
                 });
             }
 
-            // 3. Build context from top results
-            const context = searchResults.map((result, i) =>
-                `[Source ${i + 1} - ${result.title} (${result.score || 0} upvotes, similarity: ${(result.similarity * 100).toFixed(0)}%)]:\n${result.content}`
-            ).join('\n\n---\n\n');
+            // 7. Build context from top results with enhanced metadata
+            const context = searchResults.map((result, i) => {
+                const dateStr = result.created_at
+                    ? new Date(result.created_at).toISOString().split('T')[0]
+                    : 'unknown date';
+                const similarity = result.similarity ? `${(result.similarity * 100).toFixed(0)}%` : 'N/A';
+
+                return `[Source ${i + 1} - ${result.title} (${result.score || 0} upvotes, posted: ${dateStr}, similarity: ${similarity})]:\n${result.content}`;
+            }).join('\n\n---\n\n');
 
             // 4. Call Grok API
             const grokResponse = await fetch(GROK_API_URL, {
@@ -350,6 +393,14 @@ Rules:
 - If you don't know an abbreviation, DO NOT make it up - ask for clarification instead
 - When giving specific numbers (stones, levels, costs), be precise and cite the source
 
+IMPORTANT - TIME-BASED QUESTIONS:
+- When user asks "last week/month/days", CHECK the created_at dates in sources
+- ALWAYS mention the post date when answering time-based questions
+- For "most upvoted", sort by score (upvotes) and PRIORITIZE highest scores
+- Compare dates: Today is ${new Date().toISOString().split('T')[0]}
+- If no posts match the timeframe, say so explicitly
+- Format dates as "Posted on [date]" in your answer
+
 IMPORTANT - Common Tower Game Abbreviations:
 - UW = Ultimate Weapon (NOT "Ultimate Wave" or anything else)
 - SL = Spotlight (NOT "Stone of Life" or anything else)
@@ -374,7 +425,14 @@ IMPORTANT - Lab Tables:
                         },
                         {
                             role: 'user',
-                            content: `Question: ${question}${userLabsContext}\n\nCommunity Sources:\n${context}\n\nProvide a helpful answer based on these sources${userLabsContext ? ' AND the user\'s current lab levels' : ''}.`
+                            content: `Question: ${question}${userLabsContext}
+
+Community Sources:
+${context}
+
+${timeFilter ? `\nIMPORTANT: User asked about the last ${timeFilter.days} days. Only use sources from that timeframe and mention the dates in your answer.\n` : ''}
+
+Provide a helpful answer based on these sources${userLabsContext ? ' AND the user\'s current lab levels' : ''}.`
                         }
                     ]
                 })
@@ -389,15 +447,19 @@ IMPORTANT - Lab Tables:
             const answer = grokData.choices[0]?.message?.content || 'No response generated';
 
             console.log(`✅ AI answer generated (${grokData.usage?.total_tokens} tokens)`);
+            console.log(`📚 Returning ${searchResults.filter(r => r.url).length} sources (${searchResults.length} total, ${searchResults.filter(r => !r.url).length} without URLs)`);
 
             res.json({
                 success: true,
                 answer: answer,
-                sources: searchResults.map(r => ({
-                    title: r.title,
-                    url: r.url,
-                    score: r.score
-                })),
+                sources: searchResults
+                    .filter(r => r.url) // Only include sources with valid URLs
+                    .map(r => ({
+                        title: r.title,
+                        url: r.url,
+                        score: r.score,
+                        created_at: r.created_at // Include date for frontend display
+                    })),
                 usage: grokData.usage
             });
 
@@ -669,6 +731,46 @@ Always include relevant numbers and percentages. Make it personal and actionable
     });
 
     return router;
+}
+
+/**
+ * Parse time filters from user question
+ * Returns { days: number } or null
+ */
+function parseTimeFilter(question) {
+    const lowerQuestion = question.toLowerCase();
+
+    // Match patterns like "last 7 days", "past week", "last month"
+    const patterns = [
+        { regex: /last (\d+) days?/i, multiplier: 1 },
+        { regex: /past (\d+) days?/i, multiplier: 1 },
+        { regex: /last (\d+) weeks?/i, multiplier: 7 },
+        { regex: /past (\d+) weeks?/i, multiplier: 7 },
+        { regex: /last (\d+) months?/i, multiplier: 30 },
+        { regex: /past (\d+) months?/i, multiplier: 30 },
+        { regex: /last week/i, fixed: 7 },
+        { regex: /past week/i, fixed: 7 },
+        { regex: /this week/i, fixed: 7 },
+        { regex: /last month/i, fixed: 30 },
+        { regex: /past month/i, fixed: 30 },
+        { regex: /this month/i, fixed: 30 },
+        { regex: /recent/i, fixed: 14 }, // "recent" = last 2 weeks
+        { regex: /latest/i, fixed: 7 }   // "latest" = last week
+    ];
+
+    for (const pattern of patterns) {
+        const match = lowerQuestion.match(pattern.regex);
+        if (match) {
+            if (pattern.fixed) {
+                return { days: pattern.fixed };
+            } else if (match[1]) {
+                const count = parseInt(match[1]);
+                return { days: count * pattern.multiplier };
+            }
+        }
+    }
+
+    return null;
 }
 
 /**

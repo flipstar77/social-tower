@@ -320,11 +320,18 @@ class TowerChatbot {
         // Build sources HTML with footnote-style numbering
         const filteredSources = sources && sources.length > 0 ? sources.filter(s => s.url) : [];
         console.log('📋 Filtered sources for display:', filteredSources);
-        const sourcesHTML = filteredSources.map((s, i) => `
+        console.log(`📊 Total sources received: ${sources?.length || 0}, with URLs: ${filteredSources.length}`);
+
+        const sourcesHTML = filteredSources.map((s, i) => {
+            const dateStr = s.created_at
+                ? new Date(s.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                : '';
+            return `
                 <a href="${s.url}" target="_blank" class="source-link" data-index="${i + 1}">
-                    ${s.title}${s.score ? ` (${s.score} upvotes)` : ''}
+                    ${s.title}${s.score ? ` (${s.score} upvotes)` : ''}${dateStr ? ` • ${dateStr}` : ''}
                 </a>
-            `).join('');
+            `;
+        }).join('');
 
         // Build related questions HTML
         const relatedQuestionsHTML = relatedQuestions.length > 0 ? `
