@@ -116,6 +116,9 @@ class RedditScraperService {
             // Get all reddit_ids from fetched posts
             const redditIds = posts.map(post => post.parsedId);
 
+            console.log(`🔍 DEBUG: Checking ${redditIds.length} post IDs for duplicates`);
+            console.log(`🔍 DEBUG: First 5 IDs to check:`, redditIds.slice(0, 5));
+
             // Query database for existing posts
             const { data: existingPosts, error } = await this.supabase.supabase
                 .from('reddit_posts')
@@ -127,11 +130,27 @@ class RedditScraperService {
                 return posts; // Return all if check fails
             }
 
+            console.log(`🔍 DEBUG: Found ${existingPosts?.length || 0} existing posts in DB`);
+            if (existingPosts && existingPosts.length > 0) {
+                console.log(`🔍 DEBUG: First 5 existing IDs:`, existingPosts.slice(0, 5).map(p => p.reddit_id));
+                // Check if any of the IDs we're looking for are actually in the results
+                const firstFiveToCheck = redditIds.slice(0, 5);
+                const matchingIds = existingPosts.filter(p => firstFiveToCheck.includes(p.reddit_id));
+                console.log(`🔍 DEBUG: Of the first 5 IDs to check, ${matchingIds.length} were found in DB:`, matchingIds.map(p => p.reddit_id));
+            }
+
             // Create set of existing IDs
             const existingIds = new Set(existingPosts?.map(p => p.reddit_id) || []);
 
             // Filter out duplicates
-            return posts.filter(post => !existingIds.has(post.parsedId));
+            const newPosts = posts.filter(post => !existingIds.has(post.parsedId));
+
+            console.log(`🔍 DEBUG: Filtered to ${newPosts.length} new posts`);
+            if (newPosts.length > 0) {
+                console.log(`🔍 DEBUG: First 5 new post IDs:`, newPosts.slice(0, 5).map(p => p.parsedId));
+            }
+
+            return newPosts;
 
         } catch (error) {
             console.error('❌ Duplicate filtering failed:', error.message);
@@ -695,7 +714,10 @@ class RedditScraperService {
         console.log(`📡 Fetching up to ${limit} posts using Reddit JSON API with pagination...`);
 
         let allPosts = [];
-        const sortMethods = ['top', 'hot', 'new'];
+
+        // For light scrapes (< 200 posts), prioritize NEW posts to catch latest content
+        // For mega scrapes, fetch from all sources
+        const sortMethods = limit < 200 ? ['new'] : ['top', 'hot', 'new'];
         const postsPerPage = 100; // Reddit's max per request
         const pagesNeeded = Math.ceil(limit / sortMethods.length / postsPerPage);
 

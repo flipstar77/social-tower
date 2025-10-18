@@ -284,13 +284,17 @@ function createRedditRAGRouter(supabase) {
             // 2. Generate embedding for the question
             const queryEmbedding = await generateEmbedding(question);
 
+            // 3. If time filter detected, fetch MORE results and apply strict date filtering
+            //    Otherwise use semantic search normally
+            const matchCount = timeFilter ? 50 : 15; // Fetch more posts when time filtering
+
             // 3. Search BOTH Reddit RAG and Game Knowledge Base in parallel
             const [redditResults, gameKnowledgeResults] = await Promise.all([
-                // Reddit community content - increased from 3 to 15 for better coverage
+                // Reddit community content - increased count when time filtering
                 supabase.supabase.rpc('search_reddit_rag_semantic', {
                     query_embedding: queryEmbedding,
                     match_threshold: 0.2,
-                    match_count: 15
+                    match_count: matchCount
                 }).then(res => res.data || []).catch(() => []),
 
                 // Official game guides (sheets) - fetch more to ensure complete guide coverage
