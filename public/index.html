@@ -610,6 +610,12 @@ Or paste raw tournament data from game stats."></textarea>
                 <div class="analytics-loading">Loading statistics...</div>
             </div>
 
+            <!-- Progression Charts Section -->
+            <div id="progression-charts-section" class="analytics-section">
+                <h3 class="analytics-chart-title">📊 Progression Over Time</h3>
+                <div id="progression-charts-container"></div>
+            </div>
+
             <!-- Charts -->
             <div class="analytics-charts-container">
                 <div class="analytics-chart-card">
@@ -805,8 +811,14 @@ Or paste raw tournament data from game stats."></textarea>
 
     </div> <!-- End container -->
 
+    <!-- EMERGENCY CACHE CLEAR (MUST be first - security fix 2025-10-21) -->
+    <script src="js/emergency-cache-clear.js?v=1"></script>
+
     <!-- API Configuration (load FIRST before anything else) -->
     <script src="js/api-config.js?v=1"></script>
+
+    <!-- DEBUG: Auth Diagnostics (REMOVE after debugging) -->
+    <script defer src="js/debug-auth.js?v=1"></script>
 
     <!-- Utility Modules (load first) -->
     <script src="js/config/field-mappings.js?v=1"></script>
@@ -868,6 +880,7 @@ Or paste raw tournament data from game stats."></textarea>
     <script src="js/charts/PerformanceCharts.js?v=3"></script>
     <script src="js/charts/ChartDataAdapter.js?v=1"></script>
     <script src="js/charts/RunComparison.js?v=5"></script>
+    <script src="js/charts/ProgressionCharts.js?v=1"></script>
     <!-- New Modular Tower Analytics System -->
     <script type="module" src="js/tower/TowerDataService.js?v=4"></script>
     <script type="module" src="js/tower/TowerStatsCalculator.js?v=4"></script>

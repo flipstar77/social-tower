@@ -429,6 +429,45 @@
     background: linear-gradient(135deg, #2196F3, #1976D2);
 }
 
+/* Progression Charts Section */
+.analytics-section {
+    background: linear-gradient(135deg, rgba(45, 45, 95, 0.8), rgba(75, 75, 143, 0.6));
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.progression-charts {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.chart-section {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.chart-section h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #FFD700;
+    margin: 0 0 15px 0;
+    text-align: center;
+}
+
+.chart-section canvas {
+    display: block;
+    width: 100% !important;
+    height: auto !important;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
     .analytics-charts-container {
@@ -465,5 +504,9 @@
     .tower-analytics-section {
         left: 0;
         width: 100vw;
+    }
+
+    .chart-section canvas {
+        max-width: 100%;
     }
 }

@@ -20,7 +20,10 @@
       "Bash(pip install:*)",
       "Bash(python:*)",
       "Bash(timeout:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(npm test)",
+      "Bash(taskkill:*)",
+      "Bash(pkill:*)"
     ],
     "deny": [],
     "ask": []

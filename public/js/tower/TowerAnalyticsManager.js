@@ -43,6 +43,23 @@ class TowerAnalyticsManager {
 
         this.tableRenderer.renderStatsCards(stats, totals, rates);
         this.tableRenderer.renderRunsTable(this.filteredRuns, this.selectedRunId);
+
+        // Initialize progression charts if available
+        this.renderProgressionCharts();
+    }
+
+    async renderProgressionCharts() {
+        if (window.ProgressionCharts && this.runs && this.runs.length > 0) {
+            try {
+                if (!this.progressionCharts) {
+                    this.progressionCharts = new ProgressionCharts('progression-charts-container');
+                }
+                await this.progressionCharts.init(this.runs);
+                console.log('📊 Progression charts rendered successfully');
+            } catch (error) {
+                console.error('❌ Failed to render progression charts:', error);
+            }
+        }
     }
 
     async selectRun(runId) {
