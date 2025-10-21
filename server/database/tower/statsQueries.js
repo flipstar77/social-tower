@@ -11,10 +11,16 @@ class StatsQueries {
 
     /**
      * Get statistics summary
-     * @param {string} session - Optional session filter
+     * @param {Object} options - Query options
+     * @param {string} options.session - Optional session filter
+     * @param {string} options.discordUserId - User ID to filter by (REQUIRED for data isolation)
      * @returns {Promise<Object>} Statistics summary
      */
-    async getStatsSummary(session = null) {
+    async getStatsSummary(options = {}) {
+        // Support both old (session) and new ({ session, discordUserId }) signatures
+        const session = typeof options === 'string' ? options : options.session;
+        const discordUserId = typeof options === 'object' ? options.discordUserId : null;
+
         try {
             // Check if database is initialized
             if (!this.unifiedDb || !this.unifiedDb.supabase || this.unifiedDb.supabase === null) {
@@ -37,9 +43,27 @@ class StatsQueries {
                 .from('tower_runs')
                 .select('*');
 
-            if (session) {
-                query = query.eq('session_name', session);
+            // CRITICAL: Filter by user ID if provided
+            if (discordUserId) {
+                query = query.eq('discord_user_id', discordUserId);
+                console.log(`🔐 Filtering stats for user: ${discordUserId}`);
+            } else {
+                console.warn('⚠️ No user ID provided - returning empty stats for security');
+                return {
+                    total_runs: 0,
+                    max_tier: 0,
+                    max_wave: 0,
+                    total_coins: 0,
+                    avg_tier: 0,
+                    avg_wave: 0,
+                    max_damage: 0,
+                    total_damage_dealt: 0,
+                    coins_per_hour: 0,
+                    total_play_time_hours: 0
+                };
             }
+
+            // Note: session_name column doesn't exist in Supabase, removed filter
 
             const { data: runs, error } = await query;
 
@@ -82,20 +106,30 @@ class StatsQueries {
 
     /**
      * Get progress data over time
-     * @param {string} session - Optional session filter
-     * @param {string} metric - Metric to track (tier, wave, damage_dealt, etc.)
+     * @param {Object} options - Query options
+     * @param {string} options.session - Optional session filter
+     * @param {string} options.metric - Metric to track (tier, wave, damage_dealt, etc.)
+     * @param {string} options.discordUserId - User ID to filter by (REQUIRED)
      * @returns {Promise<Array>} Progress data points
      */
-    async getProgressData(session = null, metric = 'tier') {
+    async getProgressData(options = {}) {
+        const { session = null, metric = 'tier', discordUserId } = options;
+
         try {
             let query = this.unifiedDb.supabase
                 .from('tower_runs')
                 .select('submitted_at, tier, wave, damage_dealt, coins_earned')
                 .order('submitted_at', { ascending: true });
 
-            if (session) {
-                query = query.eq('session_name', session);
+            // CRITICAL: Filter by user ID
+            if (discordUserId) {
+                query = query.eq('discord_user_id', discordUserId);
+            } else {
+                console.warn('⚠️ No user ID provided for progress data');
+                return [];
             }
+
+            // Note: session_name column doesn't exist in Supabase, removed filter
 
             const { data: runs, error } = await query;
 
@@ -117,18 +151,28 @@ class StatsQueries {
 
     /**
      * Get tier distribution data
-     * @param {string} session - Optional session filter
+     * @param {Object} options - Query options
+     * @param {string} options.session - Optional session filter
+     * @param {string} options.discordUserId - User ID to filter by (REQUIRED)
      * @returns {Promise<Array>} Tier distribution
      */
-    async getTierDistribution(session = null) {
+    async getTierDistribution(options = {}) {
+        const { session = null, discordUserId } = options;
+
         try {
             let query = this.unifiedDb.supabase
                 .from('tower_runs')
                 .select('tier');
 
-            if (session) {
-                query = query.eq('session_name', session);
+            // CRITICAL: Filter by user ID
+            if (discordUserId) {
+                query = query.eq('discord_user_id', discordUserId);
+            } else {
+                console.warn('⚠️ No user ID provided for tier distribution');
+                return [];
             }
+
+            // Note: session_name column doesn't exist in Supabase, removed filter
 
             const { data: runs, error } = await query;
 

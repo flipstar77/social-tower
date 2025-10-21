@@ -38,27 +38,30 @@ class RunQueries {
 
     /**
      * Get all Tower runs with optional filtering
-     * @param {Object} options - Query options (limit, offset, session)
+     * @param {Object} options - Query options (limit, offset, session, discordUserId)
      * @returns {Promise<Array>} Array of run records
      */
     async getAllRuns(options = {}) {
-        const { limit = 50, offset = 0, session } = options;
+        const { limit = 50, offset = 0, session, discordUserId } = options;
+
+        console.log('🔍 RunQueries.getAllRuns called with:', { limit, offset, session, discordUserId });
 
         // Use unified database if available, otherwise fall back to legacy
         if (this.unifiedDb && this.unifiedDb.getRuns) {
             try {
+                console.log('📡 Calling unifiedDb.getRuns with discordUserId:', discordUserId);
+
+                // CRITICAL: Always filter by user ID if provided
                 const runs = await this.unifiedDb.getRuns({
                     limit: limit,
-                    offset: offset
+                    offset: offset,
+                    discordUserId: discordUserId  // Pass user ID for filtering
                 });
 
-                // If session filter is specified, filter the results
-                let filteredRuns = runs;
-                if (session) {
-                    filteredRuns = runs.filter(run => run.session_name === session);
-                }
+                console.log(`📊 Fetched ${runs.length} runs for user: ${discordUserId || 'anonymous'}`);
 
-                return filteredRuns;
+                // Don't filter by session_name since that column doesn't exist in Supabase
+                return runs;
             } catch (error) {
                 console.error('Error using unified database, falling back to legacy:', error);
             }
