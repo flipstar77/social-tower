@@ -1,4 +1,5 @@
 const express = require('express');
+const { authenticateUser } = require('../../middleware/auth');
 
 /**
  * Factory function to create stats router with dependencies
@@ -7,12 +8,21 @@ function createStatsRouter(dependencies) {
     const { statsQueries } = dependencies;
     const router = express.Router();
 
+    // Apply auth middleware to all routes
+    router.use(authenticateUser);
+
     // Get Tower statistics summary
     router.get('/', async (req, res) => {
         const session = req.query.session;
 
         try {
-            const stats = await statsQueries.getStatsSummary(session);
+            // CRITICAL: Filter stats by authenticated user
+            const stats = await statsQueries.getStatsSummary({
+                session,
+                discordUserId: req.discordUserId
+            });
+
+            console.log(`📊 Stats fetched for user: ${req.discordUserId || 'anonymous'}`);
 
             res.json({
                 success: true,

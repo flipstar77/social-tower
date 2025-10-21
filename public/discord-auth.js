@@ -52,6 +52,18 @@ class DiscordAuth {
             this.isAuthenticated = true;
             this.user = session.user;
 
+            // CRITICAL: Set user ID in cache service for data isolation
+            const userId = session.user.user_metadata?.provider_id || session.user.id;
+            if (window.cacheService) {
+                window.cacheService.setUserId(userId);
+                console.log('✅ Cache isolated for user:', userId);
+            }
+
+            // Make Supabase client available globally for API requests
+            if (!window.supabaseClient) {
+                window.supabaseClient = this.supabase;
+            }
+
             // Only show success message if this is a new login (not on page load)
             if (!wasAuthenticated && !this.hasShownLoginMessage && event === 'SIGNED_IN') {
                 this.showSuccess('Successfully logged in with Discord!');
@@ -66,6 +78,13 @@ class DiscordAuth {
             this.isAuthenticated = false;
             this.user = null;
             this.hasShownLoginMessage = false;
+
+            // CRITICAL: Clear user-specific cache on logout
+            if (window.cacheService) {
+                window.cacheService.clearUserCache();
+                window.cacheService.setUserId(null);
+                console.log('✅ Cache cleared on logout');
+            }
 
             // Dispatch auth state changed event for other modules
             window.dispatchEvent(new CustomEvent('authStateChanged', {
@@ -93,6 +112,19 @@ class DiscordAuth {
             if (session) {
                 this.isAuthenticated = true;
                 this.user = session.user;
+
+                // CRITICAL: Set user ID in cache service for data isolation
+                const userId = session.user.user_metadata?.provider_id || session.user.id;
+                if (window.cacheService) {
+                    window.cacheService.setUserId(userId);
+                    console.log('✅ Cache isolated for user:', userId);
+                }
+
+                // Make Supabase client available globally for API requests
+                if (!window.supabaseClient) {
+                    window.supabaseClient = this.supabase;
+                }
+
                 console.log('User authenticated:', this.user);
                 console.log('User metadata:', this.user.user_metadata);
                 console.log('Available avatar fields:', {

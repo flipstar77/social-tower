@@ -6,6 +6,47 @@
 class CacheService {
     constructor() {
         this.storage = window.localStorage;
+        this.userIdPrefix = null;
+    }
+
+    /**
+     * Set the current user ID for cache isolation
+     * CRITICAL: This must be called on login to prevent data leakage
+     */
+    setUserId(userId) {
+        console.log(`🔐 CacheService: Setting user ID for cache isolation: ${userId}`);
+        this.userIdPrefix = userId ? `user_${userId}_` : null;
+    }
+
+    /**
+     * Get the prefixed cache key for user isolation
+     */
+    _getPrefixedKey(key) {
+        return this.userIdPrefix ? `${this.userIdPrefix}${key}` : key;
+    }
+
+    /**
+     * Clear all cache for current user
+     */
+    clearUserCache() {
+        if (!this.userIdPrefix) {
+            console.warn('⚠️ No user ID set, clearing all cache');
+            this.clear();
+            return;
+        }
+
+        console.log(`🧹 Clearing cache for user: ${this.userIdPrefix}`);
+        const keysToDelete = [];
+
+        for (let i = 0; i < this.storage.length; i++) {
+            const key = this.storage.key(i);
+            if (key && key.startsWith(this.userIdPrefix)) {
+                keysToDelete.push(key);
+            }
+        }
+
+        keysToDelete.forEach(key => this.storage.removeItem(key));
+        console.log(`✅ Cleared ${keysToDelete.length} cache items`);
     }
 
     /**
@@ -13,13 +54,15 @@ class CacheService {
      */
     set(key, value, maxAge = null) {
         try {
+            const prefixedKey = this._getPrefixedKey(key);
             const cacheItem = {
                 data: value,
                 timestamp: Date.now(),
-                maxAge: maxAge
+                maxAge: maxAge,
+                userId: this.userIdPrefix // Store user ID for verification
             };
 
-            this.storage.setItem(key, JSON.stringify(cacheItem));
+            this.storage.setItem(prefixedKey, JSON.stringify(cacheItem));
             return true;
         } catch (error) {
             console.error(`Cache set error for key "${key}":`, error);
@@ -32,10 +75,18 @@ class CacheService {
      */
     get(key) {
         try {
-            const item = this.storage.getItem(key);
+            const prefixedKey = this._getPrefixedKey(key);
+            const item = this.storage.getItem(prefixedKey);
             if (!item) return null;
 
             const cacheItem = JSON.parse(item);
+
+            // SECURITY: Verify cache belongs to current user
+            if (this.userIdPrefix && cacheItem.userId !== this.userIdPrefix) {
+                console.warn(`⚠️ Cache mismatch: Expected ${this.userIdPrefix}, got ${cacheItem.userId}`);
+                this.remove(key);
+                return null;
+            }
 
             // Check if expired
             if (cacheItem.maxAge) {
@@ -65,7 +116,8 @@ class CacheService {
      */
     remove(key) {
         try {
-            this.storage.removeItem(key);
+            const prefixedKey = this._getPrefixedKey(key);
+            this.storage.removeItem(prefixedKey);
             return true;
         } catch (error) {
             console.error(`Cache remove error for key "${key}":`, error);
@@ -91,7 +143,8 @@ class CacheService {
      */
     getAge(key) {
         try {
-            const item = this.storage.getItem(key);
+            const prefixedKey = this._getPrefixedKey(key);
+            const item = this.storage.getItem(prefixedKey);
             if (!item) return null;
 
             const cacheItem = JSON.parse(item);
@@ -106,7 +159,8 @@ class CacheService {
      */
     isStale(key) {
         try {
-            const item = this.storage.getItem(key);
+            const prefixedKey = this._getPrefixedKey(key);
+            const item = this.storage.getItem(prefixedKey);
             if (!item) return true;
 
             const cacheItem = JSON.parse(item);

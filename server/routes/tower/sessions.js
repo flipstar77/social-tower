@@ -1,4 +1,5 @@
 const express = require('express');
+const { authenticateUser } = require('../../middleware/auth');
 
 /**
  * Factory function to create sessions router with dependencies
@@ -6,6 +7,9 @@ const express = require('express');
 function createSessionsRouter(dependencies) {
     const { statsQueries } = dependencies;
     const router = express.Router();
+
+    // Apply auth middleware
+    router.use(authenticateUser);
 
     // Get sessions
     router.get('/', async (req, res) => {

@@ -7,12 +7,76 @@ class DashboardDataService {
     }
 
     /**
+     * Get authentication headers for API requests (synchronous)
+     * CRITICAL: Always include auth token to ensure user data isolation
+     */
+    _getAuthHeaders() {
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+
+        try {
+            // Get session from Supabase localStorage (sb-<project>-auth-token)
+            const storageKeys = Object.keys(localStorage).filter(key =>
+                key.startsWith('sb-') && key.endsWith('-auth-token')
+            );
+
+            if (storageKeys.length > 0) {
+                const sessionData = JSON.parse(localStorage.getItem(storageKeys[0]));
+                if (sessionData?.access_token) {
+                    headers['Authorization'] = `Bearer ${sessionData.access_token}`;
+                    console.log('🔐 Including auth token in API request');
+                } else {
+                    console.warn('⚠️ No access token in session data - API may return no data');
+                }
+            } else {
+                console.warn('⚠️ No Supabase session found in localStorage - API may return no data');
+            }
+        } catch (error) {
+            console.error('❌ Error getting auth headers:', error);
+        }
+
+        return headers;
+    }
+
+    /**
+     * Get authentication headers (async version using Supabase API)
+     */
+    async _getAuthHeadersAsync() {
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+
+        if (window.supabaseClient) {
+            try {
+                const { data: { session }, error } = await window.supabaseClient.auth.getSession();
+                if (session?.access_token) {
+                    headers['Authorization'] = `Bearer ${session.access_token}`;
+                    console.log('🔐 Including auth token in API request (async)');
+                } else if (error) {
+                    console.error('❌ Error getting session:', error);
+                } else {
+                    console.warn('⚠️ No active session - API may return no data');
+                }
+            } catch (error) {
+                console.error('❌ Error getting auth headers:', error);
+            }
+        } else {
+            console.warn('⚠️ Supabase client not initialized');
+        }
+
+        return headers;
+    }
+
+    /**
      * Fetch latest statistics from API
      * @returns {Promise<Object>} Stats object
      */
     async fetchStats() {
         try {
-            const response = await fetch(`${this.apiBase}/stats`);
+            const response = await fetch(`${this.apiBase}/stats`, {
+                headers: this._getAuthHeaders()
+            });
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
@@ -33,7 +97,9 @@ class DashboardDataService {
     async fetchRuns(limit = 10) {
         try {
             console.log(`📥 Loading ${limit} runs from API...`);
-            const response = await fetch(`${this.apiBase}/runs?limit=${limit}`);
+            const response = await fetch(`${this.apiBase}/runs?limit=${limit}`, {
+                headers: this._getAuthHeaders()
+            });
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
@@ -89,9 +155,7 @@ class DashboardDataService {
         try {
             const response = await fetch(`${this.apiBase}/runs`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: this._getAuthHeaders(),
                 body: JSON.stringify(runData)
             });
 
@@ -114,7 +178,8 @@ class DashboardDataService {
     async deleteRun(runId) {
         try {
             const response = await fetch(`${this.apiBase}/runs/${runId}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: this._getAuthHeaders()
             });
 
             if (!response.ok) {

@@ -24,11 +24,70 @@ class RunManager {
         }
     }
 
+    /**
+     * Get authentication headers (synchronous)
+     * Note: This uses localStorage to get the session synchronously.
+     * For async operations, use _getAuthHeadersAsync()
+     */
+    _getAuthHeaders() {
+        const headers = { 'Content-Type': 'application/json' };
+
+        try {
+            // Get session from Supabase localStorage (sb-<project>-auth-token)
+            const storageKeys = Object.keys(localStorage).filter(key =>
+                key.startsWith('sb-') && key.endsWith('-auth-token')
+            );
+
+            if (storageKeys.length > 0) {
+                const sessionData = JSON.parse(localStorage.getItem(storageKeys[0]));
+                if (sessionData?.access_token) {
+                    headers['Authorization'] = `Bearer ${sessionData.access_token}`;
+                    console.log('✅ Auth header added (from localStorage)');
+                } else {
+                    console.warn('⚠️ No access token in session data');
+                }
+            } else {
+                console.warn('⚠️ No Supabase session found in localStorage');
+            }
+        } catch (error) {
+            console.error('❌ Error getting auth headers:', error);
+        }
+
+        return headers;
+    }
+
+    /**
+     * Get authentication headers (async version using Supabase API)
+     */
+    async _getAuthHeadersAsync() {
+        const headers = { 'Content-Type': 'application/json' };
+
+        if (window.supabaseClient) {
+            try {
+                const { data: { session }, error } = await window.supabaseClient.auth.getSession();
+                if (session?.access_token) {
+                    headers['Authorization'] = `Bearer ${session.access_token}`;
+                    console.log('✅ Auth header added (from Supabase API)');
+                } else if (error) {
+                    console.error('❌ Error getting session:', error);
+                } else {
+                    console.warn('⚠️ No session available');
+                }
+            } catch (error) {
+                console.error('❌ Error getting auth headers:', error);
+            }
+        }
+
+        return headers;
+    }
+
     // Data management
     async loadRuns() {
         try {
-            // Try API first
-            const response = await fetch(`${this.apiBase}/runs?limit=100`);
+            // Try API first with auth headers
+            const response = await fetch(`${this.apiBase}/runs?limit=100`, {
+                headers: this._getAuthHeaders()
+            });
             const data = await response.json();
 
             if (data.success && data.runs.length > 0) {
@@ -76,7 +135,8 @@ class RunManager {
     async deleteRun(runId) {
         try {
             const response = await fetch(`${this.apiBase}/runs/${runId}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: this._getAuthHeaders()
             });
 
             const data = await response.json();
@@ -100,7 +160,7 @@ class RunManager {
         try {
             const response = await fetch(`${this.apiBase}/runs/${runId}/category`, {
                 method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
+                headers: this._getAuthHeaders(),
                 body: JSON.stringify({ category })
             });
 

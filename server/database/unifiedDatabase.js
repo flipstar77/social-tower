@@ -302,14 +302,17 @@ class UnifiedDatabase {
     }
 
     async getRunsFromSupabase({ limit, offset, discordUserId }) {
+        // CRITICAL SECURITY: Always require user ID for data isolation
+        if (!discordUserId) {
+            console.warn('⚠️ No user ID provided to getRunsFromSupabase - returning empty array for security');
+            return [];
+        }
+
         let query = this.supabase
             .from('tower_runs')
             .select('*')
+            .eq('discord_user_id', discordUserId)  // CRITICAL: Always filter by user
             .order('submitted_at', { ascending: false });
-
-        if (discordUserId) {
-            query = query.eq('discord_user_id', discordUserId);
-        }
 
         // Apply limit and offset
         if (limit) {
@@ -321,6 +324,8 @@ class UnifiedDatabase {
 
         const { data, error } = await query;
         if (error) throw error;
+
+        console.log(`🔐 Fetched ${(data || []).length} runs for user ${discordUserId}`);
 
         return (data || []).map(run => ({
             ...run,

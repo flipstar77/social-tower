@@ -1,4 +1,5 @@
 const express = require('express');
+const { authenticateUser } = require('../../middleware/auth');
 
 /**
  * Factory function to create rates router with dependencies
@@ -6,6 +7,9 @@ const express = require('express');
 function createRatesRouter(dependencies) {
     const { statsQueries, ratesCalculator } = dependencies;
     const router = express.Router();
+
+    // Apply auth middleware
+    router.use(authenticateUser);
 
     // Get calculated rates and totals
     router.get('/', async (req, res) => {
