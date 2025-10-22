@@ -91,7 +91,7 @@ class ContentHub {
         console.log('📋 Fetching Reddit data from API (grouped by flair)...');
         try {
             const apiBase = window.API_CONFIG ? window.API_CONFIG.getBaseUrl() : 'https://social-tower-production.up.railway.app';
-            const response = await fetch(`${apiBase}/api/reddit/by-flair?limit=5&days=2`);
+            const response = await fetch(`${apiBase}/api/reddit/by-flair?limit=10&days=7`);
 
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
