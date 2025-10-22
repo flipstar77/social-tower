@@ -10,9 +10,24 @@ class RunQueries {
     /**
      * Insert a new Tower run
      * @param {Object} statsData - Statistics data to insert
-     * @returns {Promise<number>} Run ID of inserted record
+     * @returns {Promise<Object>} Inserted run record with ID
      */
     async insertTowerRun(statsData) {
+        // Use unified database (Supabase) if available
+        if (this.unifiedDb && this.unifiedDb.saveRun) {
+            try {
+                console.log('💾 Inserting run via unifiedDb.saveRun()');
+                const result = await this.unifiedDb.saveRun(statsData);
+                console.log('✅ Run saved successfully:', result);
+                return result;
+            } catch (error) {
+                console.error('❌ Failed to save run via unifiedDb:', error);
+                throw error;
+            }
+        }
+
+        // Legacy SQLite fallback (should not be used in production)
+        console.warn('⚠️ Using legacy SQLite fallback - this should not happen in production!');
         return new Promise((resolve, reject) => {
             // Convert arrays to JSON strings for storage
             const processedData = { ...statsData };
@@ -30,7 +45,7 @@ class RunQueries {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(this ? this.lastID : null);
+                    resolve({ id: this ? this.lastID : null });
                 }
             });
         });
