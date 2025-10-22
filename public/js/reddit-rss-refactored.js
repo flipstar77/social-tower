@@ -28,95 +28,44 @@ class RedditRSSManager extends BaseFeedManager {
     }
 
     /**
-     * Load Reddit posts data
+     * Load Reddit posts data from backend (uses scraped database)
      */
     async loadData(forceRefresh = false) {
         try {
-            console.log('🔄 Loading Reddit posts...');
+            console.log('🔄 Loading Reddit posts from backend...');
 
-            // Try multiple data sources in order
-            const baseUrl = window.location.hostname === 'localhost' ? 'http://localhost:6078' : '';
-            const urls = [
-                `${baseUrl}/api/reddit?subreddit=${this.subreddit}&limit=${this.maxItems}`,
-                `https://www.reddit.com/r/${this.subreddit}.json?limit=${this.maxItems}`
-            ];
+            // Use backend API which pulls from scraped database
+            const apiBaseUrl = window.location.hostname === 'localhost'
+                ? 'http://localhost:6078'
+                : 'https://social-tower-production.up.railway.app';
 
-            let jsonContent;
-            let fetchMethod = 'unknown';
+            const url = `${apiBaseUrl}/api/reddit?subreddit=${this.subreddit}&limit=${this.maxItems}`;
 
-            // Try local server first
-            try {
-                const result = await this.apiClient.get(urls[0], { timeout: 2000, retries: 0 });
+            const result = await this.apiClient.get(url, { timeout: 5000, retries: 1 });
 
-                if (result.success && result.data.posts) {
-                    jsonContent = {
-                        data: {
-                            children: result.data.posts.map(post => ({ data: post }))
-                        }
-                    };
-                    fetchMethod = 'local-server';
-                    console.log('✅ Local server success!');
-                } else {
-                    throw new Error('Local server returned invalid data');
-                }
-            } catch (serverError) {
-                // Try direct Reddit API
-                console.log('🔴 Local server failed, trying direct Reddit API...');
-
-                try {
-                    const response = await fetch(urls[1], {
-                        mode: 'cors',
-                        headers: {
-                            'Accept': 'application/json',
-                            'User-Agent': 'Mozilla/5.0'
-                        }
-                    });
-
-                    if (response.ok) {
-                        jsonContent = await response.json();
-                        fetchMethod = 'direct-api';
-                        console.log('✅ Direct API success!');
-                    } else {
-                        throw new Error('Direct API failed');
-                    }
-                } catch (directError) {
-                    // Fallback to CORS proxy
-                    console.log('🔴 Direct failed, trying CORS proxy...');
-                    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(urls[1])}`;
-                    const response = await fetch(proxyUrl);
-
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}`);
-                    }
-
-                    const data = await response.json();
-                    jsonContent = JSON.parse(data.contents);
-                    fetchMethod = 'cors-proxy';
-                    console.log('✅ CORS proxy success!');
-                }
-            }
-
-            // Parse posts
-            const posts = [];
-            if (jsonContent?.data?.children) {
-                for (const child of jsonContent.data.children.slice(0, this.maxItems)) {
-                    const post = this.parseItem(child.data);
+            if (result.success && result.data.posts) {
+                // Parse posts from backend response
+                const posts = [];
+                for (const postData of result.data.posts.slice(0, this.maxItems)) {
+                    const post = this.parseItem(postData);
                     if (post) posts.push(post);
                 }
-            }
 
-            if (posts.length > 0) {
-                this.items = posts.sort((a, b) => b.publishDate - a.publishDate);
-                this.lastUpdated = new Date();
-                this.saveToCache();
-                this.updateCarousel();
-                console.log(`✅ Loaded ${this.items.length} posts via ${fetchMethod}`);
+                if (posts.length > 0) {
+                    this.items = posts.sort((a, b) => b.publishDate - a.publishDate);
+                    this.lastUpdated = new Date();
+                    this.saveToCache();
+                    this.updateCarousel();
+                    console.log(`✅ Loaded ${this.items.length} posts from backend (scraped database)`);
+                } else {
+                    throw new Error('No posts found in backend response');
+                }
             } else {
-                throw new Error('No posts found');
+                throw new Error('Backend returned invalid data');
             }
 
         } catch (error) {
-            console.error('❌ Error loading Reddit data:', error);
+            console.error('❌ Error loading Reddit data from backend:', error);
             console.log('🔄 Using cached or mock data...');
 
             if (this.items.length === 0) {
@@ -153,7 +102,7 @@ class RedditRSSManager extends BaseFeedManager {
      * Load mock data as fallback
      */
     loadMockData() {
-        console.log('📋 Loading mock Reddit data (API blocked by CORS)...');
+        console.log('📋 Loading mock Reddit data (backend temporarily unavailable)...');
         this.items = [
             {
                 id: 'mock1',
