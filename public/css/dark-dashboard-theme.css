@@ -68,7 +68,7 @@ body::after {
     height: 1980px;
     left: -331px;
     top: 0;
-    background: url('../assets/thumbnail.jpg') center/cover no-repeat;
+    background: url('../assets/thetowerlogo.jpg') center/cover no-repeat;
     filter: blur(136px);
     opacity: 0.3;
     z-index: -1;

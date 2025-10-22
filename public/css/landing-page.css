@@ -93,7 +93,7 @@
 /* Left side - Artwork section */
 .hero-features {
     flex: 0 0 60%;
-    background: url('../assets/thumbnail.jpg') center/cover no-repeat,
+    background: url('../assets/thetowerlogo.jpg') center/cover no-repeat,
                 linear-gradient(135deg, rgba(0, 0, 0, 0.6), rgba(40, 40, 40, 0.4));
     background-blend-mode: overlay;
     backdrop-filter: blur(10px);
