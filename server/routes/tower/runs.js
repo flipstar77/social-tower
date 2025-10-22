@@ -209,12 +209,13 @@ function createRunsRouter(dependencies) {
         const runId = req.params.id;
 
         try {
-            const result = await runQueries.deleteRun(runId);
+            // SECURITY: Pass user ID to ensure users can only delete their own runs
+            const result = await runQueries.deleteRun(runId, req.discordUserId);
 
             if (!result) {
                 return res.status(404).json({
                     success: false,
-                    error: 'Run not found'
+                    error: 'Run not found or access denied'
                 });
             }
 
