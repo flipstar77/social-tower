@@ -542,7 +542,7 @@ class ContentHub {
         const tilesHTML = data.map(item => `
             <div class="tile-component" data-tile-id="${item.id}" style="background: ${item.gradient}">
                 <div class="tile-thumbnail" style="cursor: pointer;">
-                    <img src="${item.thumbnail}" alt="${item.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/320x180?text=No+Image'" style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px;">
+                    <img src="${item.thumbnail}" alt="${item.title}" loading="lazy" onerror="this.src='assets/thetowerlogo.jpg'" style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px;">
                     <div class="tile-overlay">
                         <div class="control-btn play-btn">▶</div>
                     </div>
@@ -1450,12 +1450,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Initialize refactored feed managers
-    // YouTube is handled by ContentHub directly via Vercel API
-    // Reddit still uses the refactored manager since Reddit API blocks Vercel
+    // YouTube is handled by ContentHub directly via Railway backend
+    // Reddit is handled by ContentHub directly via Railway backend (using scraped database)
+    // RedditRSSManager is DISABLED to prevent duplicate/mock data from showing
 
-    if (typeof RedditRSSManager !== 'undefined') {
-        window.redditManager = new RedditRSSManager();
-        window.redditManager.init();
-        console.log('✅ Reddit RSS Manager (refactored) initialized');
-    }
+    // NOTE: RedditRSSManager disabled - Content Hub handles Reddit posts by flair
+    // if (typeof RedditRSSManager !== 'undefined') {
+    //     window.redditManager = new RedditRSSManager();
+    //     window.redditManager.init();
+    //     console.log('✅ Reddit RSS Manager (refactored) initialized');
+    // }
 });
