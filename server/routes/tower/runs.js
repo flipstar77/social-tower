@@ -13,6 +13,52 @@ function createRunsRouter(dependencies) {
     // Apply auth middleware to all routes
     router.use(authenticateUser);
 
+    // Submit run data via JSON (main endpoint for web uploads)
+    router.post('/', async (req, res) => {
+        try {
+            const runData = req.body;
+
+            // Add user ID from auth
+            if (req.discordUserId) {
+                runData.discord_user_id = req.discordUserId;
+                runData.submission_source = runData.submission_source || 'web';
+            } else {
+                return res.status(401).json({
+                    success: false,
+                    error: 'Authentication required to submit runs'
+                });
+            }
+
+            console.log('💾 Saving run to database for user:', req.discordUserId);
+            console.log('📦 Run data:', {
+                tier: runData.tier,
+                wave: runData.wave,
+                coins: runData.coins || runData.coinsEarned,
+                damage: runData.damage || runData.damageDealt
+            });
+
+            // Save to database
+            const result = await runQueries.insertTowerRun(runData);
+
+            if (result && result.id) {
+                res.json({
+                    success: true,
+                    message: 'Run saved successfully',
+                    run: result
+                });
+            } else {
+                throw new Error('Failed to get run ID from database');
+            }
+
+        } catch (error) {
+            console.error('❌ Error saving run:', error);
+            res.status(500).json({
+                success: false,
+                error: 'Failed to save run: ' + error.message
+            });
+        }
+    });
+
     // Upload and parse Tower statistics
     router.post('/upload-stats', upload.single('statsFile'), async (req, res) => {
         if (!req.file) {
