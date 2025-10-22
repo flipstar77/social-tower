@@ -86,64 +86,90 @@ class ContentHub {
         }
     }
 
-    // Load real Reddit data from server API
+    // Load real Reddit data from server API (grouped by flair)
     async loadRealRedditData() {
-        console.log('📋 Fetching Reddit data from API...');
+        console.log('📋 Fetching Reddit data from API (grouped by flair)...');
         try {
             const apiBase = window.APP_CONFIG?.api?.baseUrl || '';
-            const response = await fetch(`${apiBase}/api/reddit`);
+            const response = await fetch(`${apiBase}/api/reddit/by-flair?limit=5&days=2`);
 
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
 
             const data = await response.json();
-            console.log('📋 Raw Reddit API response:', data);
+            console.log('📋 Raw Reddit API response (by flair):', data);
 
-            if (data.success && data.posts && Array.isArray(data.posts)) {
-                console.log(`📋 Processing ${data.posts.length} Reddit posts...`);
+            if (data.success && data.postsByFlair) {
+                console.log(`📋 Processing Reddit posts grouped by ${data.flairs.length} flairs...`);
 
-                // Convert Reddit posts to content format and store in contentData.reddit
-                this.contentData.reddit = data.posts.slice(0, 10).map((post, index) => {
-                    const redditPost = {
-                        id: `reddit_${index}`,
-                        title: post.title || 'No Title',
-                        author: post.author || 'Unknown',
-                        subreddit: post.subreddit || 'TheTowerGame',
-                        score: post.score || post.ups || 0,
-                        comments: post.num_comments || 0,
-                        category: 'reddit',
-                        thumbnail: post.thumbnail && post.thumbnail !== 'self' && post.thumbnail !== 'default' ? post.thumbnail : 'https://via.placeholder.com/320x180?text=Reddit+Post',
-                        url: post.url || `https://reddit.com${post.permalink}`,
-                        flair: post.link_flair_text || 'Discussion',
-                        created: post.created_utc || Date.now() / 1000,
-                        selftext: post.selftext || '',
-                        permalink: post.permalink,
-                        // Properties needed for tile rendering
-                        gradient: 'linear-gradient(135deg, #FF4500 0%, #FF6500 100%)', // Reddit orange theme
-                        matchPercentage: Math.min(95, Math.max(70, post.score ? Math.floor(70 + (post.score / 10)) : 75)),
-                        channelColor: '#FF4500',
-                        channel: `r/${post.subreddit || 'TheTowerGame'}`,
-                        rating: post.link_flair_text || 'Discussion',
-                        duration: `${post.num_comments || 0} comments`,
-                        quality: `${post.score || 0} ⬆`,
-                        views: post.score || 0,
-                        likes: Math.floor((post.score || 0) * 0.8),
-                        genres: [post.link_flair_text || 'Discussion', post.author ? `u/${post.author}` : 'Reddit']
-                    };
-                    console.log(`📋 Processed Reddit post ${index}:`, redditPost.title);
-                    return redditPost;
+                // Store posts grouped by flair
+                this.contentData.redditByFlair = {};
+
+                // Process each flair category
+                data.flairs.forEach(flair => {
+                    const posts = data.postsByFlair[flair] || [];
+                    this.contentData.redditByFlair[flair] = posts.map((post, index) => {
+                        // Get flair color
+                        const flairColors = {
+                            'Guide': '#4CAF50',
+                            'Strategy': '#2196F3',
+                            'Discussion': '#FF9800',
+                            'Question': '#9C27B0',
+                            'Showcase': '#E91E63',
+                            'Humor': '#FFC107',
+                            'Other': '#607D8B'
+                        };
+                        const flairColor = flairColors[flair] || '#FF4500';
+
+                        return {
+                            id: `reddit_${flair}_${index}`,
+                            title: post.title || 'No Title',
+                            author: post.author || 'Unknown',
+                            subreddit: post.subreddit || 'TheTowerGame',
+                            score: post.score || 0,
+                            comments: post.num_comments || 0,
+                            category: 'reddit',
+                            thumbnail: post.thumbnail && post.thumbnail !== 'self' && post.thumbnail !== 'default' ? post.thumbnail : 'https://via.placeholder.com/320x180?text=Reddit+Post',
+                            url: post.url || `https://reddit.com${post.permalink}`,
+                            flair: post.link_flair_text || flair,
+                            created: post.created_utc || Date.now() / 1000,
+                            selftext: post.selftext || '',
+                            permalink: post.permalink,
+                            // Properties needed for tile rendering
+                            gradient: `linear-gradient(135deg, ${flairColor} 0%, #FF4500 100%)`,
+                            matchPercentage: Math.min(98, Math.max(75, post.score ? Math.floor(75 + (post.score / 5)) : 80)),
+                            channelColor: flairColor,
+                            channel: `r/${post.subreddit || 'TheTowerGame'}`,
+                            rating: post.link_flair_text || flair,
+                            duration: `${post.num_comments || 0} comments`,
+                            quality: `${post.score || 0} ⬆`,
+                            views: post.score || 0,
+                            likes: Math.floor((post.score || 0) * 0.8),
+                            genres: [post.link_flair_text || flair, post.author ? `u/${post.author}` : 'Reddit']
+                        };
+                    });
                 });
 
-                console.log('✅ Loaded real Reddit content:', this.contentData.reddit.length, 'posts');
-                console.log('📋 First Reddit post sample:', this.contentData.reddit[0]);
+                // Also keep a flat list for compatibility
+                this.contentData.reddit = [];
+                data.flairs.forEach(flair => {
+                    this.contentData.reddit.push(...this.contentData.redditByFlair[flair]);
+                });
+
+                console.log('✅ Loaded Reddit content by flair:', {
+                    flairs: data.flairs,
+                    totalPosts: this.contentData.reddit.length
+                });
             } else {
                 console.warn('Invalid Reddit API response format:', data);
                 this.contentData.reddit = [];
+                this.contentData.redditByFlair = {};
             }
         } catch (error) {
             console.error('❌ Error loading Reddit data:', error);
             this.contentData.reddit = [];
+            this.contentData.redditByFlair = {};
         }
     }
 
@@ -405,13 +431,96 @@ class ContentHub {
         });
         this.renderSection('youtube', allVideos);
 
-        // Also render Reddit posts if available
-        if (this.contentData.reddit && this.contentData.reddit.length > 0) {
-            console.log('📋 Content Hub rendering Reddit posts:', this.contentData.reddit.length, 'total posts');
-            this.renderSection('reddit', this.contentData.reddit);
+        // Render Reddit posts by flair (separate rows for each flair)
+        if (this.contentData.redditByFlair && Object.keys(this.contentData.redditByFlair).length > 0) {
+            console.log('📋 Content Hub rendering Reddit posts by flair...');
+            this.renderRedditByFlair();
         } else {
             console.warn('📋 No Reddit posts to render');
         }
+    }
+
+    // Render Reddit posts by flair (creates separate section for each flair)
+    renderRedditByFlair() {
+        const redditSection = document.querySelector('.reddit-section');
+        if (!redditSection) {
+            console.warn('⚠️ Reddit section not found in DOM');
+            return;
+        }
+
+        // Get the section header
+        const sectionHeader = redditSection.querySelector('.section-header');
+
+        // Remove old flair sections if they exist
+        const oldFlairSections = redditSection.querySelectorAll('.reddit-flair-subsection');
+        oldFlairSections.forEach(section => section.remove());
+
+        // Create a section for each flair
+        Object.keys(this.contentData.redditByFlair).forEach(flair => {
+            const posts = this.contentData.redditByFlair[flair];
+            if (posts.length === 0) return;
+
+            // Create subsection for this flair
+            const flairSection = document.createElement('div');
+            flairSection.className = 'reddit-flair-subsection';
+            flairSection.innerHTML = `
+                <div class="flair-header">
+                    <h3 class="flair-title">
+                        <span class="flair-badge" style="background: ${posts[0].channelColor}">${flair}</span>
+                        <span class="flair-count">${posts.length} post${posts.length !== 1 ? 's' : ''}</span>
+                    </h3>
+                </div>
+                <div class="content-grid reddit-flair-grid" data-flair="${flair}">
+                    <!-- Posts will be rendered here -->
+                </div>
+            `;
+
+            // Insert after the section header
+            if (sectionHeader && sectionHeader.nextSibling) {
+                redditSection.insertBefore(flairSection, sectionHeader.nextSibling);
+            } else {
+                redditSection.appendChild(flairSection);
+            }
+
+            // Render tiles for this flair
+            const flairGrid = flairSection.querySelector('.reddit-flair-grid');
+            const tilesHTML = posts.map(item => `
+                <div class="tile-component" data-tile-id="${item.id}" style="background: ${item.gradient}">
+                    <div class="tile-thumbnail" style="cursor: pointer;">
+                        <img src="${item.thumbnail}" alt="${item.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/320x180?text=Reddit+Post'" style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px;">
+                        <div class="tile-overlay">
+                            <div class="control-btn play-btn">🔗</div>
+                        </div>
+                    </div>
+                    <div class="tile-header">
+                        <div class="match-score">${item.matchPercentage}% Match</div>
+                        <div class="tile-channel" style="font-size: 11px; color: ${item.channelColor}">${item.channel || 'Unknown'}</div>
+                    </div>
+                    <div class="tile-body">
+                        <h3 class="tile-title" style="font-size: 13px; margin: 8px 0; line-height: 1.3;">${item.title}</h3>
+                        <div class="tile-meta">
+                            <span class="rating" style="background: ${item.channelColor}">${item.rating}</span>
+                            <span class="duration">${item.duration}</span>
+                            <span class="quality">${item.quality}</span>
+                        </div>
+                        <div class="tile-genres">
+                            ${item.genres.map(genre => `<span class="genre-tag">${genre}</span>`).join('')}
+                        </div>
+                    </div>
+                    <div class="tile-footer">
+                        <div class="tile-stats">
+                            <span>👍 ${item.views.toLocaleString('en-US')}</span>
+                            <span>💬 ${item.comments}</span>
+                        </div>
+                        <div class="tile-author">by u/${item.author}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            flairGrid.innerHTML = `<div class="tiles-container">${tilesHTML}</div>`;
+
+            console.log(`✅ Rendered ${posts.length} posts for flair: ${flair}`);
+        });
     }
 
     renderSection(sectionName, data) {

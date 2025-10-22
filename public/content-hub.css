@@ -1438,3 +1438,195 @@
 .menu-item.active .content-icon::after {
     background: #53B9EA;
 }
+
+/* ================ REDDIT FLAIR SUBSECTIONS ================ */
+.reddit-flair-subsection {
+    margin-bottom: 40px;
+    background: rgba(10, 10, 15, 0.5);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+}
+
+.flair-header {
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.flair-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+    font-size: 1.2em;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.flair-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: 600;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.flair-count {
+    font-size: 0.75em;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 500;
+}
+
+/* Reddit flair-specific grid styling */
+.reddit-flair-grid {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding-bottom: 10px;
+}
+
+.reddit-flair-grid::-webkit-scrollbar {
+    height: 6px;
+}
+
+.reddit-flair-grid::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+}
+
+.reddit-flair-grid::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+
+.reddit-flair-grid::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Tile footer author styling */
+.tile-footer .tile-author {
+    font-size: 0.75em;
+    color: rgba(255, 255, 255, 0.7);
+    font-style: italic;
+}
+
+/* Tile header and body spacing adjustments for Reddit posts */
+.tile-header {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px 4px 0 0;
+}
+
+.tile-body {
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.2);
+    flex: 1;
+}
+
+.tile-footer {
+    padding: 8px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 0 0 4px 4px;
+}
+
+.tile-thumbnail {
+    position: relative;
+    overflow: hidden;
+}
+
+.tile-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.tile-component:hover .tile-overlay {
+    opacity: 1;
+}
+
+.tile-meta {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 8px 0;
+}
+
+.tile-meta .rating {
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.7em;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.tile-genres {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.tile-genres .genre-tag {
+    background: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.9);
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 0.7em;
+    font-weight: 500;
+}
+
+.match-score {
+    font-weight: 700;
+    font-size: 0.9em;
+    color: #3DCD5E;
+}
+
+.tile-channel {
+    font-size: 0.8em;
+    font-weight: 500;
+    opacity: 0.9;
+}
+
+.tile-title {
+    color: #ffffff;
+    font-weight: 600;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.tile-stats {
+    display: flex;
+    gap: 12px;
+    font-size: 0.85em;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.tile-stats span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
