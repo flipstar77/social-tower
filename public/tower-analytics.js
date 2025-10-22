@@ -355,8 +355,10 @@ class TowerAnalytics {
                 console.log('Calculated totals:', totals);
                 console.log('Calculated rates:', rates);
 
-                // Check for achievements based on the latest stats
-                this.checkAchievements(stats, totals);
+                // Check for achievements based on the latest stats (only for newly uploaded runs)
+                // NOTE: Disabled automatic achievement checking on page load to prevent duplicate notifications
+                // Achievements are only unlocked when runs are uploaded via script.js
+                // this.checkAchievements(stats, totals);
 
                 console.log('🔥 About to call renderStatsCards with:', { stats, totals, rates });
                 try {
