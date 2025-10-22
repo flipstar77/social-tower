@@ -112,10 +112,35 @@ class RunQueries {
 
     /**
      * Get a single Tower run by ID
-     * @param {number} runId - Run ID
+     * @param {string} runId - Run ID (UUID)
      * @returns {Promise<Object|null>} Run record or null if not found
      */
     async getRunById(runId) {
+        // Use Supabase if available
+        if (this.unifiedDb && this.unifiedDb.supabase) {
+            try {
+                const { data, error } = await this.unifiedDb.supabase
+                    .from('tower_runs')
+                    .select('*')
+                    .eq('id', runId)
+                    .single();
+
+                if (error) {
+                    if (error.code === 'PGRST116') {
+                        // Not found
+                        return null;
+                    }
+                    throw error;
+                }
+
+                return data;
+            } catch (error) {
+                console.error('❌ Failed to get run by ID:', error);
+                throw error;
+            }
+        }
+
+        // Legacy SQLite fallback
         return new Promise((resolve, reject) => {
             this.db.get('SELECT * FROM tower_runs WHERE id = ?', [runId], (err, row) => {
                 if (err) {
@@ -153,11 +178,30 @@ class RunQueries {
 
     /**
      * Update a Tower run's category
-     * @param {number} runId - Run ID
+     * @param {string} runId - Run ID (UUID)
      * @param {string} category - New category value
      * @returns {Promise<boolean>} True if update was successful
      */
     async updateRunCategory(runId, category) {
+        // Use Supabase if available
+        if (this.unifiedDb && this.unifiedDb.supabase) {
+            try {
+                const { error } = await this.unifiedDb.supabase
+                    .from('tower_runs')
+                    .update({ category })
+                    .eq('id', runId);
+
+                if (error) throw error;
+
+                console.log('✅ Run category updated in Supabase:', runId, category);
+                return true;
+            } catch (error) {
+                console.error('❌ Failed to update run category:', error);
+                throw error;
+            }
+        }
+
+        // Legacy SQLite fallback
         return new Promise((resolve, reject) => {
             this.db.run('UPDATE tower_runs SET category = ? WHERE id = ?', [category, runId], function(err) {
                 if (err) {
