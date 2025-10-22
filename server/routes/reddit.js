@@ -41,15 +41,15 @@ router.get('/', validate(schemas.redditQuery, 'query'), async (req, res) => {
 
         SecureLogger.dev('Reddit cache miss - fetching from database');
 
-        // Get database client from app locals
-        const supabase = req.app.locals.supabase;
+        // Get database client from app locals (supabase wrapper)
+        const supabaseWrapper = req.app.locals.supabase;
 
-        if (!supabase) {
+        if (!supabaseWrapper || !supabaseWrapper.supabase) {
             throw new Error('Database client not available');
         }
 
         // Fetch posts from database, ordered by creation date (newest first)
-        const { data: dbPosts, error } = await supabase
+        const { data: dbPosts, error } = await supabaseWrapper.supabase
             .from('reddit_posts')
             .select('*')
             .eq('subreddit', subreddit)
@@ -126,10 +126,10 @@ router.get('/by-flair', validate(schemas.redditQuery, 'query'), async (req, res)
 
         SecureLogger.dev('Reddit flair cache miss - fetching from database');
 
-        // Get database client from app locals
-        const supabase = req.app.locals.supabase;
+        // Get database client from app locals (supabase wrapper)
+        const supabaseWrapper = req.app.locals.supabase;
 
-        if (!supabase) {
+        if (!supabaseWrapper || !supabaseWrapper.supabase) {
             throw new Error('Database client not available');
         }
 
@@ -138,7 +138,7 @@ router.get('/by-flair', validate(schemas.redditQuery, 'query'), async (req, res)
         cutoffDate.setDate(cutoffDate.getDate() - daysBack);
 
         // Fetch posts from the last N days, grouped by flair
-        const { data: dbPosts, error } = await supabase
+        const { data: dbPosts, error} = await supabaseWrapper.supabase
             .from('reddit_posts')
             .select('*')
             .eq('subreddit', subreddit)
