@@ -90,20 +90,24 @@ class RunManager {
             });
             const data = await response.json();
 
-            if (data.success && data.runs.length > 0) {
-                this.runs = data.runs.map(run => ({
+            if (data.success) {
+                // API call succeeded - use API data even if empty
+                this.runs = (data.runs || []).map(run => ({
                     ...run,
                     id: run.id || Date.now() + Math.random(),
                     timestamp: run.timestamp || run.created_at || new Date().toISOString()
                 }));
+                console.log(`✅ Loaded ${this.runs.length} runs from API`);
                 this.emit('runsLoaded', { source: 'api', count: this.runs.length });
                 return this.runs;
+            } else {
+                console.warn('⚠️ API returned error:', data.error);
             }
         } catch (error) {
-            console.warn('API unavailable, loading from localStorage:', error);
+            console.warn('❌ API unavailable, loading from localStorage:', error);
         }
 
-        // Fallback to localStorage
+        // Fallback to localStorage only if API failed
         return this.loadFromLocalStorage();
     }
 
