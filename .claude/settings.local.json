@@ -23,7 +23,9 @@
       "Bash(npm install:*)",
       "Bash(npm test)",
       "Bash(taskkill:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(git log:*)"
     ],
     "deny": [],
     "ask": []

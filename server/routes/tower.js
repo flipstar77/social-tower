@@ -25,7 +25,6 @@ function createTowerRouter(upload) {
     const router = express.Router();
 
     // Initialize database connection
-    let db;
     let unifiedDb;
     let dbInitialized = false;
     let initializationPromise = null;
@@ -56,51 +55,13 @@ function createTowerRouter(upload) {
     // Start initialization immediately
     initializeDatabase().catch(err => console.error('Database initialization failed:', err));
 
-    try {
-
-        // For compatibility with legacy database calls, create a bridge
-        // This bridges the legacy SQLite-style API to Supabase calls
-        db = {
-            get: async (query, params, callback) => {
-                try {
-                    // This is a simplified bridge - in a full implementation,
-                    // you'd parse the SQL and convert to Supabase calls
-                    console.log('🔄 Legacy db.get() call - converting to Supabase');
-                    // For now, just call callback with null to avoid blocking
-                    if (callback) callback(null, null);
-                } catch (error) {
-                    if (callback) callback(error, null);
-                }
-            },
-            all: async (query, params, callback) => {
-                try {
-                    console.log('🔄 Legacy db.all() call - converting to Supabase');
-                    if (callback) callback(null, []);
-                } catch (error) {
-                    if (callback) callback(error, []);
-                }
-            },
-            run: async (query, params, callback) => {
-                try {
-                    console.log('🔄 Legacy db.run() call - converting to Supabase');
-                    // Return success for compatibility
-                    if (callback) callback.call({ changes: 1, lastID: 1 }, null);
-                } catch (error) {
-                    if (callback) callback(error);
-                }
-            }
-        };
-    } catch (error) {
-        console.error('❌ Failed to initialize database for Tower routes:', error);
-    }
-
     // Initialize services
     const statsProcessor = createStatsProcessor();
     const dataValidator = createDataValidator();
     const ratesCalculator = createRatesCalculator();
 
-    // Initialize database queries with dependencies
-    const databaseDependencies = { db, unifiedDb, supabase: unifiedDb };
+    // Initialize database queries with dependencies (only unifiedDb, no legacy SQLite)
+    const databaseDependencies = { unifiedDb };
     const runQueries = createRunQueries(databaseDependencies);
     const statsQueries = new createStatsQueries(databaseDependencies);
 
