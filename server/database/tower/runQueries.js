@@ -6,9 +6,8 @@ class RunQueries {
     constructor(dependencies) {
         this.unifiedDb = dependencies.unifiedDb;
 
-        if (!this.unifiedDb) {
-            throw new Error('unifiedDb is required for RunQueries');
-        }
+        // NOTE: Don't throw error immediately - unifiedDb might not be initialized yet
+        // It will be initialized on first use by tower.js middleware
     }
 
     /**
