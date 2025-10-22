@@ -308,7 +308,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const towerAnalyticsElement = document.getElementById('towerAnalytics');
     if (towerAnalyticsElement) {
         console.log('🎯 Initializing Analytics Coordinator');
-        window.analyticsCoordinator = new AnalyticsCoordinator();
+        // Use API_CONFIG to get correct backend URL (Railway in production, localhost in dev)
+        const apiBase = window.API_CONFIG ? `${window.API_CONFIG.getBaseUrl()}/api/tower` : '/api/tower';
+        window.analyticsCoordinator = new AnalyticsCoordinator(apiBase);
 
         // Initialize and render initial state
         window.analyticsCoordinator.init().then(() => {
