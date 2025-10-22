@@ -130,7 +130,7 @@ class ContentHub {
                             score: post.score || 0,
                             comments: post.num_comments || 0,
                             category: 'reddit',
-                            thumbnail: post.thumbnail && post.thumbnail !== 'self' && post.thumbnail !== 'default' ? post.thumbnail : 'https://via.placeholder.com/320x180?text=Reddit+Post',
+                            thumbnail: post.thumbnail && post.thumbnail !== 'self' && post.thumbnail !== 'default' && post.thumbnail.startsWith('http') ? post.thumbnail : 'assets/thetowerlogo.jpg',
                             url: post.url || `https://reddit.com${post.permalink}`,
                             flair: post.link_flair_text || flair,
                             created: post.created_utc || Date.now() / 1000,
@@ -487,7 +487,7 @@ class ContentHub {
             const tilesHTML = posts.map(item => `
                 <div class="tile-component" data-tile-id="${item.id}" style="background: ${item.gradient}">
                     <div class="tile-thumbnail" style="cursor: pointer;">
-                        <img src="${item.thumbnail}" alt="${item.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/320x180?text=Reddit+Post'" style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px;">
+                        <img src="${item.thumbnail}" alt="${item.title}" loading="lazy" onerror="this.src='assets/thetowerlogo.jpg'" style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px;">
                         <div class="tile-overlay">
                             <div class="control-btn play-btn">🔗</div>
                         </div>
