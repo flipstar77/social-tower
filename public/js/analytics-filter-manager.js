@@ -43,14 +43,12 @@ class FilterManager {
         if (!Array.isArray(runs)) return [];
 
         const filtered = runs.filter(run => {
-            // Session filter
-            if (this.filters.session && run.session_name !== this.filters.session) {
-                return false;
-            }
+            // NOTE: Removed session filter - Supabase schema doesn't have session_name column
+            // Session-based filtering is not supported for Supabase runs
 
             // Time range filter
             if (this.filters.timeRange !== 'all') {
-                const runDate = new Date(run.timestamp);
+                const runDate = new Date(run.timestamp || run.submitted_at || run.created_at);
                 const daysAgo = parseInt(this.filters.timeRange);
                 const cutoffDate = new Date();
                 cutoffDate.setDate(cutoffDate.getDate() - daysAgo);
