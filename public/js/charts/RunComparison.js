@@ -43,9 +43,10 @@ class RunComparison {
      */
     async checkForNewRuns() {
         try {
+            const apiUrl = window.API_CONFIG ? window.API_CONFIG.getApiUrl('api/tower/runs?limit=1') : '/api/tower/runs?limit=1';
             const response = window.discordAuth?.authenticatedFetch
-                ? await window.discordAuth.authenticatedFetch('/api/tower/runs?limit=1')
-                : await fetch('/api/tower/runs?limit=1');
+                ? await window.discordAuth.authenticatedFetch(apiUrl)
+                : await fetch(apiUrl);
             const data = await response.json();
 
             if (data.runs && data.runs.length > 0) {
