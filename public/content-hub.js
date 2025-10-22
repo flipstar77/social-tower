@@ -90,7 +90,7 @@ class ContentHub {
     async loadRealRedditData() {
         console.log('📋 Fetching Reddit data from API (grouped by flair)...');
         try {
-            const apiBase = window.APP_CONFIG?.api?.baseUrl || '';
+            const apiBase = window.API_CONFIG ? window.API_CONFIG.getBaseUrl() : 'https://social-tower-production.up.railway.app';
             const response = await fetch(`${apiBase}/api/reddit/by-flair?limit=5&days=2`);
 
             if (!response.ok) {
