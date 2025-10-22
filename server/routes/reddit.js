@@ -62,7 +62,7 @@ router.get('/', validate(schemas.redditQuery, 'query'), async (req, res) => {
 
         // Transform database posts to match frontend expected format
         const posts = (dbPosts || []).map(post => ({
-            id: post.post_id,
+            id: post.reddit_id,
             title: post.title,
             url: post.url,
             author: post.author,
@@ -167,7 +167,7 @@ router.get('/by-flair', validate(schemas.redditQuery, 'query'), async (req, res)
             groupedPosts[flair] = postsByFlair[flair]
                 .slice(0, limit)
                 .map(post => ({
-                    id: post.post_id,
+                    id: post.reddit_id,
                     title: post.title,
                     url: post.url,
                     author: post.author,
