@@ -2,7 +2,20 @@ const express = require('express');
 const router = express.Router();
 const NodeCache = require('node-cache');
 const logger = require('../core/logger');
-const SecureLogger = require('../core/secure-logger');
+
+// Try to load SecureLogger, fallback to console if not available
+let SecureLogger;
+try {
+    SecureLogger = require('../core/secure-logger');
+} catch (e) {
+    // Fallback if SecureLogger not deployed yet
+    SecureLogger = {
+        dev: () => {},
+        api: () => {},
+        error: () => {}
+    };
+}
+
 const { validate, schemas } = require('../middleware/validation');
 
 // Cache for 5 minutes (300 seconds)
