@@ -470,7 +470,7 @@ class ContentHub {
                         <span class="flair-count">${posts.length} post${posts.length !== 1 ? 's' : ''}</span>
                     </h3>
                 </div>
-                <div class="content-grid reddit-flair-grid" data-flair="${flair}">
+                <div class="content-grid reddit-flair-grid auto-rotate" data-flair="${flair}">
                     <!-- Posts will be rendered here -->
                 </div>
             `;
@@ -519,7 +519,12 @@ class ContentHub {
 
             flairGrid.innerHTML = `<div class="tiles-container">${tilesHTML}</div>`;
 
-            console.log(`✅ Rendered ${posts.length} posts for flair: ${flair}`);
+            // Start carousel rotation for this flair grid
+            if (this.rotationSettings.isRotating) {
+                this.startRotation(flairGrid);
+            }
+
+            console.log(`✅ Rendered ${posts.length} posts for flair: ${flair} with carousel rotation`);
         });
     }
 
