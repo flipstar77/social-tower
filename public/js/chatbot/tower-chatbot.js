@@ -541,13 +541,34 @@ class TowerChatbot {
     }
 }
 
-// Initialize chatbot when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
+// Initialize chatbot when DOM is ready AND user is authenticated
+function initChatbotIfAuthenticated() {
+    // Check if user is authenticated
+    if (window.discordAuth && window.discordAuth.user) {
+        console.log('✅ User authenticated - initializing chatbot');
         window.towerChatbot = new TowerChatbot();
         window.towerChatbot.init();
+    } else {
+        console.log('⚠️ User not authenticated - chatbot disabled');
+        // Hide chatbot toggle if it exists
+        const toggle = document.getElementById('chatbot-toggle');
+        if (toggle) toggle.style.display = 'none';
+    }
+}
+
+// Wait for both DOM and auth to be ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        // Wait a bit for Discord auth to initialize
+        setTimeout(initChatbotIfAuthenticated, 1000);
     });
 } else {
-    window.towerChatbot = new TowerChatbot();
-    window.towerChatbot.init();
+    setTimeout(initChatbotIfAuthenticated, 1000);
 }
+
+// Also listen for auth state changes
+document.addEventListener('discord-auth-ready', () => {
+    if (!window.towerChatbot) {
+        initChatbotIfAuthenticated();
+    }
+});
