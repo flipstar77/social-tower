@@ -224,14 +224,14 @@ class RunQueries {
             // Use Supabase for deletion
             if (this.unifiedDb && this.unifiedDb.supabase) {
                 // SECURITY: Only delete if run belongs to this user
-                const query = this.unifiedDb.supabase
+                let query = this.unifiedDb.supabase
                     .from('tower_runs')
                     .delete()
                     .eq('id', runId);
 
-                // Add user filter if provided
+                // Add user filter if provided (MUST be chained before await)
                 if (discordUserId) {
-                    query.eq('discord_user_id', discordUserId);
+                    query = query.eq('discord_user_id', discordUserId);
                 }
 
                 const { data, error } = await query;
@@ -241,7 +241,7 @@ class RunQueries {
                     throw error;
                 }
 
-                console.log('✅ Run deleted from Supabase:', runId);
+                console.log('✅ Run deleted from Supabase:', runId, 'by user:', discordUserId);
                 return true;
             }
 
