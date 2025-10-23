@@ -677,7 +677,10 @@ class TowerStatsManager {
                     tankEnemies: sessionData.tankEnemies,
                     totalFields: Object.keys(sessionData).length
                 });
-                const response = await window.discordAuth.authenticatedFetch('/api/tower/runs', {
+                // Use API_CONFIG to ensure we POST to Railway backend, not Vercel frontend
+                const apiUrl = window.API_CONFIG ? window.API_CONFIG.getApiUrl('api/tower/runs') : '/api/tower/runs';
+                console.log('📡 Posting run to:', apiUrl);
+                const response = await window.discordAuth.authenticatedFetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(sessionData)
@@ -732,12 +735,15 @@ class TowerStatsManager {
         if (session.sessionId) {
             try {
                 console.log(`🗑️ Deleting run ID ${session.sessionId} from Supabase...`);
+                // Use API_CONFIG to ensure we DELETE from Railway backend, not Vercel frontend
+                const deleteUrl = window.API_CONFIG ? window.API_CONFIG.getApiUrl(`api/tower/runs/${session.sessionId}`) : `/api/tower/runs/${session.sessionId}`;
+                console.log('📡 Deleting run from:', deleteUrl);
                 // Use authenticated fetch for DELETE request
                 const response = window.discordAuth?.authenticatedFetch
-                    ? await window.discordAuth.authenticatedFetch(`/api/tower/runs/${session.sessionId}`, {
+                    ? await window.discordAuth.authenticatedFetch(deleteUrl, {
                         method: 'DELETE'
                     })
-                    : await fetch(`/api/tower/runs/${session.sessionId}`, {
+                    : await fetch(deleteUrl, {
                         method: 'DELETE'
                     });
 
