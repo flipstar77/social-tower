@@ -17,12 +17,17 @@ class RunQueries {
      */
     async insertTowerRun(statsData) {
         try {
+            if (!this.unifiedDb) {
+                throw new Error('UnifiedDb not initialized - database not available');
+            }
+
             console.log('💾 Inserting run via unifiedDb.saveRun()');
             const result = await this.unifiedDb.saveRun(statsData);
             console.log('✅ Run saved successfully:', result);
             return result;
         } catch (error) {
             console.error('❌ Failed to save run via unifiedDb:', error);
+            console.error('Error details:', error.stack);
             throw error;
         }
     }
