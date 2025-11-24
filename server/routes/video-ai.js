@@ -226,8 +226,6 @@ router.post('/process-url', requireAuth, async (req, res) => {
       });
     }
 
-    // Download video from Supabase URL to temp directory
-    const axios = require('axios');
     const tempDir = path.join(__dirname, '../../temp/uploads');
     await fs.mkdir(tempDir, { recursive: true });
 
@@ -235,25 +233,47 @@ router.post('/process-url', requireAuth, async (req, res) => {
     const fileExt = fileName ? path.extname(fileName) : '.mp4';
     tempFilePath = path.join(tempDir, `${videoId}${fileExt}`);
 
-    logger.info('Downloading video from Supabase...', { tempPath: tempFilePath });
+    // Check if URL is from YouTube/social media
+    const isYouTube = videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be') ||
+                      videoUrl.includes('tiktok.com') || videoUrl.includes('instagram.com') ||
+                      videoUrl.includes('twitter.com') || videoUrl.includes('x.com');
 
-    // Download the video
-    const response = await axios({
-      method: 'GET',
-      url: videoUrl,
-      responseType: 'stream'
-    });
+    if (isYouTube) {
+      logger.info('Detected YouTube/social media URL, using yt-dlp...');
+      const YTDlpWrap = require('yt-dlp-wrap').default;
+      const ytDlp = new YTDlpWrap();
 
-    // Save to temp file
-    const writer = require('fs').createWriteStream(tempFilePath);
-    response.data.pipe(writer);
+      // Download with yt-dlp (format: best video+audio under 500MB)
+      await ytDlp.execPromise([
+        videoUrl,
+        '-o', tempFilePath,
+        '--format', 'best[filesize<500M]',
+        '--merge-output-format', 'mp4',
+        '--no-playlist'
+      ]);
 
-    await new Promise((resolve, reject) => {
-      writer.on('finish', resolve);
-      writer.on('error', reject);
-    });
+      logger.info('Video downloaded via yt-dlp');
+    } else {
+      // Direct download for Supabase/direct URLs
+      logger.info('Downloading video from direct URL...', { tempPath: tempFilePath });
+      const axios = require('axios');
 
-    logger.info('Video downloaded successfully');
+      const response = await axios({
+        method: 'GET',
+        url: videoUrl,
+        responseType: 'stream'
+      });
+
+      const writer = require('fs').createWriteStream(tempFilePath);
+      response.data.pipe(writer);
+
+      await new Promise((resolve, reject) => {
+        writer.on('finish', resolve);
+        writer.on('error', reject);
+      });
+
+      logger.info('Video downloaded successfully');
+    }
 
     // Validate and get metadata
     const maxSizeMB = parseInt(process.env.VIDEO_UPLOAD_LIMIT_MB || 500);
