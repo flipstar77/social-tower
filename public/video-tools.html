@@ -50,13 +50,41 @@
                 <h2>📤 Upload Video</h2>
                 <p class="section-description">Upload your Tower gameplay video for AI analysis</p>
 
-                <div id="upload-area" class="upload-drop-zone">
-                    <input type="file" id="video-file-input" accept="video/*" style="display: none;">
-                    <div class="upload-icon">🎥</div>
-                    <h3>Drag & drop video here</h3>
-                    <p>or click to browse</p>
-                    <p class="upload-hint">Supported: MP4, MOV, AVI, WebM (max 500MB)</p>
-                    <button id="browse-btn" class="btn-primary">Choose File</button>
+                <!-- Tab Switcher -->
+                <div class="upload-tabs">
+                    <button class="upload-tab active" data-tab="file">📁 File Upload</button>
+                    <button class="upload-tab" data-tab="url">🔗 Video URL</button>
+                </div>
+
+                <!-- File Upload Tab -->
+                <div id="file-upload-tab" class="upload-tab-content active">
+                    <div id="upload-area" class="upload-drop-zone">
+                        <input type="file" id="video-file-input" accept="video/*" style="display: none;">
+                        <div class="upload-icon">🎥</div>
+                        <h3>Drag & drop video here</h3>
+                        <p>or click to browse</p>
+                        <p class="upload-hint">Supported: MP4, MOV, AVI, WebM (max 500MB)</p>
+                        <button id="browse-btn" class="btn-primary">Choose File</button>
+                    </div>
+                </div>
+
+                <!-- URL Upload Tab -->
+                <div id="url-upload-tab" class="upload-tab-content" style="display: none;">
+                    <div class="url-input-container">
+                        <div class="url-input-group">
+                            <input
+                                type="url"
+                                id="video-url-input"
+                                class="url-input"
+                                placeholder="https://example.com/video.mp4 or Supabase Storage URL"
+                            >
+                            <button id="process-url-btn" class="btn-primary">Process URL</button>
+                        </div>
+                        <p class="upload-hint">
+                            Paste a direct video URL (MP4, MOV, AVI, WebM)<br>
+                            Also supports Supabase Storage URLs
+                        </p>
+                    </div>
                 </div>
 
                 <div id="upload-progress" class="upload-progress" style="display: none;">

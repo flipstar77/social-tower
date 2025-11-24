@@ -183,6 +183,130 @@ router.post('/upload', requireAuth, upload.single('video'), async (req, res) => 
 });
 
 /**
+ * POST /api/video-ai/process-url
+ * Process a video URL from Supabase Storage
+ * This endpoint accepts video URLs instead of file uploads to bypass Vercel's 4.5MB limit
+ */
+router.post('/process-url', requireAuth, async (req, res) => {
+  const { videoUrl, fileName, fileSize } = req.body;
+
+  if (!videoUrl) {
+    return res.status(400).json({
+      success: false,
+      error: 'videoUrl is required'
+    });
+  }
+
+  let tempFilePath = null;
+
+  try {
+    logger.info('Processing video from URL', {
+      userId: req.userId,
+      url: videoUrl,
+      fileName
+    });
+
+    if (!videoProcessor) {
+      return res.status(503).json({
+        success: false,
+        error: 'Video processor not available'
+      });
+    }
+
+    // Download video from Supabase URL to temp directory
+    const axios = require('axios');
+    const tempDir = path.join(__dirname, '../../temp/uploads');
+    await fs.mkdir(tempDir, { recursive: true });
+
+    const videoId = uuidv4();
+    const fileExt = fileName ? path.extname(fileName) : '.mp4';
+    tempFilePath = path.join(tempDir, `${videoId}${fileExt}`);
+
+    logger.info('Downloading video from Supabase...', { tempPath: tempFilePath });
+
+    // Download the video
+    const response = await axios({
+      method: 'GET',
+      url: videoUrl,
+      responseType: 'stream'
+    });
+
+    // Save to temp file
+    const writer = require('fs').createWriteStream(tempFilePath);
+    response.data.pipe(writer);
+
+    await new Promise((resolve, reject) => {
+      writer.on('finish', resolve);
+      writer.on('error', reject);
+    });
+
+    logger.info('Video downloaded successfully');
+
+    // Validate and get metadata
+    const maxSizeMB = parseInt(process.env.VIDEO_UPLOAD_LIMIT_MB || 500);
+    const maxDuration = parseInt(process.env.VIDEO_MAX_DURATION_SECONDS || 3600);
+
+    const validation = await videoProcessor.validateVideo(
+      tempFilePath,
+      maxSizeMB,
+      maxDuration
+    );
+
+    if (!validation.isValid) {
+      await fs.unlink(tempFilePath);
+      return res.status(400).json({
+        success: false,
+        error: 'Video validation failed',
+        details: validation.errors
+      });
+    }
+
+    const metadata = validation.metadata;
+
+    // Generate thumbnail
+    const thumbnail = await videoProcessor.generateThumbnail(tempFilePath, 1);
+    const thumbnailBase64 = thumbnail.toString('base64');
+
+    res.json({
+      success: true,
+      videoId,
+      videoUrl,
+      filename: fileName || 'video' + fileExt,
+      metadata: {
+        duration: metadata.duration,
+        width: metadata.width,
+        height: metadata.height,
+        size: metadata.size,
+        codec: metadata.codec
+      },
+      thumbnail: `data:image/jpeg;base64,${thumbnailBase64}`,
+      tempPath: tempFilePath // Return temp path for analysis
+    });
+
+  } catch (error) {
+    logger.error('Video URL processing failed', {
+      error: error.message,
+      userId: req.userId,
+      url: videoUrl
+    });
+
+    if (tempFilePath) {
+      try {
+        await fs.unlink(tempFilePath);
+      } catch (cleanupError) {
+        logger.warn('Failed to cleanup temp file', { path: tempFilePath });
+      }
+    }
+
+    res.status(500).json({
+      success: false,
+      error: 'Failed to process video URL',
+      message: error.message
+    });
+  }
+});
+
+/**
  * POST /api/video-ai/analyze
  * Analyze video and generate clips
  */

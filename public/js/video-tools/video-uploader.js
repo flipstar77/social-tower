@@ -1,6 +1,7 @@
 /**
  * Video Uploader Component
  * Handles video file upload and validation
+ * Uses direct Supabase Storage upload to bypass Vercel 4.5MB limit
  */
 
 class VideoUploader {
@@ -12,11 +13,133 @@ class VideoUploader {
     this.onUploadComplete = onUploadComplete;
     this.currentFile = null;
     this.videoData = null;
+    this.supabase = null;
 
+    this.initSupabase();
     this.init();
   }
 
+  async initSupabase() {
+    try {
+      // Import Supabase client
+      const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+
+      const supabaseUrl = 'https://kktvmpwxfyevkgotppah.supabase.co';
+      const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtrdHZtcHd4Znlldmtnb3RwcGFoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY2MTI4MTAsImV4cCI6MjA1MjE4ODgxMH0.hLl4Oizwf47R35Kq18-D_jfL0P96gkm6YEzpnVFa_jU';
+
+      this.supabase = createClient(supabaseUrl, supabaseAnonKey);
+      console.log('✅ Supabase initialized for video upload');
+    } catch (error) {
+      console.error('❌ Failed to initialize Supabase:', error);
+    }
+  }
+
+  setupTabs() {
+    const tabs = document.querySelectorAll('.upload-tab');
+    const fileTab = document.getElementById('file-upload-tab');
+    const urlTab = document.getElementById('url-upload-tab');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Remove active class from all tabs
+        tabs.forEach(t => t.classList.remove('active'));
+
+        // Add active to clicked tab
+        tab.classList.add('active');
+
+        // Switch content
+        const tabType = tab.getAttribute('data-tab');
+        if (tabType === 'file') {
+          fileTab.classList.add('active');
+          urlTab.classList.remove('active');
+          fileTab.style.display = 'block';
+          urlTab.style.display = 'none';
+        } else {
+          fileTab.classList.remove('active');
+          urlTab.classList.add('active');
+          fileTab.style.display = 'none';
+          urlTab.style.display = 'block';
+        }
+      });
+    });
+  }
+
+  async handleUrl() {
+    const urlInput = document.getElementById('video-url-input');
+    const videoUrl = urlInput.value.trim();
+
+    if (!videoUrl) {
+      alert('Please enter a video URL');
+      return;
+    }
+
+    // Basic URL validation
+    try {
+      new URL(videoUrl);
+    } catch (error) {
+      alert('Please enter a valid URL');
+      return;
+    }
+
+    // Show progress
+    this.showProgress(10);
+
+    try {
+      console.log('📥 Processing video URL:', videoUrl);
+
+      // Determine filename from URL
+      const urlObj = new URL(videoUrl);
+      const fileName = urlObj.pathname.split('/').pop() || 'video.mp4';
+
+      // Call backend to process URL
+      const response = await fetch(`${API_BASE_URL}/process-url`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-id': 'user-' + Date.now()
+        },
+        body: JSON.stringify({
+          videoUrl: videoUrl,
+          fileName: fileName,
+          fileSize: 0 // Unknown for URLs
+        })
+      });
+
+      this.showProgress(70);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('URL processing error:', errorText);
+        throw new Error(`Processing failed: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('✅ Video URL processed:', data);
+      this.videoData = data;
+
+      // Show video info
+      this.showVideoInfo(data);
+
+      // Hide progress
+      this.showProgress(100);
+      this.hideProgress();
+
+      // Clear input
+      urlInput.value = '';
+
+      console.log('🎉 URL processing complete:', data);
+
+    } catch (error) {
+      console.error('URL processing error:', error);
+      alert('Failed to process video URL: ' + error.message);
+      this.hideProgress();
+    }
+  }
+
   init() {
+    // Setup tab switching
+    this.setupTabs();
+
     // Click to browse
     this.container.addEventListener('click', () => {
       this.fileInput.click();
@@ -34,6 +157,21 @@ class VideoUploader {
         this.handleFile(file);
       }
     });
+
+    // URL processing
+    const processUrlBtn = document.getElementById('process-url-btn');
+    if (processUrlBtn) {
+      processUrlBtn.addEventListener('click', () => this.handleUrl());
+    }
+
+    const urlInput = document.getElementById('video-url-input');
+    if (urlInput) {
+      urlInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          this.handleUrl();
+        }
+      });
+    }
 
     // Drag and drop
     this.container.addEventListener('dragover', (e) => {
@@ -88,30 +226,68 @@ class VideoUploader {
     this.showProgress(0);
 
     try {
-      // Upload file
-      const formData = new FormData();
-      formData.append('video', file);
+      if (!this.supabase) {
+        throw new Error('Supabase not initialized. Please refresh the page.');
+      }
 
-      console.log('Uploading to:', `${API_BASE_URL}/upload`);
+      // Generate unique filename
+      const userId = 'user-' + Date.now();
+      const timestamp = Date.now();
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${userId}/${timestamp}.${fileExt}`;
 
-      const response = await fetch(`${API_BASE_URL}/upload`, {
+      console.log('📤 Uploading directly to Supabase Storage:', fileName);
+      this.showProgress(10);
+
+      // Upload directly to Supabase Storage (bypasses Vercel 4.5MB limit!)
+      const { data: uploadData, error: uploadError } = await this.supabase.storage
+        .from('tower-videos')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) {
+        console.error('Supabase upload error:', uploadError);
+        throw new Error(`Storage upload failed: ${uploadError.message}`);
+      }
+
+      console.log('✅ File uploaded to Supabase:', uploadData.path);
+      this.showProgress(50);
+
+      // Get public URL
+      const { data: urlData } = this.supabase.storage
+        .from('tower-videos')
+        .getPublicUrl(uploadData.path);
+
+      const videoUrl = urlData.publicUrl;
+      console.log('📹 Video URL:', videoUrl);
+
+      this.showProgress(70);
+
+      // Now call backend to process the video URL
+      console.log('🔍 Requesting video metadata from backend...');
+      const response = await fetch(`${API_BASE_URL}/process-url`, {
         method: 'POST',
         headers: {
-          'x-user-id': 'test-user-' + Date.now()
+          'Content-Type': 'application/json',
+          'x-user-id': userId
         },
-        body: formData
+        body: JSON.stringify({
+          videoUrl: videoUrl,
+          fileName: file.name,
+          fileSize: file.size
+        })
       });
-
-      console.log('Upload response status:', response.status);
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Upload error:', errorText);
-        throw new Error(`Upload failed: ${response.status} - ${errorText}`);
+        console.error('Backend processing error:', errorText);
+        throw new Error(`Processing failed: ${response.status}`);
       }
 
       const data = await response.json();
-      console.log('Upload successful:', data);
+      console.log('✅ Video processed:', data);
       this.videoData = data;
 
       // Show video info
@@ -119,8 +295,9 @@ class VideoUploader {
 
       // Hide progress
       this.hideProgress();
+      this.showProgress(100);
 
-      console.log('Upload complete:', data);
+      console.log('🎉 Upload complete:', data);
 
     } catch (error) {
       console.error('Upload error:', error);
