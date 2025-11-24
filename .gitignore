@@ -65,3 +65,13 @@ tower-wiki-*.json
 scraped-brackets.json
 scraping-progress.json
 *.txt
+
+# Video AI - Temporary files and uploads
+temp/
+uploads/
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.webm
+server/.env
