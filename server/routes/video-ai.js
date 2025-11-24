@@ -518,13 +518,19 @@ router.post('/generate-transcript', requireAuth, async (req, res) => {
 router.get('/health', async (req, res) => {
   try {
     let geminiHealth = false;
+    let geminiError = null;
 
     // Try to initialize and check Gemini service
     try {
+      console.log('Health check: Attempting to get Gemini service...');
       const service = getGeminiService();
+      console.log('Health check: Service initialized, calling healthCheck()...');
       geminiHealth = await service.healthCheck();
+      console.log('Health check: Result =', geminiHealth);
     } catch (error) {
       console.error('Gemini health check error:', error.message);
+      console.error('Full error:', error);
+      geminiError = error.message;
     }
 
     res.json({
@@ -532,7 +538,8 @@ router.get('/health', async (req, res) => {
       services: {
         gemini: geminiHealth ? 'healthy' : 'unhealthy',
         videoProcessor: 'available',
-        apiKeyConfigured: !!process.env.GEMINI_API_KEY
+        apiKeyConfigured: !!process.env.GEMINI_API_KEY,
+        geminiError: geminiError
       },
       timestamp: new Date().toISOString()
     });
