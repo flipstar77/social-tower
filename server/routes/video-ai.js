@@ -232,14 +232,15 @@ router.post('/process-url', requireAuth, async (req, res) => {
                       videoUrl.includes('twitter.com') || videoUrl.includes('x.com');
 
     if (isYouTube) {
-      // Use ytdl-core for YouTube downloads (serverless-compatible)
-      logger.info('Detected YouTube/social media URL, using ytdl-core...');
+      // Use ytdl-core serverless version for Vercel compatibility
+      logger.info('Detected YouTube/social media URL, using ytdl-core serverless...');
 
       try {
-        const ytdl = require('@ybd-project/ytdl-core');
+        const { YtdlCore } = require('@ybd-project/ytdl-core/serverless');
+        const ytdl = new YtdlCore();
 
         // Download YouTube video
-        const videoStream = ytdl(videoUrl, {
+        const videoStream = ytdl.download(videoUrl, {
           quality: 'highest',
           filter: 'videoandaudio'
         });
