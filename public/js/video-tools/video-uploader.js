@@ -92,6 +92,8 @@ class VideoUploader {
       const formData = new FormData();
       formData.append('video', file);
 
+      console.log('Uploading to:', `${API_BASE_URL}/upload`);
+
       const response = await fetch(`${API_BASE_URL}/upload`, {
         method: 'POST',
         headers: {
@@ -100,11 +102,16 @@ class VideoUploader {
         body: formData
       });
 
+      console.log('Upload response status:', response.status);
+
       if (!response.ok) {
-        throw new Error('Upload failed');
+        const errorText = await response.text();
+        console.error('Upload error:', errorText);
+        throw new Error(`Upload failed: ${response.status} - ${errorText}`);
       }
 
       const data = await response.json();
+      console.log('Upload successful:', data);
       this.videoData = data;
 
       // Show video info

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: white;
+        }
+        .test-section {
+            background: #2a2a2a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #764ba2;
+        }
+        .result {
+            background: #0a0a0a;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success { color: #10b981; }
+        .error { color: #ef4444; }
+        .info { color: #3b82f6; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Video API Test Page</h1>
+    <p>Test the Video AI API endpoints</p>
+
+    <!-- Health Check -->
+    <div class="test-section">
+        <h2>1. Health Check</h2>
+        <button onclick="testHealth()">Test /api/video-ai/health</button>
+        <div id="health-result" class="result"></div>
+    </div>
+
+    <!-- Comment Analysis -->
+    <div class="test-section">
+        <h2>2. Comment Analysis (No video needed)</h2>
+        <button onclick="testComments()">Test Comment Analysis</button>
+        <div id="comments-result" class="result"></div>
+    </div>
+
+    <!-- Video Upload -->
+    <div class="test-section">
+        <h2>3. Video Upload</h2>
+        <input type="file" id="video-file" accept="video/*">
+        <button onclick="testUpload()">Upload Video</button>
+        <div id="upload-result" class="result"></div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.hostname === 'localhost'
+            ? 'http://localhost:6078/api/video-ai'
+            : 'https://trackyourstats.vercel.app/api/video-ai';
+
+        function log(elementId, message, type = 'info') {
+            const el = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            el.innerHTML += `<div class="${type}">[${timestamp}] ${message}</div>`;
+            el.scrollTop = el.scrollHeight;
+        }
+
+        async function testHealth() {
+            const resultEl = 'health-result';
+            document.getElementById(resultEl).innerHTML = '';
+
+            log(resultEl, `Testing: ${API_BASE}/health`);
+
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                log(resultEl, `Status: ${response.status}`, response.ok ? 'success' : 'error');
+
+                const data = await response.json();
+                log(resultEl, `Response: ${JSON.stringify(data, null, 2)}`, 'success');
+
+                if (data.services?.gemini === 'healthy') {
+                    log(resultEl, '✅ Gemini AI is READY!', 'success');
+                } else {
+                    log(resultEl, '❌ Gemini AI is not available', 'error');
+                }
+            } catch (error) {
+                log(resultEl, `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testComments() {
+            const resultEl = 'comments-result';
+            document.getElementById(resultEl).innerHTML = '';
+
+            const testComments = [
+                "This tower run is insane!",
+                "How did you beat wave 500?",
+                "What modules are you using?",
+                "Best gameplay I've seen!",
+                "Can you make a tutorial?"
+            ];
+
+            log(resultEl, `Testing comment analysis...`);
+            log(resultEl, `Analyzing ${testComments.length} comments`);
+
+            try {
+                const response = await fetch(`${API_BASE}/analyze-comments`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-user-id': 'test-user'
+                    },
+                    body: JSON.stringify({ comments: testComments })
+                });
+
+                log(resultEl, `Status: ${response.status}`, response.ok ? 'success' : 'error');
+
+                const data = await response.json();
+                log(resultEl, `Sentiment: ${data.analysis?.sentiment}`, 'success');
+                log(resultEl, `Summary: ${data.analysis?.summary}`, 'info');
+                log(resultEl, `Topics: ${data.analysis?.keyTopics?.join(', ')}`, 'info');
+                log(resultEl, `Full Response: ${JSON.stringify(data, null, 2)}`, 'success');
+            } catch (error) {
+                log(resultEl, `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testUpload() {
+            const resultEl = 'upload-result';
+            const fileInput = document.getElementById('video-file');
+            document.getElementById(resultEl).innerHTML = '';
+
+            if (!fileInput.files[0]) {
+                log(resultEl, 'Please select a video file first', 'error');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            log(resultEl, `File: ${file.name}`);
+            log(resultEl, `Size: ${(file.size / 1024 / 1024).toFixed(2)} MB`);
+            log(resultEl, `Type: ${file.type}`);
+
+            const formData = new FormData();
+            formData.append('video', file);
+
+            log(resultEl, `Uploading to: ${API_BASE}/upload`);
+
+            try {
+                const response = await fetch(`${API_BASE}/upload`, {
+                    method: 'POST',
+                    headers: {
+                        'x-user-id': 'test-user-' + Date.now()
+                    },
+                    body: formData
+                });
+
+                log(resultEl, `Status: ${response.status}`, response.ok ? 'success' : 'error');
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    log(resultEl, `Error: ${errorText}`, 'error');
+                    return;
+                }
+
+                const data = await response.json();
+                log(resultEl, `✅ Upload successful!`, 'success');
+                log(resultEl, `Video ID: ${data.videoId}`, 'success');
+                log(resultEl, `Duration: ${data.metadata?.duration}s`, 'info');
+                log(resultEl, `Resolution: ${data.metadata?.width}x${data.metadata?.height}`, 'info');
+                log(resultEl, `Full Response: ${JSON.stringify(data, null, 2)}`, 'success');
+            } catch (error) {
+                log(resultEl, `Error: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

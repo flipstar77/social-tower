@@ -3,9 +3,9 @@
  * Coordinates all video tool components
  */
 
-const API_BASE_URL = window.location.hostname === 'localhost'
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? 'http://localhost:6078/api/video-ai'
-  : '/api/video-ai';
+  : 'https://trackyourstats.vercel.app/api/video-ai';
 
 class VideoToolsApp {
   constructor() {
