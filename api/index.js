@@ -1,5 +1,5 @@
 // Vercel Serverless Function Entry Point
-// Updated: 2025-01-24 - Force redeploy with GEMINI_API_KEY env var
+// Updated: 2025-01-24 - Force redeploy #2 with GEMINI_API_KEY env var
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
