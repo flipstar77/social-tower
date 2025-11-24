@@ -11,24 +11,37 @@ const { v4: uuidv4 } = require('uuid');
 
 const router = express.Router();
 
-// Initialize services with error handling
+// Lazy initialization for serverless environment
 let geminiService = null;
 let videoProcessor = null;
 
-try {
-  const GeminiService = require('../services/gemini-service');
-  geminiService = new GeminiService();
-  console.log('✅ Gemini service initialized');
-} catch (error) {
-  console.error('❌ Failed to initialize Gemini service:', error.message);
+// Initialize services on first use (lazy loading)
+function getGeminiService() {
+  if (!geminiService) {
+    try {
+      const GeminiService = require('../services/gemini-service');
+      geminiService = new GeminiService();
+      console.log('✅ Gemini service initialized');
+    } catch (error) {
+      console.error('❌ Failed to initialize Gemini service:', error.message);
+      throw error;
+    }
+  }
+  return geminiService;
 }
 
-try {
-  const VideoProcessor = require('../services/video-processor');
-  videoProcessor = new VideoProcessor();
-  console.log('✅ Video processor initialized');
-} catch (error) {
-  console.error('❌ Failed to initialize Video processor:', error.message);
+function getVideoProcessor() {
+  if (!videoProcessor) {
+    try {
+      const VideoProcessor = require('../services/video-processor');
+      videoProcessor = new VideoProcessor();
+      console.log('✅ Video processor initialized');
+    } catch (error) {
+      console.error('❌ Failed to initialize Video processor:', error.message);
+      throw error;
+    }
+  }
+  return videoProcessor;
 }
 
 // Use console.log instead of logger for serverless
@@ -119,7 +132,7 @@ router.post('/upload', requireAuth, upload.single('video'), async (req, res) => 
     const maxSizeMB = parseInt(process.env.VIDEO_UPLOAD_LIMIT_MB || 500);
     const maxDuration = parseInt(process.env.VIDEO_MAX_DURATION_SECONDS || 3600);
 
-    const validation = await videoProcessor.validateVideo(
+    const validation = await getVideoProcessor().validateVideo(
       tempFilePath,
       maxSizeMB,
       maxDuration
@@ -142,7 +155,7 @@ router.post('/upload', requireAuth, upload.single('video'), async (req, res) => 
     const metadata = validation.metadata;
 
     // Generate thumbnail
-    const thumbnail = await videoProcessor.generateThumbnail(tempFilePath, 1);
+    const thumbnail = await getVideoProcessor().generateThumbnail(tempFilePath, 1);
     const thumbnailBase64 = thumbnail.toString('base64');
 
     res.json({
@@ -246,7 +259,7 @@ router.post('/process-url', requireAuth, async (req, res) => {
     const maxSizeMB = parseInt(process.env.VIDEO_UPLOAD_LIMIT_MB || 500);
     const maxDuration = parseInt(process.env.VIDEO_MAX_DURATION_SECONDS || 3600);
 
-    const validation = await videoProcessor.validateVideo(
+    const validation = await getVideoProcessor().validateVideo(
       tempFilePath,
       maxSizeMB,
       maxDuration
@@ -264,7 +277,7 @@ router.post('/process-url', requireAuth, async (req, res) => {
     const metadata = validation.metadata;
 
     // Generate thumbnail
-    const thumbnail = await videoProcessor.generateThumbnail(tempFilePath, 1);
+    const thumbnail = await getVideoProcessor().generateThumbnail(tempFilePath, 1);
     const thumbnailBase64 = thumbnail.toString('base64');
 
     res.json({
@@ -327,14 +340,14 @@ router.post('/analyze', requireAuth, async (req, res) => {
     });
 
     // Extract frames
-    const frames = await videoProcessor.extractFrames(videoPath, duration);
+    const frames = await getVideoProcessor().extractFrames(videoPath, duration);
 
     logger.info('Frames extracted, sending to Gemini', {
       frameCount: frames.length
     });
 
     // Analyze with Gemini AI
-    const clips = await geminiService.analyzeVideoFrames(frames, duration);
+    const clips = await getGeminiService().analyzeVideoFrames(frames, duration);
 
     logger.info('Video analysis complete', {
       userId: req.userId,
@@ -387,10 +400,10 @@ router.post('/generate-clip', requireAuth, async (req, res) => {
       endTime
     });
 
-    await videoProcessor.trimVideo(videoPath, startTime, endTime, outputPath);
+    await getVideoProcessor().trimVideo(videoPath, startTime, endTime, outputPath);
 
     // Generate thumbnail for clip
-    const thumbnail = await videoProcessor.generateThumbnail(outputPath, 0);
+    const thumbnail = await getVideoProcessor().generateThumbnail(outputPath, 0);
 
     res.json({
       success: true,
@@ -432,7 +445,7 @@ router.post('/analyze-comments', requireAuth, async (req, res) => {
       commentCount: comments.length
     });
 
-    const analysis = await geminiService.analyzeComments(comments);
+    const analysis = await getGeminiService().analyzeComments(comments);
 
     res.json({
       success: true,
@@ -474,10 +487,10 @@ router.post('/generate-transcript', requireAuth, async (req, res) => {
     });
 
     // Extract frames
-    const frames = await videoProcessor.extractFrames(videoPath, duration);
+    const frames = await getVideoProcessor().extractFrames(videoPath, duration);
 
     // Generate transcript
-    const transcript = await geminiService.generateTranscript(frames, duration);
+    const transcript = await getGeminiService().generateTranscript(frames, duration);
 
     res.json({
       success: true,
@@ -506,19 +519,19 @@ router.get('/health', async (req, res) => {
   try {
     let geminiHealth = false;
 
-    if (geminiService) {
-      try {
-        geminiHealth = await geminiService.healthCheck();
-      } catch (error) {
-        console.error('Gemini health check error:', error.message);
-      }
+    // Try to initialize and check Gemini service
+    try {
+      const service = getGeminiService();
+      geminiHealth = await service.healthCheck();
+    } catch (error) {
+      console.error('Gemini health check error:', error.message);
     }
 
     res.json({
       success: true,
       services: {
         gemini: geminiHealth ? 'healthy' : 'unhealthy',
-        videoProcessor: videoProcessor ? 'healthy' : 'unavailable',
+        videoProcessor: 'available',
         apiKeyConfigured: !!process.env.GEMINI_API_KEY
       },
       timestamp: new Date().toISOString()
@@ -549,7 +562,7 @@ router.delete('/cleanup', requireAuth, async (req, res) => {
   }
 
   try {
-    await videoProcessor.cleanup(filePaths);
+    await getVideoProcessor().cleanup(filePaths);
 
     res.json({
       success: true,
