@@ -232,32 +232,37 @@ router.post('/process-url', requireAuth, async (req, res) => {
                       videoUrl.includes('twitter.com') || videoUrl.includes('x.com');
 
     if (isYouTube) {
-      // Try yt-dlp if available (may not work in serverless environment)
-      logger.info('Detected YouTube/social media URL, attempting yt-dlp download...');
+      // Use ytdl-core for YouTube downloads (serverless-compatible)
+      logger.info('Detected YouTube/social media URL, using ytdl-core...');
 
       try {
-        const YTDlpWrap = require('yt-dlp-wrap').default;
-        const ytDlp = new YTDlpWrap();
+        const ytdl = require('@ybd-project/ytdl-core');
 
-        // Download with yt-dlp (format: best video+audio under 500MB)
-        await ytDlp.execPromise([
-          videoUrl,
-          '-o', tempFilePath,
-          '--format', 'best[filesize<500M]',
-          '--merge-output-format', 'mp4',
-          '--no-playlist'
-        ]);
+        // Download YouTube video
+        const videoStream = ytdl(videoUrl, {
+          quality: 'highest',
+          filter: 'videoandaudio'
+        });
 
-        logger.info('Video downloaded via yt-dlp');
-      } catch (ytdlpError) {
-        logger.error('yt-dlp download failed:', { error: ytdlpError.message });
+        const writer = require('fs').createWriteStream(tempFilePath);
+        videoStream.pipe(writer);
+
+        await new Promise((resolve, reject) => {
+          writer.on('finish', resolve);
+          writer.on('error', reject);
+          videoStream.on('error', reject);
+        });
+
+        logger.info('Video downloaded via ytdl-core');
+      } catch (ytdlError) {
+        logger.error('YouTube download failed:', { error: ytdlError.message });
 
         // Return helpful error message
         return res.status(400).json({
           success: false,
-          error: 'YouTube/social media URLs require the video to be downloaded first',
-          suggestion: 'Please download the video to your computer first, then upload it using the File Upload tab. Vercel serverless environment does not support yt-dlp binary execution.',
-          ytdlpError: ytdlpError.message
+          error: 'Failed to download YouTube video',
+          suggestion: 'YouTube URL may be invalid, age-restricted, or unavailable. Try downloading the video to your computer first, then upload it using the File Upload tab.',
+          details: ytdlError.message
         });
       }
     } else {
