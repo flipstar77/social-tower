@@ -232,34 +232,39 @@ router.post('/process-url', requireAuth, async (req, res) => {
                       videoUrl.includes('twitter.com') || videoUrl.includes('x.com');
 
     if (isYouTube) {
-      // Use ytdl-core serverless version for Vercel compatibility
-      logger.info('Detected YouTube/social media URL, using ytdl-core serverless...');
+      // Use standard ytdl-core for YouTube downloads
+      logger.info('Detected YouTube/social media URL, using ytdl-core...');
 
       try {
-        const { YtdlCore, toPipeableStream } = require('@ybd-project/ytdl-core/serverless');
-        const ytdl = new YtdlCore();
+        const ytdl = require('@ybd-project/ytdl-core');
 
         logger.info('Downloading video stream from YouTube...');
 
-        // Download YouTube video (returns ReadableStream)
-        const stream = await ytdl.download(videoUrl, {
-          quality: 'highest',
-          filter: 'videoandaudio'
+        // Download YouTube video with highest quality
+        const videoStream = ytdl(videoUrl, {
+          quality: 'highestvideo',
+          filter: 'audioandvideo'
         });
-
-        // Convert to Node.js pipeable stream
-        const pipeableStream = toPipeableStream(stream);
 
         const writer = require('fs').createWriteStream(tempFilePath);
-        pipeableStream.pipe(writer);
+        videoStream.pipe(writer);
 
         await new Promise((resolve, reject) => {
-          writer.on('finish', resolve);
-          writer.on('error', reject);
-          pipeableStream.on('error', reject);
+          writer.on('finish', () => {
+            logger.info('Video file write completed');
+            resolve();
+          });
+          writer.on('error', (err) => {
+            logger.error('Writer error:', err);
+            reject(err);
+          });
+          videoStream.on('error', (err) => {
+            logger.error('Stream error:', err);
+            reject(err);
+          });
         });
 
-        logger.info('Video downloaded via ytdl-core serverless');
+        logger.info('Video downloaded via ytdl-core');
       } catch (ytdlError) {
         logger.error('YouTube download failed:', { error: ytdlError.message });
 
