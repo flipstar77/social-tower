@@ -219,13 +219,6 @@ router.post('/process-url', requireAuth, async (req, res) => {
       fileName
     });
 
-    if (!videoProcessor) {
-      return res.status(503).json({
-        success: false,
-        error: 'Video processor not available'
-      });
-    }
-
     const tempDir = path.join(__dirname, '../../temp/uploads');
     await fs.mkdir(tempDir, { recursive: true });
 
@@ -239,20 +232,34 @@ router.post('/process-url', requireAuth, async (req, res) => {
                       videoUrl.includes('twitter.com') || videoUrl.includes('x.com');
 
     if (isYouTube) {
-      logger.info('Detected YouTube/social media URL, using yt-dlp...');
-      const YTDlpWrap = require('yt-dlp-wrap').default;
-      const ytDlp = new YTDlpWrap();
+      // Try yt-dlp if available (may not work in serverless environment)
+      logger.info('Detected YouTube/social media URL, attempting yt-dlp download...');
 
-      // Download with yt-dlp (format: best video+audio under 500MB)
-      await ytDlp.execPromise([
-        videoUrl,
-        '-o', tempFilePath,
-        '--format', 'best[filesize<500M]',
-        '--merge-output-format', 'mp4',
-        '--no-playlist'
-      ]);
+      try {
+        const YTDlpWrap = require('yt-dlp-wrap').default;
+        const ytDlp = new YTDlpWrap();
 
-      logger.info('Video downloaded via yt-dlp');
+        // Download with yt-dlp (format: best video+audio under 500MB)
+        await ytDlp.execPromise([
+          videoUrl,
+          '-o', tempFilePath,
+          '--format', 'best[filesize<500M]',
+          '--merge-output-format', 'mp4',
+          '--no-playlist'
+        ]);
+
+        logger.info('Video downloaded via yt-dlp');
+      } catch (ytdlpError) {
+        logger.error('yt-dlp download failed:', { error: ytdlpError.message });
+
+        // Return helpful error message
+        return res.status(400).json({
+          success: false,
+          error: 'YouTube/social media URLs require the video to be downloaded first',
+          suggestion: 'Please download the video to your computer first, then upload it using the File Upload tab. Vercel serverless environment does not support yt-dlp binary execution.',
+          ytdlpError: ytdlpError.message
+        });
+      }
     } else {
       // Direct download for Supabase/direct URLs
       logger.info('Downloading video from direct URL...', { tempPath: tempFilePath });
