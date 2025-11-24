@@ -236,25 +236,30 @@ router.post('/process-url', requireAuth, async (req, res) => {
       logger.info('Detected YouTube/social media URL, using ytdl-core serverless...');
 
       try {
-        const { YtdlCore } = require('@ybd-project/ytdl-core/serverless');
+        const { YtdlCore, toPipeableStream } = require('@ybd-project/ytdl-core/serverless');
         const ytdl = new YtdlCore();
 
-        // Download YouTube video
-        const videoStream = ytdl.download(videoUrl, {
+        logger.info('Downloading video stream from YouTube...');
+
+        // Download YouTube video (returns ReadableStream)
+        const stream = await ytdl.download(videoUrl, {
           quality: 'highest',
           filter: 'videoandaudio'
         });
 
+        // Convert to Node.js pipeable stream
+        const pipeableStream = toPipeableStream(stream);
+
         const writer = require('fs').createWriteStream(tempFilePath);
-        videoStream.pipe(writer);
+        pipeableStream.pipe(writer);
 
         await new Promise((resolve, reject) => {
           writer.on('finish', resolve);
           writer.on('error', reject);
-          videoStream.on('error', reject);
+          pipeableStream.on('error', reject);
         });
 
-        logger.info('Video downloaded via ytdl-core');
+        logger.info('Video downloaded via ytdl-core serverless');
       } catch (ytdlError) {
         logger.error('YouTube download failed:', { error: ytdlError.message });
 
