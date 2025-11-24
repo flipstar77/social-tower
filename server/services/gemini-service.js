@@ -14,8 +14,8 @@ class GeminiService {
       throw new Error('GEMINI_API_KEY not found in environment variables');
     }
 
-    this.ai = new GoogleGenAI({ apiKey });
-    this.modelName = process.env.GEMINI_MODEL || 'gemini-3-pro-preview';
+    this.ai = new GoogleGenAI(apiKey);
+    this.modelName = process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp';
 
     logger.info('Gemini AI Service initialized', { model: this.modelName });
   }
