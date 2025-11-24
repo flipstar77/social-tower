@@ -8,15 +8,35 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs').promises;
 const { v4: uuidv4 } = require('uuid');
-const GeminiService = require('../services/gemini-service');
-const VideoProcessor = require('../services/video-processor');
-const logger = require('../core/logger');
 
 const router = express.Router();
 
-// Initialize services
-const geminiService = new GeminiService();
-const videoProcessor = new VideoProcessor();
+// Initialize services with error handling
+let geminiService = null;
+let videoProcessor = null;
+
+try {
+  const GeminiService = require('../services/gemini-service');
+  geminiService = new GeminiService();
+  console.log('✅ Gemini service initialized');
+} catch (error) {
+  console.error('❌ Failed to initialize Gemini service:', error.message);
+}
+
+try {
+  const VideoProcessor = require('../services/video-processor');
+  videoProcessor = new VideoProcessor();
+  console.log('✅ Video processor initialized');
+} catch (error) {
+  console.error('❌ Failed to initialize Video processor:', error.message);
+}
+
+// Use console.log instead of logger for serverless
+const logger = {
+  info: (msg, data) => console.log(msg, data || ''),
+  error: (msg, data) => console.error(msg, data || ''),
+  warn: (msg, data) => console.warn(msg, data || '')
+};
 
 // Configure multer for video uploads
 const storage = multer.diskStorage({
@@ -360,18 +380,28 @@ router.post('/generate-transcript', requireAuth, async (req, res) => {
  */
 router.get('/health', async (req, res) => {
   try {
-    const geminiHealth = await geminiService.healthCheck();
+    let geminiHealth = false;
+
+    if (geminiService) {
+      try {
+        geminiHealth = await geminiService.healthCheck();
+      } catch (error) {
+        console.error('Gemini health check error:', error.message);
+      }
+    }
 
     res.json({
       success: true,
       services: {
         gemini: geminiHealth ? 'healthy' : 'unhealthy',
-        videoProcessor: 'healthy'
+        videoProcessor: videoProcessor ? 'healthy' : 'unavailable',
+        apiKeyConfigured: !!process.env.GEMINI_API_KEY
       },
       timestamp: new Date().toISOString()
     });
 
   } catch (error) {
+    console.error('Health check failed:', error);
     res.status(500).json({
       success: false,
       error: 'Health check failed',
