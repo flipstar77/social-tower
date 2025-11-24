@@ -31,6 +31,7 @@ const createDiscordAuthRouter = require('./routes/discord-auth');
 const createDiscordApiRouter = require('./routes/discord-api');
 const tournamentBracketsRouter = require('./routes/tournament-brackets');
 const createUserLabsRouter = require('./routes/user-labs');
+const videoAIRouter = require('./routes/video-ai');
 
 const app = express();
 const PORT = process.env.PORT || 6078;
@@ -229,6 +230,9 @@ app.use('/api/user-labs', userLabsRouter);
 const createCalculatorRouter = require('./routes/calculator');
 const calculatorRouter = createCalculatorRouter(supabase);
 app.use('/api/calculator', calculatorRouter);
+
+// Mount video AI router
+app.use('/api/video-ai', videoAIRouter);
 
 
 // Routes

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Video Tools - Tower Stats</title>
+    <link rel="icon" type="image/jpeg" href="assets/thetowerlogo.jpg">
+
+    <!-- Existing Dashboard Styles -->
+    <link rel="stylesheet" href="styles.css?v=9">
+    <link rel="stylesheet" href="css/glassmorphism-theme.css?v=2">
+    <link rel="stylesheet" href="css/dark-dashboard-theme.css?v=1">
+
+    <!-- Video Tools Styles -->
+    <link rel="stylesheet" href="css/video-tools.css?v=1">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body style="background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #2a2a2a 100%); font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 0;">
+
+    <!-- Header -->
+    <header class="video-tools-header">
+        <div class="header-content">
+            <div class="header-left">
+                <a href="index.html" class="back-button">
+                    ← Back to Dashboard
+                </a>
+                <h1>🎬 AI Video Tools</h1>
+                <span class="beta-badge">BETA</span>
+            </div>
+            <div class="header-right">
+                <div class="status-indicator">
+                    <span class="status-dot"></span>
+                    <span id="ai-status">AI Ready</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="video-tools-container">
+
+        <!-- Left Panel - Upload & Clips -->
+        <div class="left-panel">
+
+            <!-- Upload Section -->
+            <div class="upload-section glass-card">
+                <h2>📤 Upload Video</h2>
+                <p class="section-description">Upload your Tower gameplay video for AI analysis</p>
+
+                <div id="upload-area" class="upload-drop-zone">
+                    <input type="file" id="video-file-input" accept="video/*" style="display: none;">
+                    <div class="upload-icon">🎥</div>
+                    <h3>Drag & drop video here</h3>
+                    <p>or click to browse</p>
+                    <p class="upload-hint">Supported: MP4, MOV, AVI, WebM (max 500MB)</p>
+                    <button id="browse-btn" class="btn-primary">Choose File</button>
+                </div>
+
+                <div id="upload-progress" class="upload-progress" style="display: none;">
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="progress-bar"></div>
+                    </div>
+                    <p class="progress-text" id="progress-text">Uploading... 0%</p>
+                </div>
+
+                <div id="video-info" class="video-info" style="display: none;">
+                    <h4>Video Info</h4>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Duration:</span>
+                            <span id="video-duration">--</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Size:</span>
+                            <span id="video-size">--</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Resolution:</span>
+                            <span id="video-resolution">--</span>
+                        </div>
+                    </div>
+                    <button id="analyze-btn" class="btn-primary btn-analyze">
+                        ✨ Analyze with AI
+                    </button>
+                </div>
+            </div>
+
+            <!-- Clips List -->
+            <div class="clips-section glass-card">
+                <div class="section-header">
+                    <h2>✂️ Detected Clips</h2>
+                    <select id="sort-clips" class="sort-select">
+                        <option value="virality">Sort by Virality</option>
+                        <option value="time">Sort by Time</option>
+                    </select>
+                </div>
+
+                <div id="clips-list" class="clips-list">
+                    <div class="empty-state">
+                        <div class="empty-icon">🎬</div>
+                        <p>No clips yet</p>
+                        <p class="empty-hint">Upload and analyze a video to see AI-detected viral moments</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Panel - Video Player & Analysis -->
+        <div class="right-panel">
+
+            <!-- Video Player -->
+            <div class="player-section glass-card">
+                <div id="video-player-container" class="video-player-container">
+                    <div class="player-placeholder">
+                        <div class="placeholder-icon">📹</div>
+                        <p>No video loaded</p>
+                        <p class="placeholder-hint">Upload a video to get started</p>
+                    </div>
+                    <video id="video-player" class="video-player" controls style="display: none;"></video>
+                </div>
+
+                <!-- Player Controls -->
+                <div id="player-controls" class="player-controls" style="display: none;">
+                    <div class="controls-row">
+                        <button id="download-clip-btn" class="btn-secondary">
+                            ⬇️ Download Clip
+                        </button>
+                        <button id="share-clip-btn" class="btn-secondary">
+                            🔗 Copy Link
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analysis Results -->
+            <div class="analysis-section glass-card">
+                <h2>🤖 AI Analysis</h2>
+
+                <div id="analysis-results" class="analysis-results">
+                    <div class="empty-state">
+                        <div class="empty-icon">🔍</div>
+                        <p>No analysis yet</p>
+                        <p class="empty-hint">Analyze a video to see AI insights</p>
+                    </div>
+                </div>
+
+                <div id="clip-details" class="clip-details" style="display: none;">
+                    <div class="detail-header">
+                        <h3 id="clip-title">Clip Title</h3>
+                        <span id="clip-virality" class="virality-badge">85</span>
+                    </div>
+
+                    <div class="detail-body">
+                        <div class="detail-section">
+                            <h4>📝 Summary</h4>
+                            <p id="clip-summary">Clip summary will appear here...</p>
+                        </div>
+
+                        <div class="detail-section">
+                            <h4>💡 Why It's Viral</h4>
+                            <p id="clip-reasoning">AI reasoning will appear here...</p>
+                        </div>
+
+                        <div class="detail-section">
+                            <h4>🏷️ Tags</h4>
+                            <div id="clip-tags" class="tags-container"></div>
+                        </div>
+
+                        <div class="detail-section">
+                            <h4>⏱️ Timing</h4>
+                            <div class="timing-info">
+                                <span id="clip-timing">0:00 - 0:15</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h3 id="loading-title">Processing Video...</h3>
+            <p id="loading-message">This may take a minute</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/video-tools/video-uploader.js"></script>
+    <script src="js/video-tools/video-player.js"></script>
+    <script src="js/video-tools/clip-manager.js"></script>
+    <script src="js/video-tools/video-tools-main.js"></script>
+
+</body>
+</html>
