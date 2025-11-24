@@ -15,7 +15,7 @@ class GeminiService {
     }
 
     this.ai = new GoogleGenAI({ apiKey: apiKey });
-    this.modelName = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+    this.modelName = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 
     logger.info('Gemini AI Service initialized', { model: this.modelName });
   }
@@ -304,7 +304,7 @@ class GeminiService {
     try {
       const result = await this.ai.models.generateContent({
         model: this.modelName,
-        contents: { parts: [{ text: 'Hello' }] }
+        contents: 'Hello'
       });
 
       return !!result.text;
