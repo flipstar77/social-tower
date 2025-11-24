@@ -21,6 +21,7 @@ const createTowerRouter = require('../server/routes/tower-vercel');
 const createRedditRAGRouter = require('../server/routes/reddit-rag');
 const createGuidesRouter = require('../server/routes/guides');
 const createUserLabsRouter = require('../server/routes/user-labs');
+const videoAIRouter = require('../server/routes/video-ai');
 
 // Initialize Supabase for database routes
 const SupabaseManager = require('../server/supabase-config');
@@ -40,6 +41,7 @@ try {
 // Mount routes
 app.use('/api/reddit', redditRouter);
 app.use('/api/videos', videosRouter);
+app.use('/api/video-ai', videoAIRouter);
 
 // Only mount database routes if Supabase is available
 if (supabase && supabase.supabase) {
